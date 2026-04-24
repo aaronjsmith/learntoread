@@ -204,6 +204,14 @@
       box-shadow: 0 0 0 3px var(--accent-soft);
     }
 
+    .letter-tile.letter-tile--chunk {
+      min-width: 72px;
+      padding-left: 18px;
+      padding-right: 18px;
+      font-size: 1.45rem;
+      letter-spacing: 0.03em;
+    }
+
     .scrub-wrap {
       max-width: 420px;
       margin: 0 auto;
@@ -228,11 +236,16 @@
       position: fixed;
       inset: 0;
       background: rgba(26, 39, 68, 0.45);
-      display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
       z-index: 100;
+      display: none;
+    }
+
+    /* Author `display: flex` must not override the `hidden` attribute */
+    .modal-overlay:not([hidden]) {
+      display: flex;
     }
 
     .modal {
@@ -365,7 +378,7 @@
       <div class="activity-grid">
         <button type="button" class="activity-card" id="activitySightWords">
           <h3>Sight words</h3>
-          <p>Tap letters to hear sounds. Slide under the word to sound it out.</p>
+          <p>Tap each chunk (like <strong>th</strong> or <strong>sh</strong>) to hear its sound. Slide under the word to sound it out.</p>
         </button>
       </div>
     </section>
@@ -380,9 +393,9 @@
       <div class="word-stage">
         <p class="word-big" id="sightWordTitle">—</p>
         <p class="word-meta" id="sightWordProgress"></p>
-        <div class="letter-row" id="letterRow" role="group" aria-label="Letters in the word"></div>
+        <div class="letter-row" id="letterRow" role="group" aria-label="Letter sounds in the word"></div>
         <div class="scrub-wrap">
-          <label for="scrubSlider">Sound out the word (slide along the letters)</label>
+          <label for="scrubSlider">Sound out the word (slide across each chunk)</label>
           <input type="range" id="scrubSlider" min="0" max="0" value="0" />
         </div>
       </div>

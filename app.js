@@ -24,7 +24,52 @@
     { word: "play" },
   ];
 
-  /** Short speakable hints for letter sounds (phonics-style for TTS). */
+  /**
+   * Longest-match-first patterns for splitting words into graphemes when JSON
+   * has no `letters` array (e.g. "the" → ["TH","E"], "ship" → ["SH","I","P"]).
+   */
+  const GRAPHEME_PATTERNS = (() => {
+    const raw = [
+      "tch",
+      "dge",
+      "eigh",
+      "igh",
+      "ch",
+      "sh",
+      "th",
+      "wh",
+      "ck",
+      "ng",
+      "nk",
+      "ph",
+      "qu",
+      "ss",
+      "ll",
+      "ff",
+      "zz",
+      "ar",
+      "er",
+      "ir",
+      "or",
+      "ur",
+      "ai",
+      "ay",
+      "ea",
+      "ee",
+      "oa",
+      "oo",
+      "ou",
+      "ow",
+      "oi",
+      "oy",
+      "kn",
+      "wr",
+      "gn",
+    ];
+    return [...new Set(raw)].sort((a, b) => b.length - a.length);
+  })();
+
+  /** Short speakable hints for single letters (phonics-style for TTS). */
   const DEFAULT_LETTER_SOUNDS = {
     a: "ah",
     b: "buh",
@@ -52,6 +97,45 @@
     x: "ks",
     y: "yuh",
     z: "zzz",
+  };
+
+  /** TTS-friendly hints for graphemes (digraphs and common chunks). */
+  const DEFAULT_GRAPHEME_HINTS = {
+    tch: "ch",
+    dge: "juh",
+    eigh: "ay",
+    igh: "eye",
+    ch: "chuh",
+    sh: "shhh",
+    th: "thhh",
+    wh: "wuh",
+    ck: "kuh",
+    ng: "ung",
+    nk: "ink",
+    ph: "fff",
+    qu: "kwuh",
+    ss: "sss",
+    ll: "lll",
+    ff: "fff",
+    zz: "zzz",
+    ar: "ar",
+    er: "er",
+    ir: "er",
+    or: "or",
+    ur: "er",
+    ai: "ay",
+    ay: "ay",
+    ea: "eh",
+    ee: "ee",
+    oa: "oh",
+    oo: "oo",
+    ou: "ow",
+    ow: "ow",
+    oi: "oy",
+    oy: "oy",
+    kn: "nuh",
+    wr: "rer",
+    gn: "nuh",
   };
 
   let voices = [];
@@ -121,28 +205,88 @@
     return sightWords[Math.min(Math.max(0, i), sightWords.length - 1)];
   }
 
-  function lettersForEntry(entry) {
-    const w = (entry.word || "").toUpperCase();
-    if (Array.isArray(entry.letters) && entry.letters.length) {
-      return entry.letters.map(String);
+  function segmentWordIntoGraphemes(raw) {
+    const word = (raw || "").trim();
+    if (!word) return [];
+    const lower = word.toLowerCase();
+    const out = [];
+    let i = 0;
+    while (i < lower.length) {
+      let matched = null;
+      for (const p of GRAPHEME_PATTERNS) {
+        if (lower.startsWith(p, i)) {
+          matched = p;
+          break;
+        }
+      }
+      if (matched) {
+        out.push(word.slice(i, i + matched.length).toUpperCase());
+        i += matched.length;
+      } else {
+        out.push(word[i].toUpperCase());
+        i += 1;
+      }
     }
-    return w.split("");
+    return out;
   }
 
-  function soundForLetter(char, entry) {
-    const c = String(char).toLowerCase();
-    if (entry.sounds && typeof entry.sounds === "object") {
-      const key = String(char).toLowerCase();
-      if (entry.sounds[key] != null) return String(entry.sounds[key]);
+  function lettersForEntry(entry) {
+    const w = (entry.word || "").trim();
+    if (!w) return [];
+
+    if (Array.isArray(entry.letters) && entry.letters.length) {
+      const normalized = entry.letters.map((x) => String(x).toUpperCase());
+      const joined = entry.letters.map((x) => String(x).toLowerCase()).join("");
+      const wordNorm = w.toLowerCase().replace(/\s+/g, "");
+      if (joined === wordNorm) return normalized;
     }
-    if (DEFAULT_LETTER_SOUNDS[c]) return DEFAULT_LETTER_SOUNDS[c];
-    return c;
+    return segmentWordIntoGraphemes(w);
+  }
+
+  function soundForGrapheme(grapheme, entry, graphemeIndex) {
+    const key = String(grapheme).toLowerCase();
+    const sounds = entry.sounds;
+
+    if (Array.isArray(sounds) && sounds[graphemeIndex] != null) {
+      return String(sounds[graphemeIndex]);
+    }
+    if (sounds && typeof sounds === "object" && !Array.isArray(sounds)) {
+      if (sounds[key] != null) return String(sounds[key]);
+    }
+    if (DEFAULT_GRAPHEME_HINTS[key]) return DEFAULT_GRAPHEME_HINTS[key];
+    if (key.length === 1 && DEFAULT_LETTER_SOUNDS[key]) {
+      return DEFAULT_LETTER_SOUNDS[key];
+    }
+    return key;
   }
 
   function getSelectedVoice() {
     const idx = parseInt(els.voiceSelect.value, 10);
     if (!Number.isFinite(idx) || idx < 0) return null;
     return filteredVoices[idx] || null;
+  }
+
+  /**
+   * Prefer Microsoft Ava Online (Edge); name/URI strings vary by browser/OS.
+   */
+  function pickDefaultVoice(list) {
+    if (!list.length) return null;
+    const avaOnline = list.find((v) => {
+      const n = v.name.toLowerCase();
+      const u = v.voiceURI.toLowerCase();
+      return (
+        n.includes("ava") && (n.includes("online") || u.includes("online"))
+      );
+    });
+    if (avaOnline) return avaOnline;
+    const ava = list.find((v) => v.name.toLowerCase().includes("ava"));
+    if (ava) return ava;
+    return (
+      list.find((v) => v.default) ||
+      list.find((v) => v.lang.toLowerCase().startsWith("en-us")) ||
+      list.find((v) => v.lang.toLowerCase().startsWith("en-gb")) ||
+      list[0]
+    );
   }
 
   function applyVoiceFilters() {
@@ -187,9 +331,19 @@
       els.voiceSelect.appendChild(option);
     });
 
-    if (state.voiceName) {
-      const idx = filteredVoices.findIndex((v) => v.name === state.voiceName);
-      if (idx >= 0) els.voiceSelect.value = String(idx);
+    const savedIdx = state.voiceName
+      ? filteredVoices.findIndex((v) => v.name === state.voiceName)
+      : -1;
+
+    if (savedIdx >= 0) {
+      els.voiceSelect.value = String(savedIdx);
+    } else if (filteredVoices.length) {
+      const pick = pickDefaultVoice(filteredVoices);
+      const idx = filteredVoices.indexOf(pick);
+      state.voiceName = pick.name;
+      els.voiceSelect.value = String(idx);
+    } else {
+      state.voiceName = "";
     }
   }
 
@@ -206,8 +360,8 @@
     speechSynthesis.speak(u);
   }
 
-  function speakLetterSound(char, entry) {
-    const hint = soundForLetter(char, entry);
+  function speakGraphemeSound(grapheme, entry, graphemeIndex) {
+    const hint = soundForGrapheme(grapheme, entry, graphemeIndex);
     speakText(hint, { rate: Math.min(1.1, state.rate + 0.05) });
   }
 
@@ -271,12 +425,16 @@
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "letter-tile";
+      if (String(ch).length > 1) btn.classList.add("letter-tile--chunk");
       btn.textContent = ch;
-      btn.setAttribute("aria-label", `Letter ${ch}`);
+      btn.setAttribute(
+        "aria-label",
+        String(ch).length > 1 ? `Letter group ${ch}` : `Letter ${ch}`
+      );
       btn.dataset.index = String(idx);
       btn.addEventListener("click", () => {
         setActiveLetter(idx);
-        speakLetterSound(ch, entry);
+        speakGraphemeSound(ch, entry, idx);
       });
       els.letterRow.appendChild(btn);
     });
@@ -442,7 +600,7 @@
         const entry = getWordEntry(state.sightWordIndex);
         const letters = lettersForEntry(entry);
         const ch = letters[i];
-        if (ch) speakLetterSound(ch, entry);
+        if (ch) speakGraphemeSound(ch, entry, i);
         scrubTimer = null;
       }, 120);
     });
