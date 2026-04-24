@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TTS</title>
+</head>
+<body>
+  <main>
+    <h1>Text To Speech</h1>
+
+    <label for="regionSelect">Region:</label>
+    <select id="regionSelect">
+      <option value="">All Regions</option>
+      <option value="us">US</option>
+      <option value="gb">UK</option>
+      <option value="au">AU</option>
+      <option value="ca">CA</option>
+    </select>
+
+    <label>
+      <input type="checkbox" id="onlineToggle" checked>
+      Online Voices
+    </label>
+
+    <label for="genderSelect">Gender:</label>
+    <select id="genderSelect">
+      <option value="both">Both</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+
+    <br><br>
+
+    <select id="voiceSelect"></select>
+
+    <button onclick="speak()">Speak</button>
+  </main>
+
+  <script>
+    let voices = [];
+    let filteredVoices = [];
+
+    speechSynthesis.onvoiceschanged = loadVoices;
+
+    function loadVoices() {
+      voices = speechSynthesis.getVoices();
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const region = document.getElementById("regionSelect").value;
+      const onlineOnly = document.getElementById("onlineToggle").checked;
+      const gender = document.getElementById("genderSelect").value;
+
+      filteredVoices = voices.filter(v => {
+        const lang = v.lang.toLowerCase();
+        const name = v.name.toLowerCase();
+        const uri = v.voiceURI.toLowerCase();
+
+        // English only
+        if (!lang.startsWith("en")) return false;
+
+        // Region filter
+        if (region && !lang.includes(region)) return false;
+
+        // Online voices (best-effort)
+        if (onlineOnly && !(uri.includes("google") || uri.includes("online"))) {
+          return false;
+        }
+
+        // Gender filter (best-effort)
+        if (gender === "male" &&
+            !(name.includes("male") || name.includes("man"))) {
+          return false;
+        }
+
+        if (gender === "female" &&
+            !(name.includes("female") || name.includes("woman") || name.includes("girl"))) {
+          return false;
+        }
+
+        return true;
+      });
+
+      populateDropdown();
+    }
+
+    function populateDropdown() {
+      const voiceSelect = document.getElementById("voiceSelect");
+      voiceSelect.innerHTML = "";
+
+      filteredVoices.forEach((voice, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${voice.name} (${voice.lang})`;
+        voiceSelect.appendChild(option);
+      });
+
+      // Restore last used voice
+      const savedName = localStorage.getItem("lastVoiceName");
+      if (savedName) {
+        const idx = filteredVoices.findIndex(v => v.name === savedName);
+        if (idx >= 0) voiceSelect.value = idx;
+      }
+    }
+
+    function speak() {
+      const idx = document.getElementById("voiceSelect").value;
+      const voice = filteredVoices[idx];
+      if (!voice) return;
+
+      localStorage.setItem("lastVoiceName", voice.name);
+
+      const utterance = new SpeechSynthesisUtterance("Don't forget to Subscribe");
+      utterance.voice = voice;
+
+      speechSynthesis.speak(utterance);
+    }
+
+    // Re-filter when UI changes
+    document.getElementById("regionSelect").onchange = applyFilters;
+    document.getElementById("onlineToggle").onchange = applyFilters;
+    document.getElementById("genderSelect").onchange = applyFilters;
+  </script>
+</body>
+</html>
