@@ -69,75 +69,6 @@
     return [...new Set(raw)].sort((a, b) => b.length - a.length);
   })();
 
-  /** Short speakable hints for single letters (phonics-style for TTS). */
-  const DEFAULT_LETTER_SOUNDS = {
-    a: "ah",
-    b: "buh",
-    c: "kuh",
-    d: "duh",
-    e: "eh",
-    f: "fff",
-    g: "guh",
-    h: "huh",
-    i: "ih",
-    j: "juh",
-    k: "kuh",
-    l: "lll",
-    m: "mmm",
-    n: "nnn",
-    o: "oh",
-    p: "puh",
-    q: "kwuh",
-    r: "rrr",
-    s: "sss",
-    t: "tuh",
-    u: "uh",
-    v: "vvv",
-    w: "wuh",
-    x: "ks",
-    y: "yuh",
-    z: "zzz",
-  };
-
-  /** TTS-friendly hints for graphemes (digraphs and common chunks). */
-  const DEFAULT_GRAPHEME_HINTS = {
-    tch: "ch",
-    dge: "juh",
-    eigh: "ay",
-    igh: "eye",
-    ch: "chuh",
-    sh: "shhh",
-    th: "thhh",
-    wh: "wuh",
-    ck: "kuh",
-    ng: "ung",
-    nk: "ink",
-    ph: "fff",
-    qu: "kwuh",
-    ss: "sss",
-    ll: "lll",
-    ff: "fff",
-    zz: "zzz",
-    ar: "ar",
-    er: "er",
-    ir: "er",
-    or: "or",
-    ur: "er",
-    ai: "ay",
-    ay: "ay",
-    ea: "eh",
-    ee: "ee",
-    oa: "oh",
-    oo: "oo",
-    ou: "ow",
-    ow: "ow",
-    oi: "oy",
-    oy: "oy",
-    kn: "nuh",
-    wr: "rer",
-    gn: "nuh",
-  };
-
   let voices = [];
   let filteredVoices = [];
   let sightWords = [];
@@ -243,21 +174,25 @@
     return segmentWordIntoGraphemes(w);
   }
 
-  function soundForGrapheme(grapheme, entry, graphemeIndex) {
-    const key = String(grapheme).toLowerCase();
-    const sounds = entry.sounds;
+  /**
+   * Spoken form for chunks/slider: the real word from the start through this
+   * grapheme so TTS blends it as language, not isolated phonics hints.
+   */
+  function wordPrefixThroughGrapheme(entry, graphemeIndex) {
+    const letters = lettersForEntry(entry);
+    const word = (entry.word || "").trim();
+    if (!word || !letters.length) return "";
+    const idx = Math.min(Math.max(0, graphemeIndex | 0), letters.length - 1);
+    let charCount = 0;
+    for (let i = 0; i <= idx; i++) {
+      charCount += letters[i].length;
+    }
+    return word.slice(0, charCount);
+  }
 
-    if (Array.isArray(sounds) && sounds[graphemeIndex] != null) {
-      return String(sounds[graphemeIndex]);
-    }
-    if (sounds && typeof sounds === "object" && !Array.isArray(sounds)) {
-      if (sounds[key] != null) return String(sounds[key]);
-    }
-    if (DEFAULT_GRAPHEME_HINTS[key]) return DEFAULT_GRAPHEME_HINTS[key];
-    if (key.length === 1 && DEFAULT_LETTER_SOUNDS[key]) {
-      return DEFAULT_LETTER_SOUNDS[key];
-    }
-    return key;
+  function speakWordBuildupToGrapheme(entry, graphemeIndex) {
+    const fragment = wordPrefixThroughGrapheme(entry, graphemeIndex);
+    if (fragment) speakText(fragment.toLowerCase());
   }
 
   function getSelectedVoice() {
@@ -360,11 +295,6 @@
     speechSynthesis.speak(u);
   }
 
-  function speakGraphemeSound(grapheme, entry, graphemeIndex) {
-    const hint = soundForGrapheme(grapheme, entry, graphemeIndex);
-    speakText(hint, { rate: Math.min(1.1, state.rate + 0.05) });
-  }
-
   function speakWholeWord(word) {
     speakText(word.toLowerCase());
   }
@@ -434,7 +364,7 @@
       btn.dataset.index = String(idx);
       btn.addEventListener("click", () => {
         setActiveLetter(idx);
-        speakGraphemeSound(ch, entry, idx);
+        speakWordBuildupToGrapheme(entry, idx);
       });
       els.letterRow.appendChild(btn);
     });
@@ -599,8 +529,7 @@
       scrubTimer = setTimeout(() => {
         const entry = getWordEntry(state.sightWordIndex);
         const letters = lettersForEntry(entry);
-        const ch = letters[i];
-        if (ch) speakGraphemeSound(ch, entry, i);
+        if (letters[i]) speakWordBuildupToGrapheme(entry, i);
         scrubTimer = null;
       }, 120);
     });
