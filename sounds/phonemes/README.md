@@ -1,12 +1,9 @@
-# Phoneme sounds
+# Phoneme sounds (human recordings)
 
-Generated with [klattsch](https://github.com/chewieglass-labs/klattsch) (MIT),
-using Klatt 1980 English formant targets.
-
-Regenerate:
+MP3s converted from Wikimedia Commons IPA pronunciation samples (human voice).
 
 ```bash
-node scripts/generate-phonemes.mjs
+npm run fetch:phonemes
 ```
 
-Files are named by ARPABET-style ids (`ae.wav`, `sh.wav`, …).
+See [ATTRIBUTION.md](./ATTRIBUTION.md) for sources and license.

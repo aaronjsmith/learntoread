@@ -5,10 +5,9 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "generate:phonemes": "node scripts/generate-phonemes.mjs"
+    "fetch:phonemes": "node scripts/fetch-phonemes.mjs"
   },
   "devDependencies": {
-    "klattsch": "^0.8.0",
     "wrangler": "^4.118.0"
   }
 }

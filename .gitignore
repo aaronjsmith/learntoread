@@ -4,3 +4,4 @@ node_modules/
 .mf
 .DS_Store
 *.log
+.tmp-video/

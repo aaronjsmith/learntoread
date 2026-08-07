@@ -1,9 +1,14 @@
 {
   "sightWords": [
     {
+      "word": "hat",
+      "letters": ["H", "A", "T"],
+      "phonemes": ["hh", "ae", "t"]
+    },
+    {
       "word": "the",
       "letters": ["TH", "E"],
-      "phonemes": ["dh", "ah"],
+      "phonemes": ["dh", "ax"],
       "sounds": ["thuh", "uh"]
     },
     {
@@ -14,7 +19,7 @@
     {
       "word": "a",
       "letters": ["A"],
-      "phonemes": ["ah"]
+      "phonemes": ["ax"]
     },
     {
       "word": "to",

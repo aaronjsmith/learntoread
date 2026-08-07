@@ -4,18 +4,19 @@ A TTS app for teaching kids to read, using HTML and JavaScript.
 
 ## Letter sounds
 
-Tapping a letter plays an isolated phoneme from `sounds/phonemes/`, generated with
-[klattsch](https://github.com/chewieglass-labs/klattsch) (MIT) — a Klatt-style
-formant synthesizer that produces real vowel and consonant sounds (not letter names).
+Tap a letter to hear its **sound** (not its name). Slide under the word to blend
+those sounds in order — same idea as blending trainers like Lotty Learns. Tap the
+word itself to hear it spoken whole (browser voice).
 
-Regenerate the bank:
+Phoneme MP3s in `sounds/phonemes/` are **human recordings** from
+[Wikimedia Commons](https://commons.wikimedia.org/) (CC BY-SA). See
+`sounds/phonemes/ATTRIBUTION.md`.
+
+Regenerate (requires `ffmpeg` on PATH):
 
 ```bash
-npm run generate:phonemes
+npm run fetch:phonemes
 ```
-
-Whole-word speech still uses the browser voice (Voice settings). The scrub slider
-builds the spoken word; letter tiles play phonemes.
 
 ## Deploy (Cloudflare Workers)
 

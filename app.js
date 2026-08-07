@@ -6,14 +6,15 @@
   const DEFAULT_PREVIEW_TEXT = "Hello! I will help you read.";
 
   const DEFAULT_WORDS = [
+    { word: "hat", letters: ["H", "A", "T"], phonemes: ["hh", "ae", "t"] },
     {
       word: "the",
       letters: ["TH", "E"],
-      phonemes: ["dh", "ah"],
+      phonemes: ["dh", "ax"],
       sounds: ["thuh", "uh"],
     },
     { word: "and", letters: ["A", "N", "D"], phonemes: ["ae", "n", "d"] },
-    { word: "a", letters: ["A"], phonemes: ["ah"] },
+    { word: "a", letters: ["A"], phonemes: ["ax"] },
     { word: "to", letters: ["T", "O"], phonemes: ["t", "uw"] },
     { word: "is", letters: ["I", "S"], phonemes: ["ih", "z"] },
     { word: "you", letters: ["Y", "OU"], phonemes: ["y", "uw"] },
@@ -338,7 +339,7 @@
     if (!key) return null;
     let audio = phonemeAudioCache.get(key);
     if (!audio) {
-      audio = new Audio(`${PHONEME_AUDIO_BASE}${key}.wav`);
+      audio = new Audio(`${PHONEME_AUDIO_BASE}${key}.mp3`);
       audio.preload = "auto";
       phonemeAudioCache.set(key, audio);
     }
@@ -346,7 +347,7 @@
   }
 
   /**
-   * Play an isolated phoneme WAV from the klattsch-generated library.
+   * Play an isolated letter-sound MP3 (human Wikimedia Commons recordings).
    * Falls back to a short TTS hint only if the file is missing.
    */
   function playPhoneme(id, fallbackText) {
@@ -848,21 +849,19 @@
       if (entry.word) speakWholeWord(entry.word);
     });
 
-    let scrubTimer = null;
+    /** Last scrub index that played a phoneme (Lotty-style: one sound per letter). */
+    let lastScrubPhonemeIndex = -1;
     els.scrubSlider.addEventListener("input", () => {
       const i = parseInt(els.scrubSlider.value, 10) || 0;
-      const tiles = els.letterRow.querySelectorAll(".letter-tile");
-      tiles.forEach((t, idx) => {
-        t.classList.toggle("letter-tile--active", idx === i);
-      });
-      state.scrubIndex = i;
-      if (scrubTimer) clearTimeout(scrubTimer);
-      scrubTimer = setTimeout(() => {
-        const entry = getWordEntry(state.sightWordIndex);
-        const letters = lettersForEntry(entry);
-        if (letters[i]) speakWordBuildupToGrapheme(entry, i);
-        scrubTimer = null;
-      }, 120);
+      setActiveLetter(i);
+      if (i === lastScrubPhonemeIndex) return;
+      lastScrubPhonemeIndex = i;
+      const entry = getWordEntry(state.sightWordIndex);
+      const letters = lettersForEntry(entry);
+      if (letters[i]) speakGraphemeSound(entry, i);
+    });
+    els.scrubSlider.addEventListener("change", () => {
+      lastScrubPhonemeIndex = -1;
     });
 
     els.exportBtn.addEventListener("click", () => {
