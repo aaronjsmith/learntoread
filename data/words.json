@@ -1,24 +1,105 @@
 {
   "sightWords": [
-    { "word": "the", "sounds": ["thuh", "uh"] },
-    { "word": "and" },
-    { "word": "a" },
-    { "word": "to" },
-    { "word": "is" },
-    { "word": "you" },
-    { "word": "it" },
-    { "word": "in" },
-    { "word": "said" },
-    { "word": "for" },
-    { "word": "up" },
-    { "word": "look" },
-    { "word": "go" },
-    { "word": "we" },
-    { "word": "can" },
-    { "word": "see" },
-    { "word": "my" },
-    { "word": "like" },
-    { "word": "at" },
-    { "word": "play" }
+    {
+      "word": "the",
+      "letters": ["TH", "E"],
+      "phonemes": ["dh", "ah"],
+      "sounds": ["thuh", "uh"]
+    },
+    {
+      "word": "and",
+      "letters": ["A", "N", "D"],
+      "phonemes": ["ae", "n", "d"]
+    },
+    {
+      "word": "a",
+      "letters": ["A"],
+      "phonemes": ["ah"]
+    },
+    {
+      "word": "to",
+      "letters": ["T", "O"],
+      "phonemes": ["t", "uw"]
+    },
+    {
+      "word": "is",
+      "letters": ["I", "S"],
+      "phonemes": ["ih", "z"]
+    },
+    {
+      "word": "you",
+      "letters": ["Y", "OU"],
+      "phonemes": ["y", "uw"]
+    },
+    {
+      "word": "it",
+      "letters": ["I", "T"],
+      "phonemes": ["ih", "t"]
+    },
+    {
+      "word": "in",
+      "letters": ["I", "N"],
+      "phonemes": ["ih", "n"]
+    },
+    {
+      "word": "said",
+      "letters": ["S", "AI", "D"],
+      "phonemes": ["s", "eh", "d"]
+    },
+    {
+      "word": "for",
+      "letters": ["F", "OR"],
+      "phonemes": ["f", "er"]
+    },
+    {
+      "word": "up",
+      "letters": ["U", "P"],
+      "phonemes": ["ah", "p"]
+    },
+    {
+      "word": "look",
+      "letters": ["L", "OO", "K"],
+      "phonemes": ["l", "uh", "k"]
+    },
+    {
+      "word": "go",
+      "letters": ["G", "O"],
+      "phonemes": ["g", "ow"]
+    },
+    {
+      "word": "we",
+      "letters": ["W", "E"],
+      "phonemes": ["w", "iy"]
+    },
+    {
+      "word": "can",
+      "letters": ["C", "A", "N"],
+      "phonemes": ["k", "ae", "n"]
+    },
+    {
+      "word": "see",
+      "letters": ["S", "EE"],
+      "phonemes": ["s", "iy"]
+    },
+    {
+      "word": "my",
+      "letters": ["M", "Y"],
+      "phonemes": ["m", "ay"]
+    },
+    {
+      "word": "like",
+      "letters": ["L", "I", "KE"],
+      "phonemes": ["l", "ay", "k"]
+    },
+    {
+      "word": "at",
+      "letters": ["A", "T"],
+      "phonemes": ["ae", "t"]
+    },
+    {
+      "word": "play",
+      "letters": ["P", "L", "AY"],
+      "phonemes": ["p", "l", "ey"]
+    }
   ]
 }

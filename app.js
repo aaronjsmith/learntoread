@@ -6,27 +6,101 @@
   const DEFAULT_PREVIEW_TEXT = "Hello! I will help you read.";
 
   const DEFAULT_WORDS = [
-    { word: "the", sounds: ["thuh", "uh"] },
-    { word: "and" },
-    { word: "a" },
-    { word: "to" },
-    { word: "is" },
-    { word: "you" },
-    { word: "it" },
-    { word: "in" },
-    { word: "said" },
-    { word: "for" },
-    { word: "up" },
-    { word: "look" },
-    { word: "go" },
-    { word: "we" },
-    { word: "can" },
-    { word: "see" },
-    { word: "my" },
-    { word: "like" },
-    { word: "at" },
-    { word: "play" },
+    {
+      word: "the",
+      letters: ["TH", "E"],
+      phonemes: ["dh", "ah"],
+      sounds: ["thuh", "uh"],
+    },
+    { word: "and", letters: ["A", "N", "D"], phonemes: ["ae", "n", "d"] },
+    { word: "a", letters: ["A"], phonemes: ["ah"] },
+    { word: "to", letters: ["T", "O"], phonemes: ["t", "uw"] },
+    { word: "is", letters: ["I", "S"], phonemes: ["ih", "z"] },
+    { word: "you", letters: ["Y", "OU"], phonemes: ["y", "uw"] },
+    { word: "it", letters: ["I", "T"], phonemes: ["ih", "t"] },
+    { word: "in", letters: ["I", "N"], phonemes: ["ih", "n"] },
+    { word: "said", letters: ["S", "AI", "D"], phonemes: ["s", "eh", "d"] },
+    { word: "for", letters: ["F", "OR"], phonemes: ["f", "er"] },
+    { word: "up", letters: ["U", "P"], phonemes: ["ah", "p"] },
+    { word: "look", letters: ["L", "OO", "K"], phonemes: ["l", "uh", "k"] },
+    { word: "go", letters: ["G", "O"], phonemes: ["g", "ow"] },
+    { word: "we", letters: ["W", "E"], phonemes: ["w", "iy"] },
+    { word: "can", letters: ["C", "A", "N"], phonemes: ["k", "ae", "n"] },
+    { word: "see", letters: ["S", "EE"], phonemes: ["s", "iy"] },
+    { word: "my", letters: ["M", "Y"], phonemes: ["m", "ay"] },
+    { word: "like", letters: ["L", "I", "KE"], phonemes: ["l", "ay", "k"] },
+    { word: "at", letters: ["A", "T"], phonemes: ["ae", "t"] },
+    { word: "play", letters: ["P", "L", "AY"], phonemes: ["p", "l", "ey"] },
   ];
+
+  /** Primary phonics sound for a grapheme when the word has no phonemes list. */
+  const DEFAULT_GRAPHEME_PHONEME = {
+    a: "ae",
+    e: "eh",
+    i: "ih",
+    o: "aa",
+    u: "ah",
+    b: "b",
+    c: "k",
+    d: "d",
+    f: "f",
+    g: "g",
+    h: "hh",
+    j: "jh",
+    k: "k",
+    l: "l",
+    m: "m",
+    n: "n",
+    p: "p",
+    q: "kw",
+    r: "r",
+    s: "s",
+    t: "t",
+    v: "v",
+    w: "w",
+    x: "ks",
+    y: "y",
+    z: "z",
+    th: "th",
+    sh: "sh",
+    ch: "ch",
+    wh: "w",
+    ck: "k",
+    ng: "ng",
+    nk: "ng",
+    ph: "f",
+    qu: "kw",
+    tch: "ch",
+    dge: "jh",
+    ee: "iy",
+    ea: "iy",
+    oo: "uw",
+    oa: "ow",
+    ai: "ey",
+    ay: "ey",
+    oy: "oy",
+    oi: "oy",
+    ow: "ow",
+    ou: "aw",
+    igh: "ay",
+    eigh: "ey",
+    ar: "aa",
+    er: "er",
+    ir: "er",
+    or: "er",
+    ur: "er",
+    kn: "n",
+    wr: "r",
+    gn: "n",
+    ss: "s",
+    ll: "l",
+    ff: "f",
+    zz: "z",
+  };
+
+  const PHONEME_AUDIO_BASE = "sounds/phonemes/";
+  const phonemeAudioCache = new Map();
+  let activePhonemeAudio = null;
 
   /**
    * Longest-match-first patterns for splitting words into graphemes when JSON
@@ -212,6 +286,113 @@
       if (joined === wordNorm) return normalized;
     }
     return segmentWordIntoGraphemes(w);
+  }
+
+  function normalizePhonemeId(raw) {
+    const id = String(raw || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z]/g, "");
+    return id || "";
+  }
+
+  function defaultPhonemeForGrapheme(graphemeUpper) {
+    const g = String(graphemeUpper || "")
+      .toLowerCase()
+      .replace(/[^a-z]/g, "");
+    if (!g) return "";
+    if (DEFAULT_GRAPHEME_PHONEME[g]) return DEFAULT_GRAPHEME_PHONEME[g];
+    if (g.length > 1) {
+      const last = g[g.length - 1];
+      if (DEFAULT_GRAPHEME_PHONEME[last]) return DEFAULT_GRAPHEME_PHONEME[last];
+    }
+    return DEFAULT_GRAPHEME_PHONEME[g[0]] || "";
+  }
+
+  /**
+   * Phoneme id for a letter tile (from words.json or primary phonics defaults).
+   */
+  function phonemeIdForGrapheme(entry, graphemeIndex) {
+    const letters = lettersForEntry(entry);
+    if (!letters.length) return "";
+    const idx = Math.min(Math.max(0, graphemeIndex | 0), letters.length - 1);
+    const list = entry.phonemes;
+    if (Array.isArray(list) && list[idx] != null) {
+      const id = normalizePhonemeId(list[idx]);
+      if (id) return id;
+    }
+    return defaultPhonemeForGrapheme(letters[idx]);
+  }
+
+  function stopPhonemeAudio() {
+    if (!activePhonemeAudio) return;
+    try {
+      activePhonemeAudio.pause();
+      activePhonemeAudio.currentTime = 0;
+    } catch (_) {}
+    activePhonemeAudio = null;
+  }
+
+  function getPhonemeAudio(id) {
+    const key = normalizePhonemeId(id);
+    if (!key) return null;
+    let audio = phonemeAudioCache.get(key);
+    if (!audio) {
+      audio = new Audio(`${PHONEME_AUDIO_BASE}${key}.wav`);
+      audio.preload = "auto";
+      phonemeAudioCache.set(key, audio);
+    }
+    return audio;
+  }
+
+  /**
+   * Play an isolated phoneme WAV from the klattsch-generated library.
+   * Falls back to a short TTS hint only if the file is missing.
+   */
+  function playPhoneme(id, fallbackText) {
+    const audio = getPhonemeAudio(id);
+    if (!audio) {
+      if (fallbackText) speakText(String(fallbackText).toLowerCase());
+      return;
+    }
+
+    try {
+      speechSynthesis.cancel();
+    } catch (_) {}
+    stopPhonemeAudio();
+
+    const start = () => {
+      activePhonemeAudio = audio;
+      const p = audio.play();
+      if (p && typeof p.catch === "function") {
+        p.catch(() => {
+          if (fallbackText) speakText(String(fallbackText).toLowerCase());
+        });
+      }
+    };
+
+    audio.onerror = () => {
+      phonemeAudioCache.delete(normalizePhonemeId(id));
+      if (fallbackText) speakText(String(fallbackText).toLowerCase());
+    };
+
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+    } catch (_) {}
+
+    if (audio.readyState >= 2) start();
+    else {
+      audio.addEventListener("canplaythrough", start, { once: true });
+      audio.load();
+    }
+  }
+
+  function speakGraphemeSound(entry, graphemeIndex) {
+    const id = phonemeIdForGrapheme(entry, graphemeIndex);
+    const letters = lettersForEntry(entry);
+    const label = letters[graphemeIndex] || "";
+    playPhoneme(id, label ? String(label).toLowerCase() : "");
   }
 
   /**
@@ -420,6 +601,7 @@
     const voice = getSelectedVoice();
     if (!voice || !text) return;
 
+    stopPhonemeAudio();
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.voice = voice;
@@ -492,14 +674,20 @@
       btn.className = "letter-tile";
       if (String(ch).length > 1) btn.classList.add("letter-tile--chunk");
       btn.textContent = ch;
+      const phonemeId = phonemeIdForGrapheme(entry, idx);
       btn.setAttribute(
         "aria-label",
-        String(ch).length > 1 ? `Letter group ${ch}` : `Letter ${ch}`
+        phonemeId
+          ? `Sound for ${ch}`
+          : String(ch).length > 1
+            ? `Letter group ${ch}`
+            : `Letter ${ch}`
       );
       btn.dataset.index = String(idx);
+      btn.dataset.phoneme = phonemeId;
       btn.addEventListener("click", () => {
         setActiveLetter(idx);
-        speakWordBuildupToGrapheme(entry, idx);
+        speakGraphemeSound(entry, idx);
       });
       els.letterRow.appendChild(btn);
     });
