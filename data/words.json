@@ -1,6 +1,6 @@
 {
   "sightWords": [
-    { "word": "the" },
+    { "word": "the", "sounds": ["thuh", "uh"] },
     { "word": "and" },
     { "word": "a" },
     { "word": "to" },

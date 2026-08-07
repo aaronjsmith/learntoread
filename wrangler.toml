@@ -1,0 +1,6 @@
+name = "learntoread"
+compatibility_date = "2026-08-07"
+
+# Static site — deploy with: npm run deploy  (or npx wrangler deploy)
+[assets]
+directory = "."

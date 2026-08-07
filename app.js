@@ -1,8 +1,12 @@
 (function () {
   "use strict";
 
+  const LS_USER_NAME = "learntoread_userName";
+  const LS_PREVIEW_TEXT = "learntoread_previewText";
+  const DEFAULT_PREVIEW_TEXT = "Hello! I will help you read.";
+
   const DEFAULT_WORDS = [
-    { word: "the" },
+    { word: "the", sounds: ["thuh", "uh"] },
     { word: "and" },
     { word: "a" },
     { word: "to" },
@@ -75,6 +79,7 @@
 
   const state = {
     userName: "",
+    previewText: DEFAULT_PREVIEW_TEXT,
     sightWordIndex: 0,
     region: "",
     onlineOnly: true,
@@ -91,8 +96,38 @@
     return document.getElementById(id);
   }
 
+  function persistUserName(name) {
+    const t = String(name || "").trim();
+    try {
+      if (t) localStorage.setItem(LS_USER_NAME, t);
+      else localStorage.removeItem(LS_USER_NAME);
+    } catch (_) {}
+  }
+
+  function persistPreviewText(text) {
+    const t = String(text || "").trim() || DEFAULT_PREVIEW_TEXT;
+    state.previewText = t;
+    try {
+      localStorage.setItem(LS_PREVIEW_TEXT, t);
+    } catch (_) {}
+  }
+
+  function loadPersistedProfile() {
+    try {
+      const u = localStorage.getItem(LS_USER_NAME);
+      if (u != null) {
+        const t = String(u).trim();
+        if (t) state.userName = t;
+      }
+    } catch (_) {}
+    try {
+      const p = localStorage.getItem(LS_PREVIEW_TEXT);
+      if (p != null && String(p).trim()) state.previewText = String(p).trim();
+    } catch (_) {}
+    if (!state.previewText) state.previewText = DEFAULT_PREVIEW_TEXT;
+  }
+
   function resetStateForFreshStart() {
-    state.userName = "";
     state.sightWordIndex = 0;
     state.scrubIndex = 0;
     state.region = "";
@@ -104,7 +139,10 @@
   }
 
   function applyProgressData(data) {
-    if (data.userName != null) state.userName = String(data.userName);
+    if (data.userName != null) {
+      state.userName = String(data.userName).trim();
+      persistUserName(state.userName);
+    }
     if (Number.isFinite(data.sightWordIndex))
       state.sightWordIndex = Math.max(0, data.sightWordIndex | 0);
     if (sightWords.length)
@@ -129,6 +167,8 @@
     els.pitchRange.value = String(state.pitch);
     els.rateValue.textContent = els.rateRange.value;
     els.pitchValue.textContent = els.pitchRange.value;
+    if (els.settingsPreviewText)
+      els.settingsPreviewText.value = state.previewText;
   }
 
   function getWordEntry(i) {
@@ -190,9 +230,103 @@
     return word.slice(0, charCount);
   }
 
-  function speakWordBuildupToGrapheme(entry, graphemeIndex) {
+  /**
+   * Browsers often say "tee aitch" for bare "th". Short TTS spellings that
+   * usually come out closer to the digraph (still using the real word for context).
+   */
+  function phoneticHintFirstGrapheme(graphemeUpper, wordLower) {
+    const g = String(graphemeUpper).toLowerCase();
+    if (g === "th") {
+      if (
+        /^(therm|themat|theat|theor|thes|thick|thin|think|thing|third|thank|thumb|thun|thr|thw)/.test(
+          wordLower
+        )
+      ) {
+        return "thhh";
+      }
+      if (
+        /^(the|this|that|they|them|their|there|these|those|then|than|though|thus|thy|thee|thou)\b/.test(
+          wordLower
+        )
+      ) {
+        return "thuh";
+      }
+      return "thhh";
+    }
+    const DIGRAPH_HINTS = {
+      ch: "chuh",
+      sh: "shhh",
+      wh: "wuh",
+      ph: "fff",
+      qu: "kwuh",
+      tch: "ch",
+      dge: "juh",
+      igh: "eye",
+      ng: "ung",
+      ck: "kuh",
+    };
+    if (DIGRAPH_HINTS[g]) return DIGRAPH_HINTS[g];
+    return null;
+  }
+
+  /**
+   * When the buildup is only the first multi-letter chunk, speak a phonetic
+   * hint; once the slice is longer, use the real letters so it stays "in" the word.
+   */
+  function ttsTextForWordBuildup(entry, graphemeIndex) {
+    const letters = lettersForEntry(entry);
+    const word = (entry.word || "").trim();
+    const wordLower = word.toLowerCase();
     const fragment = wordPrefixThroughGrapheme(entry, graphemeIndex);
-    if (fragment) speakText(fragment.toLowerCase());
+    if (!fragment) return "";
+
+    const sounds = entry.sounds;
+    if (Array.isArray(sounds) && sounds.length === letters.length) {
+      const parts = [];
+      for (let i = 0; i <= graphemeIndex; i++) {
+        const s = sounds[i];
+        if (s == null || !String(s).trim()) {
+          parts.length = 0;
+          break;
+        }
+        parts.push(String(s).trim());
+      }
+      if (parts.length === graphemeIndex + 1) return parts.join(" ");
+    }
+
+    const lettersJoined = letters.map((l) => String(l).toLowerCase()).join("");
+    const wordNorm = wordLower.replace(/\s+/g, "");
+    if (
+      lettersJoined === wordNorm &&
+      wordLower === "the" &&
+      letters.length === 2 &&
+      graphemeIndex === 1
+    ) {
+      return "thuh uh";
+    }
+
+    if (fragment.toLowerCase() === wordLower) return fragment;
+
+    if (graphemeIndex !== 0 || !letters.length) return fragment;
+
+    const first = String(letters[0]);
+    if (first.length < 2) return fragment;
+
+    if (Array.isArray(sounds) && sounds[0] != null) {
+      return String(sounds[0]);
+    }
+    if (sounds && typeof sounds === "object" && !Array.isArray(sounds)) {
+      const key = first.toLowerCase();
+      if (sounds[key] != null) return String(sounds[key]);
+    }
+
+    const hint = phoneticHintFirstGrapheme(first, wordLower);
+    return hint || fragment;
+  }
+
+  function speakWordBuildupToGrapheme(entry, graphemeIndex) {
+    const toSpeak = ttsTextForWordBuildup(entry, graphemeIndex);
+    if (toSpeak) speakText(toSpeak.toLowerCase());
   }
 
   function getSelectedVoice() {
@@ -292,6 +426,7 @@
     u.rate = state.rate;
     u.pitch = state.pitch;
     if (opts && typeof opts.rate === "number") u.rate = opts.rate;
+    if (opts && typeof opts.pitch === "number") u.pitch = opts.pitch;
     speechSynthesis.speak(u);
   }
 
@@ -419,7 +554,7 @@
       applyVoiceFilters();
       els.welcomeModal.hidden = true;
       els.nameModal.hidden = false;
-      els.nameInput.value = "";
+      els.nameInput.value = state.userName || "";
       els.nameInput.focus();
       updateHomeGreeting();
     });
@@ -435,6 +570,7 @@
       const name = els.nameInput.value.trim();
       if (!name) return;
       state.userName = name;
+      persistUserName(name);
       els.nameModal.hidden = true;
       updateHomeGreeting();
     });
@@ -471,11 +607,18 @@
       state.pitch = parseFloat(els.pitchRange.value) || 1;
       const v = getSelectedVoice();
       if (v) state.voiceName = v.name;
+      const previewLine = els.settingsPreviewText.value.trim();
+      if (previewLine) persistPreviewText(previewLine);
       els.settingsModal.hidden = true;
     });
 
     els.settingsPreview.addEventListener("click", () => {
-      speakText("Hello! I will help you read.");
+      const previewLine = els.settingsPreviewText.value.trim();
+      if (!previewLine) return;
+      persistPreviewText(previewLine);
+      const rate = parseFloat(els.rateRange.value) || state.rate;
+      const pitch = parseFloat(els.pitchRange.value) || state.pitch;
+      speakText(previewLine, { rate, pitch });
     });
 
     ["regionSelect", "onlineToggle", "genderSelect"].forEach((id) => {
@@ -512,7 +655,7 @@
       updateSightWordUI();
     });
 
-    els.speakWordBtn.addEventListener("click", () => {
+    els.sightWordTitle.addEventListener("click", () => {
       const entry = getWordEntry(state.sightWordIndex);
       if (entry.word) speakWholeWord(entry.word);
     });
@@ -572,6 +715,7 @@
     els.closeSettings = $("closeSettings");
     els.settingsSave = $("settingsSave");
     els.settingsPreview = $("settingsPreview");
+    els.settingsPreviewText = $("settingsPreviewText");
     els.regionSelect = $("regionSelect");
     els.onlineToggle = $("onlineToggle");
     els.genderSelect = $("genderSelect");
@@ -589,7 +733,6 @@
     els.scrubSlider = $("scrubSlider");
     els.prevWord = $("prevWord");
     els.nextWord = $("nextWord");
-    els.speakWordBtn = $("speakWordBtn");
     els.exportBtn = $("exportBtn");
     els.importBtn = $("importBtn");
     els.importInput = $("importInput");
@@ -597,6 +740,7 @@
 
   async function init() {
     cacheElements();
+    loadPersistedProfile();
     bindEvents();
 
     await loadWordsFromJson();

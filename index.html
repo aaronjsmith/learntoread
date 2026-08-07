@@ -168,6 +168,27 @@
       color: var(--ink);
     }
 
+    button.word-big {
+      display: block;
+      width: 100%;
+      font-family: inherit;
+      text-align: center;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: var(--radius);
+    }
+
+    button.word-big:hover {
+      color: var(--accent-dark);
+    }
+
+    button.word-big:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
+
     .word-meta {
       color: var(--muted);
       font-size: 0.95rem;
@@ -388,10 +409,9 @@
         <button type="button" class="secondary" id="backHome">← Home</button>
         <button type="button" class="secondary" id="prevWord">Previous word</button>
         <button type="button" id="nextWord">Next word</button>
-        <button type="button" class="secondary" id="speakWordBtn">Hear whole word</button>
       </div>
       <div class="word-stage">
-        <p class="word-big" id="sightWordTitle">—</p>
+        <button type="button" class="word-big" id="sightWordTitle" aria-label="Hear whole word">—</button>
         <p class="word-meta" id="sightWordProgress"></p>
         <div class="letter-row" id="letterRow" role="group" aria-label="Letter sounds in the word"></div>
         <div class="scrub-wrap">
@@ -406,7 +426,7 @@
     <div class="modal">
       <h2 id="welcomeTitle">Welcome</h2>
       <p>
-        Nothing is stored on the website server (for example on GitHub Pages). Your progress is kept in this tab until you close it.
+        Nothing is stored on the website server. Your progress is kept in this tab until you close it.
         Open a <strong>progress JSON</strong> file you saved earlier, or start fresh and download updates with <strong>Save JSON</strong> in the header.
       </p>
       <div class="modal-actions" style="flex-direction: column; align-items: stretch;">
@@ -420,7 +440,7 @@
   <div class="modal-overlay" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="nameTitle" hidden>
     <div class="modal">
       <h2 id="nameTitle">What is your name?</h2>
-      <p>We use your name to say hello and as part of the suggested filename when you use <strong>Save JSON</strong>.</p>
+      <p>We use your name to say hello and as part of the suggested filename when you use <strong>Save JSON</strong>. It is kept on this device for next time.</p>
       <form id="nameForm">
         <div class="field">
           <label for="nameInput">Your name</label>
@@ -472,6 +492,10 @@
         <div class="field">
           <label for="pitchRange">Pitch <span id="pitchValue">1.05</span></label>
           <input type="range" id="pitchRange" min="0.8" max="1.3" step="0.05" value="1.05" />
+        </div>
+        <div class="field">
+          <label for="settingsPreviewText">Preview text</label>
+          <input type="text" id="settingsPreviewText" maxlength="500" autocomplete="off" spellcheck="true" />
         </div>
       </div>
       <div class="modal-actions">
