@@ -3,6 +3,7 @@
 
   const LS_USER_NAME = "learntoread_userName";
   const LS_PREVIEW_TEXT = "learntoread_previewText";
+  const LS_PROGRESS = "learntoread_progress";
   const DEFAULT_PREVIEW_TEXT = "Hello! I will help you read.";
 
   const DEFAULT_WORDS = [
@@ -202,6 +203,40 @@
     if (!state.previewText) state.previewText = DEFAULT_PREVIEW_TEXT;
   }
 
+  function buildProgressPayload() {
+    return {
+      version: 1,
+      savedAt: new Date().toISOString(),
+      userName: state.userName,
+      sightWordIndex: state.sightWordIndex,
+      voiceName: state.voiceName,
+      region: state.region,
+      onlineOnly: state.onlineOnly,
+      gender: state.gender,
+      rate: state.rate,
+      pitch: state.pitch,
+    };
+  }
+
+  function persistProgress() {
+    try {
+      localStorage.setItem(LS_PROGRESS, JSON.stringify(buildProgressPayload()));
+    } catch (_) {}
+  }
+
+  /** @returns {boolean} true if progress was restored from localStorage */
+  function loadPersistedProgress() {
+    try {
+      const raw = localStorage.getItem(LS_PROGRESS);
+      if (raw == null || !String(raw).trim()) return false;
+      const data = JSON.parse(raw);
+      applyProgressData(data, { persist: false });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   function resetStateForFreshStart() {
     state.sightWordIndex = 0;
     state.scrubIndex = 0;
@@ -213,7 +248,8 @@
     state.pitch = 1.05;
   }
 
-  function applyProgressData(data) {
+  function applyProgressData(data, opts) {
+    const shouldPersist = !opts || opts.persist !== false;
     if (data.userName != null) {
       state.userName = String(data.userName).trim();
       persistUserName(state.userName);
@@ -232,6 +268,7 @@
     if (data.gender != null) state.gender = String(data.gender);
     if (typeof data.rate === "number") state.rate = data.rate;
     if (typeof data.pitch === "number") state.pitch = data.pitch;
+    if (shouldPersist) persistProgress();
   }
 
   function syncControlsFromState() {
@@ -739,6 +776,7 @@
 
     els.welcomeStartFresh.addEventListener("click", () => {
       resetStateForFreshStart();
+      persistProgress();
       syncControlsFromState();
       applyVoiceFilters();
       els.welcomeModal.hidden = true;
@@ -760,6 +798,7 @@
       if (!name) return;
       state.userName = name;
       persistUserName(name);
+      persistProgress();
       els.nameModal.hidden = true;
       updateHomeGreeting();
     });
@@ -798,6 +837,7 @@
       if (v) state.voiceName = v.name;
       const previewLine = els.settingsPreviewText.value.trim();
       if (previewLine) persistPreviewText(previewLine);
+      persistProgress();
       els.settingsModal.hidden = true;
     });
 
@@ -834,6 +874,7 @@
       if (state.sightWordIndex <= 0) return;
       state.sightWordIndex--;
       state.scrubIndex = 0;
+      persistProgress();
       updateSightWordUI();
     });
 
@@ -841,6 +882,7 @@
       if (state.sightWordIndex >= sightWords.length - 1) return;
       state.sightWordIndex++;
       state.scrubIndex = 0;
+      persistProgress();
       updateSightWordUI();
     });
 
@@ -866,16 +908,8 @@
 
     els.exportBtn.addEventListener("click", () => {
       const payload = {
-        version: 1,
+        ...buildProgressPayload(),
         exportedAt: new Date().toISOString(),
-        userName: state.userName,
-        sightWordIndex: state.sightWordIndex,
-        voiceName: state.voiceName,
-        region: state.region,
-        onlineOnly: state.onlineOnly,
-        gender: state.gender,
-        rate: state.rate,
-        pitch: state.pitch,
       };
       const blob = new Blob([JSON.stringify(payload, null, 2)], {
         type: "application/json",
@@ -928,6 +962,7 @@
   async function init() {
     cacheElements();
     loadPersistedProfile();
+    const hasSavedProgress = loadPersistedProgress();
     bindEvents();
 
     await loadWordsFromJson();
@@ -939,8 +974,19 @@
     syncControlsFromState();
     updateHomeGreeting();
 
-    els.welcomeModal.hidden = false;
-    els.nameModal.hidden = true;
+    if (hasSavedProgress) {
+      els.welcomeModal.hidden = true;
+      if (!state.userName.trim()) {
+        els.nameModal.hidden = false;
+        els.nameInput.value = "";
+        els.nameInput.focus();
+      } else {
+        els.nameModal.hidden = true;
+      }
+    } else {
+      els.welcomeModal.hidden = false;
+      els.nameModal.hidden = true;
+    }
 
     showScreen("home");
   }

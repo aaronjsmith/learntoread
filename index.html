@@ -394,7 +394,7 @@
       <h2>Activities</h2>
       <p class="lead" id="homeGreeting">Pick an activity.</p>
       <p class="lead" id="homeFileHint" style="font-size: 0.95rem; margin-top: -12px;">
-        Progress stays in your browser until you leave. Use <strong>Save JSON</strong> to keep a copy on this device.
+        Progress is saved automatically in this browser. Use <strong>Save JSON</strong> / <strong>Load JSON</strong> only if you want a backup copy.
       </p>
       <div class="activity-grid">
         <button type="button" class="activity-card" id="activitySightWords">
@@ -429,12 +429,12 @@
     <div class="modal">
       <h2 id="welcomeTitle">Welcome</h2>
       <p>
-        Nothing is stored on the website server. Your progress is kept in this tab until you close it.
-        Open a <strong>progress JSON</strong> file you saved earlier, or start fresh and download updates with <strong>Save JSON</strong> in the header.
+        Progress is saved automatically in this browser (not on the website server).
+        Start fresh, or optionally open a <strong>progress JSON</strong> backup you saved earlier.
       </p>
       <div class="modal-actions" style="flex-direction: column; align-items: stretch;">
-        <button type="button" id="welcomeOpenFile">Open progress file…</button>
-        <button type="button" class="secondary" id="welcomeStartFresh">Start fresh</button>
+        <button type="button" id="welcomeStartFresh">Start fresh</button>
+        <button type="button" class="secondary" id="welcomeOpenFile">Open progress file…</button>
       </div>
       <input type="file" id="welcomeImportInput" class="sr-only" accept="application/json,.json" aria-hidden="true" tabindex="-1" />
     </div>
@@ -443,7 +443,7 @@
   <div class="modal-overlay" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="nameTitle" hidden>
     <div class="modal">
       <h2 id="nameTitle">What is your name?</h2>
-      <p>We use your name to say hello and as part of the suggested filename when you use <strong>Save JSON</strong>. It is kept on this device for next time.</p>
+      <p>We use your name to say hello. It is kept on this device for next time, and used in the suggested filename if you export a JSON backup.</p>
       <form id="nameForm">
         <div class="field">
           <label for="nameInput">Your name</label>
