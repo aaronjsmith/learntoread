@@ -383,6 +383,37 @@
     return audio;
   }
 
+  /** Phoneme ids needed for the current word list (plus grapheme defaults). */
+  function collectPhonemeIdsToPreload() {
+    const ids = new Set();
+    for (const entry of sightWords) {
+      const letters = lettersForEntry(entry);
+      for (let i = 0; i < letters.length; i++) {
+        const id = phonemeIdForGrapheme(entry, i);
+        if (id) ids.add(id);
+      }
+    }
+    for (const id of Object.values(DEFAULT_GRAPHEME_PHONEME)) {
+      const key = normalizePhonemeId(id);
+      if (key) ids.add(key);
+    }
+    return ids;
+  }
+
+  /**
+   * Warm phonemeAudioCache so first letter taps do not wait on network.
+   * Does not call play() — mobile still requires a user gesture to unmute/play.
+   */
+  function preloadPhonemeAudio() {
+    for (const id of collectPhonemeIdsToPreload()) {
+      const audio = getPhonemeAudio(id);
+      if (!audio) continue;
+      try {
+        if (audio.readyState < 2) audio.load();
+      } catch (_) {}
+    }
+  }
+
   /**
    * Play an isolated letter-sound MP3 (human Wikimedia Commons recordings).
    * Falls back to a short TTS hint only if the file is missing.
@@ -967,6 +998,7 @@
 
     await loadWordsFromJson();
     clampWordIndex();
+    preloadPhonemeAudio();
 
     speechSynthesis.onvoiceschanged = loadVoices;
     loadVoices();
