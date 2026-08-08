@@ -1,5 +1,7 @@
 # Phoneme audio attribution
 
+## Active files in this repo
+
 Human recordings from [Wikimedia Commons](https://commons.wikimedia.org/),
 used under **CC BY-SA 3.0** (and/or GFDL) as stated on each file page.
 
@@ -11,7 +13,19 @@ Regenerate (requires `ffmpeg` on PATH):
 npm run fetch:phonemes
 ```
 
-## Files
+## Preferred future source (not redistributed yet)
+
+[LearnPhonics.co phonics sounds](https://learnphonics.co/phonics-sounds) hosts clear
+classroom-style letter/phoneme WAVs under `/audio/phonemes/`. **No public
+redistribution license was found** — do not vendor or hotlink those files until
+permission is granted (`editors@learnphonics.co`).
+
+Mapping, hosting details, and a permission-gated fetch script:
+
+- [LEARNPHONICS.md](./LEARNPHONICS.md)
+- `npm run fetch:learnphonics -- --i-have-permission` (only after permission)
+
+## Wikimedia file list
 
 - `iy.mp3` ← [Close front unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Close_front_unrounded_vowel.ogg)
 - `ih.mp3` ← [Near-close near-front unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Near-close_near-front_unrounded_vowel.ogg)
@@ -26,7 +40,7 @@ npm run fetch:phonemes
 - `ax.mp3` ← [Mid-central vowel.ogg](https://commons.wikimedia.org/wiki/File:Mid-central_vowel.ogg)
 - `ey.mp3` ← [Close-mid front unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Close-mid_front_unrounded_vowel.ogg)
 - `ay.mp3` ← [Open front unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Open_front_unrounded_vowel.ogg)
-- `ow.mp3` ← [Close-mid back rounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Close-mid_back_rounded_vowel.ogg)
+- `ow.mp3` ← [Close-mid back rounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Close_mid_back_rounded_vowel.ogg)
 - `aw.mp3` ← [Open back unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Open_back_unrounded_vowel.ogg)
 - `oy.mp3` ← [Open-mid back rounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Open-mid_back_rounded_vowel.ogg)
 - `f.mp3` ← [Voiceless labio-dental fricative.ogg](https://commons.wikimedia.org/wiki/File:Voiceless_labio-dental_fricative.ogg)

@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "fetch:phonemes": "node scripts/fetch-phonemes.mjs"
+    "fetch:phonemes": "node scripts/fetch-phonemes.mjs",
+    "fetch:learnphonics": "node scripts/fetch-learnphonics-phonemes.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.118.0"

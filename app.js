@@ -415,7 +415,7 @@
   }
 
   /**
-   * Play an isolated letter-sound MP3 (human Wikimedia Commons recordings).
+   * Play an isolated letter-sound MP3 from sounds/phonemes/{id}.mp3.
    * Falls back to a short TTS hint only if the file is missing.
    */
   function playPhoneme(id, fallbackText) {

@@ -12,11 +12,22 @@ Phoneme MP3s in `sounds/phonemes/` are **human recordings** from
 [Wikimedia Commons](https://commons.wikimedia.org/) (CC BY-SA). See
 `sounds/phonemes/ATTRIBUTION.md`.
 
-Regenerate (requires `ffmpeg` on PATH):
+[LearnPhonics.co](https://learnphonics.co/phonics-sounds) has clearer phonics
+letter sounds, but **no public redistribution license** was found — mapping and
+a permission-gated fetch live in `sounds/phonemes/LEARNPHONICS.md`.
+
+Regenerate Commons samples (requires `ffmpeg` on PATH):
 
 ```bash
 npm run fetch:phonemes
 ```
+
+After LearnPhonics permission:
+
+```bash
+npm run fetch:learnphonics -- --i-have-permission
+```
+
 
 ## Deploy (Cloudflare Workers)
 
