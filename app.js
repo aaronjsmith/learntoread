@@ -269,6 +269,10 @@
   let storyReadGen = 0;
   let storyKaraokeActiveEl = null;
   let storyKaraokeTimerIds = [];
+  /** @type {object | null} */
+  let storyBlendEntry = null;
+  let storyBlendScrubIndex = -1;
+  let storyBlendLastPhonemeIndex = -1;
 
   const STORY_LEVELS = ["beginner", "advanced"];
   const STORY_LEVEL_SPEAK = {
@@ -1997,9 +2001,9 @@
         const levelName =
           STORY_LEVEL_SPEAK[content.level] || STORY_LEVEL_SPEAK.beginner;
         if (page.pageIndex > 0) {
-          return `Page ${page.pageIndex + 1} of ${page.pageCount}. Look at the picture. Tap Read aloud to hear this page.`;
+          return `Page ${page.pageIndex + 1} of ${page.pageCount}. Look at the picture. Tap a word to break it into sounds. Tap Read aloud to hear this page.`;
         }
-        return `${title}. ${levelName} level. Look at the picture. Turn the pages as you read. Tap Read aloud to listen. Tap I finished when you're done.`;
+        return `${title}. ${levelName} level. Look at the picture. Tap a word to blend its sounds. Turn the pages as you read. Tap Read aloud to listen. Tap I finished when you're done.`;
       }
       case "report":
         return "Report card. Here are your stars for letters, words, and stories.";
@@ -2074,9 +2078,114 @@
   }
 
   function speakTappedStoryWord(wordEl) {
+    openStoryWordBlend(wordEl);
+  }
+
+  function entryForStoryWord(rawWord) {
+    const key = sightWordKey(wordForSpeech(rawWord));
+    if (!key) return { word: "" };
+    const known = sightWords.find((w) => sightWordKey(w.word) === key);
+    if (known) return known;
+    return { word: key };
+  }
+
+  function parkStoryBlendPanel() {
+    if (!els.storyBlend) return;
+    const host =
+      els.storyReader ||
+      (els.storyBody && els.storyBody.parentElement) ||
+      null;
+    if (host) host.appendChild(els.storyBlend);
+  }
+
+  function hideStoryWordBlend() {
+    storyBlendEntry = null;
+    storyBlendScrubIndex = -1;
+    storyBlendLastPhonemeIndex = -1;
+    if (els.storyBlend) els.storyBlend.hidden = true;
+    parkStoryBlendPanel();
+    document.querySelectorAll(".story-word.is-blend-target").forEach((el) => {
+      el.classList.remove("is-blend-target");
+    });
+  }
+
+  function setStoryBlendActiveLetter(index) {
+    if (!els.storyBlendLetters) return;
+    const letterIndex = Number.isFinite(index) ? index | 0 : -1;
+    const tiles = els.storyBlendLetters.querySelectorAll(".letter-tile");
+    tiles.forEach((t, i) => {
+      t.classList.toggle(
+        "letter-tile--active",
+        letterIndex >= 0 && i === letterIndex
+      );
+    });
+    storyBlendScrubIndex = letterIndex;
+    if (els.storyBlendSlider) {
+      els.storyBlendSlider.value = String(
+        scrubValueFromLetterIndex(letterIndex)
+      );
+    }
+  }
+
+  function renderStoryBlendUI(entry) {
+    if (!els.storyBlend || !els.storyBlendLetters || !els.storyBlendSlider) return;
+    const letters = lettersForEntry(entry);
+    const wordDisplay = sightWordKey(entry.word) || "—";
+    if (els.storyBlendWord) {
+      els.storyBlendWord.textContent = wordDisplay;
+      els.storyBlendWord.setAttribute(
+        "aria-label",
+        `Hear whole word ${wordDisplay}`
+      );
+    }
+    els.storyBlendLetters.innerHTML = "";
+    letters.forEach((ch, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "letter-tile";
+      if (String(ch).length > 1) btn.classList.add("letter-tile--chunk");
+      btn.textContent = ch;
+      const phonemeId = phonemeIdForGrapheme(entry, idx);
+      btn.setAttribute(
+        "aria-label",
+        phonemeId
+          ? `Sound for ${ch}`
+          : String(ch).length > 1
+            ? `Letter group ${ch}`
+            : `Letter ${ch}`
+      );
+      btn.addEventListener("click", () => {
+        setStoryBlendActiveLetter(idx);
+        speakGraphemeSound(entry, idx);
+      });
+      els.storyBlendLetters.appendChild(btn);
+    });
+    els.storyBlendSlider.min = "0";
+    els.storyBlendSlider.max = String(letters.length);
+    storyBlendScrubIndex = -1;
+    storyBlendLastPhonemeIndex = -1;
+    setStoryBlendActiveLetter(-1);
+    els.storyBlend.hidden = false;
+  }
+
+  function openStoryWordBlend(wordEl) {
     const toSpeak = wordForSpeech(wordEl && wordEl.textContent);
-    if (!toSpeak) return;
-    if (storyReading) stopStoryReading();
+    if (!toSpeak || !els.storyBlend) return;
+    if (storyReading) stopStoryReading({ skipRestore: true });
+
+    document.querySelectorAll(".story-word.is-blend-target").forEach((el) => {
+      el.classList.remove("is-blend-target");
+    });
+    wordEl.classList.add("is-blend-target");
+
+    const entry = entryForStoryWord(toSpeak);
+    storyBlendEntry = entry;
+
+    const host = wordEl.closest("p") || wordEl.parentElement;
+    if (host && host.parentNode) {
+      host.after(els.storyBlend);
+    }
+    renderStoryBlendUI(entry);
     speakText(toSpeak);
   }
 
@@ -2211,6 +2320,7 @@
    */
   function prepareStoryKaraoke(content) {
     clearStoryKaraokeHighlight();
+    hideStoryWordBlend();
     const tracks = [];
     if (!content) return tracks;
 
@@ -3993,6 +4103,37 @@
       });
     });
 
+    if (els.storyBlendClose) {
+      els.storyBlendClose.addEventListener("click", () => {
+        hideStoryWordBlend();
+      });
+    }
+    if (els.storyBlendWord) {
+      els.storyBlendWord.addEventListener("click", () => {
+        if (storyBlendEntry && storyBlendEntry.word) {
+          speakText(sightWordKey(storyBlendEntry.word));
+        }
+      });
+    }
+    if (els.storyBlendSlider) {
+      els.storyBlendSlider.addEventListener("input", () => {
+        if (!storyBlendEntry) return;
+        const letterIdx = letterIndexFromScrubValue(els.storyBlendSlider.value);
+        setStoryBlendActiveLetter(letterIdx);
+        if (letterIdx < 0) {
+          storyBlendLastPhonemeIndex = -1;
+          return;
+        }
+        if (letterIdx === storyBlendLastPhonemeIndex) return;
+        storyBlendLastPhonemeIndex = letterIdx;
+        const letters = lettersForEntry(storyBlendEntry);
+        if (letters[letterIdx]) speakGraphemeSound(storyBlendEntry, letterIdx);
+      });
+      els.storyBlendSlider.addEventListener("change", () => {
+        storyBlendLastPhonemeIndex = -1;
+      });
+    }
+
     if (els.storyStopRead) {
       els.storyStopRead.addEventListener("click", () => {
         stopStoryReading();
@@ -4198,6 +4339,11 @@
     els.storyTitle = $("storyTitle");
     els.storyMeta = $("storyMeta");
     els.storyBody = $("storyBody");
+    els.storyBlend = $("storyBlend");
+    els.storyBlendWord = $("storyBlendWord");
+    els.storyBlendClose = $("storyBlendClose");
+    els.storyBlendLetters = $("storyBlendLetters");
+    els.storyBlendSlider = $("storyBlendSlider");
     els.storyMoral = $("storyMoral");
     els.storyPageNav = $("storyPageNav");
     els.storyPageLabel = $("storyPageLabel");
@@ -4207,6 +4353,7 @@
     els.storyStopRead = $("storyStopRead");
     els.storyFinished = $("storyFinished");
     els.storyCredit = $("storyCredit");
+    els.storyReader = $("storyReader");
     els.reportStoryList = $("reportStoryList");
     els.sightScreen = $("sightScreen");
     els.sightWordTitle = $("sightWordTitle");

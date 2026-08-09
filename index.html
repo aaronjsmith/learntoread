@@ -297,7 +297,7 @@
     }
 
     /* Primary CTA darken only — card/surface buttons set their own hover. */
-    button:hover:not(.section-report):not(.activity-card):not(.word-big):not(.letter-tile):not(.say-word-btn):not(.icon-btn):not(.speak-help-btn):not(.story-card):not(.story-level-btn):not(.phonics-cue):not(.phonics-letter-big):not(.sight-word-emoji-btn):not(.profile-card):not(.story-word):not(.secondary) {
+    button:hover:not(.section-report):not(.activity-card):not(.word-big):not(.letter-tile):not(.say-word-btn):not(.icon-btn):not(.speak-help-btn):not(.story-card):not(.story-level-btn):not(.phonics-cue):not(.phonics-letter-big):not(.sight-word-emoji-btn):not(.profile-card):not(.story-word):not(.story-blend-word):not(.secondary) {
       background: var(--accent-dark);
     }
 
@@ -2374,28 +2374,106 @@
     }
 
     .story-body {
-      font-size: 1.05rem;
-      font-weight: 600;
-      line-height: 1.5;
+      font-family: var(--display);
+      font-size: clamp(1.45rem, 5.5vw, 1.85rem);
+      font-weight: 700;
+      line-height: 1.55;
       color: var(--ink);
+      text-align: center;
       flex: 1;
       min-height: 0;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .story-body.is-beginner {
-      font-size: 1.2rem;
+      font-size: clamp(1.7rem, 6.5vw, 2.2rem);
       font-weight: 700;
-      line-height: 1.55;
-      letter-spacing: 0.01em;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
     }
 
     .story-body.is-beginner p {
-      margin: 0 0 0.55em;
+      margin: 0 0 0.65em;
     }
 
     .story-body p {
-      margin: 0 0 0.9em;
+      margin: 0 0 0.75em;
+      text-align: center;
+    }
+
+    .story-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .story-word.is-blend-target {
+      background: var(--sun-soft);
+      color: var(--ink);
+      box-shadow: inset 0 -0.22em 0 0 var(--sun);
+      font-weight: 800;
+    }
+
+    .story-blend {
+      margin: 8px 0 10px;
+      padding: 10px 10px 12px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #fff 0%, #f3fffc 100%);
+      border: 3px solid var(--mint-soft);
+      box-shadow: 0 5px 0 rgba(62, 207, 190, 0.16);
+      flex-shrink: 0;
+    }
+
+    .story-blend[hidden] {
+      display: none !important;
+    }
+
+    .story-blend-head {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .story-blend-word {
+      font-family: var(--display);
+      font-size: clamp(1.4rem, 5vw, 1.9rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin: 0;
+      padding: 4px 10px;
+      min-height: 44px;
+      background: none;
+      border: none;
+      border-radius: 12px;
+      box-shadow: none;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .story-blend-word:hover {
+      background: var(--sun-soft);
+      color: var(--accent-dark);
+    }
+
+    .letter-row--story {
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+
+    .scrub-wrap--story {
+      margin: 0 auto;
+      max-width: 100%;
+    }
+
+    .scrub-wrap--story .scrub-label-row {
+      margin-bottom: 6px;
+    }
+
+    .scrub-wrap--story label {
+      font-size: 0.88rem;
     }
 
     .story-word {
@@ -2420,8 +2498,8 @@
     }
 
     .story-body.is-beginner .story-word {
-      padding: 0.22em 0.28em;
-      margin: 0.1em 0.04em;
+      padding: 0.2em 0.28em;
+      margin: 0.08em 0.04em;
     }
 
     .story-word.is-reading {
@@ -2454,11 +2532,13 @@
     }
 
     .story-moral {
-      margin: 18px 0 0;
+      margin: 10px 0 0;
       padding: 12px 14px;
       border-radius: 16px;
       background: var(--mint-soft);
       border: 2px solid rgba(62, 207, 190, 0.35);
+      font-family: var(--display);
+      font-size: clamp(1.2rem, 4.5vw, 1.45rem);
       font-weight: 800;
       color: var(--mint-dark);
       text-align: center;
@@ -3160,6 +3240,22 @@
           </button>
         </div>
         <div class="story-body" id="storyBody"></div>
+        <div class="story-blend" id="storyBlend" hidden>
+          <div class="story-blend-head">
+            <button type="button" class="story-blend-word" id="storyBlendWord" aria-label="Hear whole word">—</button>
+            <button type="button" class="speak-help-btn" id="storyBlendClose" title="Close" aria-label="Close letter sounds">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close"/></svg>
+            </button>
+          </div>
+          <div class="letter-row letter-row--story" id="storyBlendLetters" role="group" aria-label="Letter sounds in the word"></div>
+          <div class="scrub-wrap scrub-wrap--story">
+            <div class="scrub-label-row">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-blend"/></svg>
+              <label for="storyBlendSlider">Blend the sounds (start left, then slide across each letter)</label>
+            </div>
+            <input type="range" id="storyBlendSlider" min="0" max="0" value="0" aria-label="Blend letter sounds — start before the first letter" />
+          </div>
+        </div>
         <p class="story-moral" id="storyMoral" hidden></p>
         <div class="story-page-nav" id="storyPageNav" hidden>
           <button type="button" class="secondary icon-btn icon-btn--wide" id="storyPrevPage" aria-label="Previous page" data-speak="Previous">
