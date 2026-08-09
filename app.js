@@ -399,6 +399,8 @@
   let voices = [];
   let filteredVoices = [];
   let sightWords = [];
+  /** @type {{ id: string, onset: string, coda: string, vowels: string[], words: string[] }[]} */
+  let vowelFamilies = [];
   /** @type {{ word: string, display: string }[]} */
   let flashcardWords = [];
   let stories = [];
@@ -428,11 +430,15 @@
     userName: "",
     previewText: DEFAULT_PREVIEW_TEXT,
     sightWordIndex: 0,
+    vowelFamilyIndex: 0,
+    vowelVowelIndex: 0,
     flashcardWordIndex: 0,
     phonicsIndex: 0,
     phonicsMastery: {},
     sightMastery: {},
     sightPracticeCounts: {},
+    vowelFamilyPracticed: {},
+    vowelWordMastery: {},
     flashcardMastery: {},
     storiesProgress: {},
     storyReadingLevel: "beginner",
@@ -574,11 +580,14 @@
   function emptyLearningFields() {
     return {
       sightWordIndex: 0,
+      vowelFamilyIndex: 0,
       flashcardWordIndex: 0,
       phonicsIndex: 0,
       phonicsMastery: {},
       sightMastery: {},
       sightPracticeCounts: {},
+      vowelFamilyPracticed: {},
+      vowelWordMastery: {},
       flashcardMastery: {},
       storiesProgress: {},
       storyReadingLevel: "beginner",
@@ -664,11 +673,14 @@
     p.grade = normalizeGrade(state.profileGrade);
     p.ellieColor = normalizeEllieColor(state.ellieColor);
     p.sightWordIndex = state.sightWordIndex | 0;
+    p.vowelFamilyIndex = state.vowelFamilyIndex | 0;
     p.flashcardWordIndex = state.flashcardWordIndex | 0;
     p.phonicsIndex = state.phonicsIndex | 0;
     p.phonicsMastery = state.phonicsMastery || {};
     p.sightMastery = state.sightMastery || {};
     p.sightPracticeCounts = state.sightPracticeCounts || {};
+    p.vowelFamilyPracticed = state.vowelFamilyPracticed || {};
+    p.vowelWordMastery = state.vowelWordMastery || {};
     p.flashcardMastery = state.flashcardMastery || {};
     p.storiesProgress = state.storiesProgress || {};
     p.storyReadingLevel = getStoryReadingLevel();
@@ -682,6 +694,8 @@
     state.profileGrade = normalizeGrade(p.grade);
     state.ellieColor = normalizeEllieColor(p.ellieColor);
     state.sightWordIndex = Math.max(0, p.sightWordIndex | 0);
+    state.vowelFamilyIndex = Math.max(0, p.vowelFamilyIndex | 0);
+    state.vowelVowelIndex = 0;
     state.flashcardWordIndex = Math.max(0, p.flashcardWordIndex | 0);
     state.phonicsIndex = Math.max(0, p.phonicsIndex | 0);
     state.phonicsMastery =
@@ -695,6 +709,14 @@
     state.sightPracticeCounts =
       p.sightPracticeCounts && typeof p.sightPracticeCounts === "object"
         ? { ...p.sightPracticeCounts }
+        : {};
+    state.vowelFamilyPracticed =
+      p.vowelFamilyPracticed && typeof p.vowelFamilyPracticed === "object"
+        ? { ...p.vowelFamilyPracticed }
+        : {};
+    state.vowelWordMastery =
+      p.vowelWordMastery && typeof p.vowelWordMastery === "object"
+        ? { ...p.vowelWordMastery }
         : {};
     state.flashcardMastery =
       p.flashcardMastery && typeof p.flashcardMastery === "object"
@@ -714,6 +736,7 @@
         Math.max(0, sightWords.length - 1)
       );
     }
+    clampVowelFamilyIndex();
     clampFlashcardIndex();
     state.phonicsIndex = Math.min(
       state.phonicsIndex,
@@ -733,11 +756,15 @@
 
   function resetLearningStateOnly() {
     state.sightWordIndex = 0;
+    state.vowelFamilyIndex = 0;
+    state.vowelVowelIndex = 0;
     state.flashcardWordIndex = 0;
     state.phonicsIndex = 0;
     state.phonicsMastery = {};
     state.sightMastery = {};
     state.sightPracticeCounts = {};
+    state.vowelFamilyPracticed = {};
+    state.vowelWordMastery = {};
     state.flashcardMastery = {};
     state.storiesProgress = {};
     state.storyReadingLevel = "beginner";

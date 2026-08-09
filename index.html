@@ -1434,7 +1434,7 @@
       font-size: 1.05rem;
     }
 
-    .ellie-color-row {
+    .theme-color-row {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
@@ -1442,7 +1442,7 @@
       margin: 4px 0 8px;
     }
 
-    .ellie-color-row button {
+    .theme-color-row button {
       width: 56px;
       height: 56px;
       min-width: 56px;
@@ -1454,7 +1454,7 @@
       background: var(--swatch, var(--accent));
     }
 
-    .ellie-color-row button.is-selected {
+    .theme-color-row button.is-selected {
       outline: 3px solid var(--ink);
       outline-offset: 2px;
       box-shadow: 0 4px 0 rgba(42, 53, 80, 0.2);
@@ -1469,31 +1469,31 @@
       text-align: center;
     }
 
-    body.ellie-theme-mint {
+    body.theme-mint {
       --accent: #3ecfbe;
       --accent-dark: #2ab3a3;
       --accent-soft: #d5f7f2;
     }
 
-    body.ellie-theme-sky {
+    body.theme-sky {
       --accent: #6bb7ff;
       --accent-dark: #4a9aef;
       --accent-soft: #d9ecff;
     }
 
-    body.ellie-theme-sun {
+    body.theme-sun {
       --accent: #ffc94a;
       --accent-dark: #e6a820;
       --accent-soft: #fff0c2;
     }
 
-    body.ellie-theme-grape {
+    body.theme-grape {
       --accent: #a78bfa;
       --accent-dark: #7c5ce0;
       --accent-soft: #ede9fe;
     }
 
-    body.ellie-theme-coral {
+    body.theme-coral {
       --accent: #ff8a6a;
       --accent-dark: #e86a48;
       --accent-soft: #ffe4db;
@@ -1634,12 +1634,6 @@
       50% { transform: rotate(3deg); }
     }
 
-    @keyframes cheer-bounce {
-      0%, 100% { transform: translateY(0) scale(1); }
-      35% { transform: translateY(-14px) scale(1.06); }
-      70% { transform: translateY(-4px) scale(1.02); }
-    }
-
     @keyframes think-tilt {
       0%, 100% { transform: rotate(0deg); }
       40% { transform: rotate(-8deg); }
@@ -1648,11 +1642,6 @@
 
     @media (prefers-reduced-motion: reduce) {
       .brand-mark,
-      .ellie-stage svg,
-      .sight-buddy svg,
-      .modal-ellie svg,
-      .friend,
-      .ellie-bubble,
       .say-word-btn[aria-pressed="true"] .say-mic,
       .say-word-btn[aria-pressed="true"] .say-mic::after,
       .say-listen-hint.is-active {
@@ -2828,10 +2817,6 @@
     }
 
     @media (max-height: 700px) {
-      .home-hero .ellie-stage {
-        display: none;
-      }
-
       .story-illustration-wrap {
         max-height: min(24dvh, 200px);
       }
