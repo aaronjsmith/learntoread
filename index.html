@@ -1869,9 +1869,9 @@
       flex: 1;
       min-height: 0;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
+      grid-template-rows: repeat(3, minmax(0, 1fr));
       align-content: stretch;
-      overflow: hidden;
+      overflow: auto;
     }
 
     @media (min-width: 560px) {
@@ -2842,15 +2842,60 @@
       }
 
       .story-illustration-wrap {
-        max-height: min(28dvh, 240px);
+        max-height: min(24dvh, 200px);
       }
 
       .story-illustration {
-        max-height: min(28dvh, 240px);
+        max-height: min(24dvh, 200px);
       }
 
       .sight-buddy {
         display: none;
+      }
+    }
+
+    @media (max-height: 640px) {
+      .home-hero {
+        display: none;
+      }
+
+      #homeScreen > h2 {
+        display: none;
+      }
+
+      #homeScreen > .lead-row {
+        display: none;
+      }
+
+      .section-reports {
+        gap: 8px;
+      }
+
+      .section-report {
+        padding: 8px 10px;
+      }
+
+      .section-report-icon {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .header-actions .btn-caption {
+        display: none;
+      }
+
+      .header-actions .icon-btn {
+        min-width: 48px;
+        min-height: 48px;
+        padding: 8px;
+      }
+
+      .header-progress {
+        width: min(72px, 22vw);
+        min-width: 56px;
+        padding: 6px;
       }
     }
 
@@ -3228,12 +3273,12 @@
         <h1 class="brand-title">Ellie Reads</h1>
       </button>
       <div class="header-actions">
-        <div class="header-progress" aria-label="Overall learning progress">
+        <button type="button" class="header-progress" id="headerProgressBtn" title="Report card" aria-label="Report card — overall progress" data-speak="Report card">
           <span class="progress-overall-label" id="overallProgressLabel">0%</span>
           <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="overallProgressBar">
             <div class="progress-bar-fill" id="overallProgressFill"></div>
           </div>
-        </div>
+        </button>
         <button type="button" class="icon-btn" id="openProfiles" title="Who’s reading?" aria-label="Who’s reading?" data-speak="Who’s reading">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-who"/></svg>
           <span class="btn-caption" id="openProfilesCaption">Who?</span>

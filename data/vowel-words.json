@@ -1,0 +1,102 @@
+{
+  "families": [
+    {
+      "id": "c_t",
+      "onset": "c",
+      "coda": "t",
+      "vowels": ["a", "o", "u"],
+      "words": ["cat", "cot", "cut"]
+    },
+    {
+      "id": "b_g",
+      "onset": "b",
+      "coda": "g",
+      "vowels": ["a", "i", "o", "u"],
+      "words": ["bag", "big", "bog", "bug"]
+    },
+    {
+      "id": "h_t",
+      "onset": "h",
+      "coda": "t",
+      "vowels": ["a", "i", "o", "u"],
+      "words": ["hat", "hit", "hot", "hut"]
+    },
+    {
+      "id": "p_n",
+      "onset": "p",
+      "coda": "n",
+      "vowels": ["a", "e", "i", "u"],
+      "words": ["pan", "pen", "pin", "pun"]
+    },
+    {
+      "id": "m_p",
+      "onset": "m",
+      "coda": "p",
+      "vowels": ["a", "o"],
+      "words": ["map", "mop"]
+    },
+    {
+      "id": "b_t",
+      "onset": "b",
+      "coda": "t",
+      "vowels": ["a", "e", "i", "u"],
+      "words": ["bat", "bet", "bit", "but"]
+    },
+    {
+      "id": "d_g",
+      "onset": "d",
+      "coda": "g",
+      "vowels": ["i", "o", "u"],
+      "words": ["dig", "dog", "dug"]
+    },
+    {
+      "id": "c_p",
+      "onset": "c",
+      "coda": "p",
+      "vowels": ["a", "o", "u"],
+      "words": ["cap", "cop", "cup"]
+    },
+    {
+      "id": "b_d",
+      "onset": "b",
+      "coda": "d",
+      "vowels": ["a", "e", "i", "u"],
+      "words": ["bad", "bed", "bid", "bud"]
+    },
+    {
+      "id": "n_t",
+      "onset": "n",
+      "coda": "t",
+      "vowels": ["e", "i", "o", "u"],
+      "words": ["net", "nit", "not", "nut"]
+    },
+    {
+      "id": "l_p",
+      "onset": "l",
+      "coda": "p",
+      "vowels": ["a", "i", "o"],
+      "words": ["lap", "lip", "lop"]
+    },
+    {
+      "id": "f_n",
+      "onset": "f",
+      "coda": "n",
+      "vowels": ["a", "i", "u"],
+      "words": ["fan", "fin", "fun"]
+    },
+    {
+      "id": "s_t",
+      "onset": "s",
+      "coda": "t",
+      "vowels": ["a", "e", "i"],
+      "words": ["sat", "set", "sit"]
+    },
+    {
+      "id": "t_p",
+      "onset": "t",
+      "coda": "p",
+      "vowels": ["a", "i", "o"],
+      "words": ["tap", "tip", "top"]
+    }
+  ]
+}
