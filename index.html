@@ -1907,15 +1907,26 @@
     .section-report h3 {
       margin: 0 0 4px;
       font-family: var(--display);
-      font-size: 1.05rem;
+      font-size: clamp(0.95rem, 2.8vw, 1.05rem);
       color: var(--mint-dark);
+      line-height: 1.15;
     }
 
     .section-report p {
       margin: 0 0 8px;
-      font-size: 0.88rem;
+      font-size: clamp(0.78rem, 2.4vw, 0.88rem);
       font-weight: 700;
       color: var(--muted);
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .section-report .progress-bar {
+      margin-top: auto;
+      flex-shrink: 0;
     }
 
     .section-report--sight {
@@ -1962,29 +1973,6 @@
 
     .section-report--stories h3 {
       color: #d49200;
-    }
-
-    .section-report--report {
-      border-color: #ffe0e8;
-      box-shadow: 0 5px 0 rgba(255, 107, 138, 0.14);
-    }
-
-    button.section-report--report:hover,
-    button.section-report--report:active {
-      background: #fff8fa;
-    }
-
-    button.section-report--report:hover {
-      border-color: var(--accent);
-      box-shadow: 0 7px 0 rgba(255, 107, 138, 0.18);
-    }
-
-    button.section-report--report:active {
-      box-shadow: 0 3px 0 rgba(255, 107, 138, 0.14);
-    }
-
-    .section-report--report h3 {
-      color: var(--accent-dark);
     }
 
     .section-report--flashcards {
