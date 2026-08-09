@@ -841,6 +841,75 @@
       ]
     },
     {
+      "id": "dos-can-run",
+      "category": "primer",
+      "title": "Dos Can Run",
+      "author": "Ellie Reads",
+      "blurb": "Run, Dos, run! A computer primer.",
+      "image": "assets/stories/dos-can-run.jpg",
+      "imageAlt": "Dos, a friendly little computer, runs with a floppy disk nearby",
+      "levels": {
+        "beginner": {
+          "title": "Dos Can Run",
+          "moral": "Fun to run and play."
+        },
+        "advanced": {
+          "title": "Dos Can Run",
+          "moral": "Fun to run and play."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/dos-can-run/p01.jpg",
+          "imageAlt": "Friendly computer critter Dos stands and smiles",
+          "beginner": [
+            "See Dos.",
+            "Dos can run."
+          ],
+          "advanced": [
+            "See Dos.",
+            "Dos can run on the path."
+          ]
+        },
+        {
+          "image": "assets/stories/dos-can-run/p02.jpg",
+          "imageAlt": "Dos runs happily along the path",
+          "beginner": [
+            "Run, Dos, run!",
+            "Go, Dos, go!"
+          ],
+          "advanced": [
+            "Run, Dos, run!",
+            "Dos runs and runs."
+          ]
+        },
+        {
+          "image": "assets/stories/dos-can-run/p03.jpg",
+          "imageAlt": "Dos runs toward a friendly floppy disk",
+          "beginner": [
+            "See the disk.",
+            "Go, go, go!"
+          ],
+          "advanced": [
+            "See the big disk.",
+            "Dos can go to the disk."
+          ]
+        },
+        {
+          "image": "assets/stories/dos-can-run/p04.jpg",
+          "imageAlt": "Dos sits and rests after a fun run",
+          "beginner": [
+            "Dos can stop.",
+            "Fun!"
+          ],
+          "advanced": [
+            "Dos can stop and rest.",
+            "Fun to run and play!"
+          ]
+        }
+      ]
+    },
+    {
       "id": "tortoise-hare",
       "category": "fable",
       "title": "The Tortoise and the Hare",
@@ -1178,6 +1247,696 @@
             "The boy shouted, “Wolf! Wolf!” But this time the villagers did not come.",
             "“He cannot fool us again,” they said.",
             "The wolf scared the sheep, and the boy learned a hard lesson: if you tell fibs, people may not believe you when you tell the truth."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bible-noah-ark",
+      "category": "bible",
+      "title": "Noah and the Ark",
+      "author": "Bible · for children",
+      "blurb": "Noah listens. Rain comes. Then the sun!",
+      "image": "assets/stories/bible-noah-ark.jpg",
+      "imageAlt": "Noah smiles by a big wooden ark with soft rain clouds",
+      "levels": {
+        "beginner": {
+          "title": "Noah and the Ark",
+          "moral": "Listen and be kind."
+        },
+        "advanced": {
+          "title": "Noah and the Ark",
+          "moral": "Noah listened to God and cared for his family."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bible-noah-ark/p01.jpg",
+          "imageAlt": "Noah listens under a soft sky",
+          "beginner": [
+            "See Noah.",
+            "Noah can listen."
+          ],
+          "advanced": [
+            "See Noah.",
+            "Noah listens to God."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-noah-ark/p02.jpg",
+          "imageAlt": "Noah and family near a big wooden ark",
+          "beginner": [
+            "Noah builds.",
+            "A big ark!"
+          ],
+          "advanced": [
+            "Noah builds a big ark.",
+            "His family helps."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-noah-ark/p03.jpg",
+          "imageAlt": "Soft rain falls; animals go two by two into the ark",
+          "beginner": [
+            "Rain, rain.",
+            "In they go."
+          ],
+          "advanced": [
+            "Soft rain falls.",
+            "Animals go in. Safe!"
+          ]
+        },
+        {
+          "image": "assets/stories/bible-noah-ark/p04.jpg",
+          "imageAlt": "Sun and rainbow after the rain; family smiles",
+          "beginner": [
+            "The rain stops.",
+            "See the sun!"
+          ],
+          "advanced": [
+            "The rain stops.",
+            "See the sun and a bright bow!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bible-david-brave",
+      "category": "bible",
+      "title": "David Is Brave",
+      "author": "Bible · for children",
+      "blurb": "Little David trusts God and is brave.",
+      "image": "assets/stories/bible-david-brave.jpg",
+      "imageAlt": "Young David stands brave with a soft sunny hillside",
+      "levels": {
+        "beginner": {
+          "title": "David Is Brave",
+          "moral": "Be brave. Trust God."
+        },
+        "advanced": {
+          "title": "David Is Brave",
+          "moral": "David was small, but his faith was big."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bible-david-brave/p01.jpg",
+          "imageAlt": "Young David watches sheep on a green hill",
+          "beginner": [
+            "See David.",
+            "David is small."
+          ],
+          "advanced": [
+            "See David.",
+            "David is small, but he can help."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-david-brave/p02.jpg",
+          "imageAlt": "David looks toward a far tall figure with calm courage",
+          "beginner": [
+            "A big man.",
+            "David is not afraid."
+          ],
+          "advanced": [
+            "A big man stands far away.",
+            "David is not afraid."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-david-brave/p03.jpg",
+          "imageAlt": "David looks up and prays with a calm face",
+          "beginner": [
+            "David trusts God.",
+            "God can help."
+          ],
+          "advanced": [
+            "David trusts God.",
+            "God can help him be brave."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-david-brave/p04.jpg",
+          "imageAlt": "David smiles; peace and soft light on the hill",
+          "beginner": [
+            "David is brave.",
+            "God helps David!"
+          ],
+          "advanced": [
+            "David is brave and true.",
+            "God helps David. Peace comes."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bible-daniel-lions",
+      "category": "bible",
+      "title": "Daniel and the Lions",
+      "author": "Bible · for children",
+      "blurb": "Daniel prays. God keeps him safe.",
+      "image": "assets/stories/bible-daniel-lions.jpg",
+      "imageAlt": "Daniel prays calmly near gentle resting lions",
+      "levels": {
+        "beginner": {
+          "title": "Daniel and the Lions",
+          "moral": "Pray and trust God."
+        },
+        "advanced": {
+          "title": "Daniel and the Lions",
+          "moral": "Daniel prayed, and God kept him safe."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bible-daniel-lions/p01.jpg",
+          "imageAlt": "Daniel kneels and prays by a window",
+          "beginner": [
+            "See Daniel.",
+            "Daniel prays."
+          ],
+          "advanced": [
+            "See Daniel.",
+            "Daniel prays each day."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-daniel-lions/p02.jpg",
+          "imageAlt": "Daniel still prays with a peaceful face",
+          "beginner": [
+            "Daniel still prays.",
+            "He loves God."
+          ],
+          "advanced": [
+            "Daniel still prays.",
+            "He loves God and will not stop."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-daniel-lions/p03.jpg",
+          "imageAlt": "Gentle lions rest near Daniel; soft cave light",
+          "beginner": [
+            "Lions are near.",
+            "Daniel is calm."
+          ],
+          "advanced": [
+            "Lions are near.",
+            "Daniel is calm. He trusts God."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-daniel-lions/p04.jpg",
+          "imageAlt": "Morning light; Daniel safe and smiling",
+          "beginner": [
+            "God keeps Daniel safe.",
+            "Daniel is glad!"
+          ],
+          "advanced": [
+            "God keeps Daniel safe.",
+            "Daniel is glad and gives thanks."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bible-jesus-children",
+      "category": "bible",
+      "title": "Jesus Loves Children",
+      "author": "Bible · for children",
+      "blurb": "Jesus welcomes little ones with love.",
+      "image": "assets/stories/bible-jesus-children.jpg",
+      "imageAlt": "Jesus smiles with children gathered near him",
+      "levels": {
+        "beginner": {
+          "title": "Jesus Loves Children",
+          "moral": "Jesus loves you."
+        },
+        "advanced": {
+          "title": "Jesus Loves Children",
+          "moral": "Jesus welcomes children with love."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bible-jesus-children/p01.jpg",
+          "imageAlt": "Children walk happily toward Jesus",
+          "beginner": [
+            "See the children.",
+            "They want to see Jesus."
+          ],
+          "advanced": [
+            "See the children.",
+            "They want to come to Jesus."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-jesus-children/p02.jpg",
+          "imageAlt": "Jesus opens his arms with a warm smile",
+          "beginner": [
+            "Jesus says, \"Come.\"",
+            "Come to me."
+          ],
+          "advanced": [
+            "Jesus says, \"Come to me.\"",
+            "He opens his arms."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-jesus-children/p03.jpg",
+          "imageAlt": "Jesus sits with children; soft kind light",
+          "beginner": [
+            "Jesus is kind.",
+            "Jesus loves them."
+          ],
+          "advanced": [
+            "Jesus is kind and good.",
+            "Jesus loves the children."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-jesus-children/p04.jpg",
+          "imageAlt": "Children smile beside Jesus, peaceful and happy",
+          "beginner": [
+            "Jesus loves you.",
+            "You can come too!"
+          ],
+          "advanced": [
+            "Jesus loves little ones.",
+            "You can come to him too!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bible-good-friend",
+      "category": "bible",
+      "title": "A Good Friend Helps",
+      "author": "Bible · for children",
+      "blurb": "A kind friend stops and helps.",
+      "image": "assets/stories/bible-good-friend.jpg",
+      "imageAlt": "A kind traveler helps another person on a sunny road",
+      "levels": {
+        "beginner": {
+          "title": "A Good Friend Helps",
+          "moral": "Be a good friend."
+        },
+        "advanced": {
+          "title": "A Good Friend Helps",
+          "moral": "A good friend stops and helps with love."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bible-good-friend/p01.jpg",
+          "imageAlt": "A tired traveler sits by the side of a road",
+          "beginner": [
+            "A man sits.",
+            "He needs help."
+          ],
+          "advanced": [
+            "A man sits by the road.",
+            "He needs help."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-good-friend/p02.jpg",
+          "imageAlt": "Some people walk past without stopping",
+          "beginner": [
+            "Some walk by.",
+            "They do not stop."
+          ],
+          "advanced": [
+            "Some people walk by.",
+            "They do not stop to help."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-good-friend/p03.jpg",
+          "imageAlt": "A kind friend kneels and helps gently",
+          "beginner": [
+            "A friend stops.",
+            "He helps!"
+          ],
+          "advanced": [
+            "A good friend stops.",
+            "He helps with care."
+          ]
+        },
+        {
+          "image": "assets/stories/bible-good-friend/p04.jpg",
+          "imageAlt": "Both smile; kindness on a warm path",
+          "beginner": [
+            "Be a good friend.",
+            "Help with love."
+          ],
+          "advanced": [
+            "Be a good friend.",
+            "Help others with love."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bom-nephi-brave",
+      "category": "bom",
+      "title": "Nephi Is Brave",
+      "author": "Book of Mormon · for children",
+      "blurb": "Nephi listens and is brave.",
+      "image": "assets/stories/bom-nephi-brave.jpg",
+      "imageAlt": "Young Nephi stands brave under a soft desert sky",
+      "levels": {
+        "beginner": {
+          "title": "Nephi Is Brave",
+          "moral": "Listen and be brave."
+        },
+        "advanced": {
+          "title": "Nephi Is Brave",
+          "moral": "Nephi listened to God and was brave."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bom-nephi-brave/p01.jpg",
+          "imageAlt": "Nephi listens with a calm face",
+          "beginner": [
+            "See Nephi.",
+            "Nephi can listen."
+          ],
+          "advanced": [
+            "See Nephi.",
+            "Nephi listens to God."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-nephi-brave/p02.jpg",
+          "imageAlt": "Nephi walks with courage on a path",
+          "beginner": [
+            "Nephi can go.",
+            "Nephi is brave."
+          ],
+          "advanced": [
+            "Nephi can go.",
+            "God helps Nephi be brave."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-nephi-brave/p03.jpg",
+          "imageAlt": "Nephi holds special plates carefully with care",
+          "beginner": [
+            "Nephi gets the plates.",
+            "He is careful."
+          ],
+          "advanced": [
+            "Nephi gets the plates.",
+            "He is careful and true."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-nephi-brave/p04.jpg",
+          "imageAlt": "Nephi brings the plates home; family glad",
+          "beginner": [
+            "Nephi comes home.",
+            "His family is glad!"
+          ],
+          "advanced": [
+            "Nephi comes home safe.",
+            "His family is glad!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bom-lehi-tree",
+      "category": "bom",
+      "title": "Lehi Sees a Tree",
+      "author": "Book of Mormon · for children",
+      "blurb": "Lehi sees a bright tree and wants his family near.",
+      "image": "assets/stories/bom-lehi-tree.jpg",
+      "imageAlt": "Lehi looks at a glowing white tree with soft fruit light",
+      "levels": {
+        "beginner": {
+          "title": "Lehi Sees a Tree",
+          "moral": "Love your family."
+        },
+        "advanced": {
+          "title": "Lehi Sees a Tree",
+          "moral": "Lehi wanted his family to come to the good tree."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bom-lehi-tree/p01.jpg",
+          "imageAlt": "Lehi dreams under soft night light",
+          "beginner": [
+            "See Lehi.",
+            "Lehi has a dream."
+          ],
+          "advanced": [
+            "See Lehi.",
+            "Lehi has a special dream."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-lehi-tree/p02.jpg",
+          "imageAlt": "A bright white tree with glowing fruit",
+          "beginner": [
+            "Lehi sees a tree.",
+            "The tree is bright!"
+          ],
+          "advanced": [
+            "Lehi sees a bright tree.",
+            "The fruit looks good and sweet."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-lehi-tree/p03.jpg",
+          "imageAlt": "Lehi tastes fruit and looks happy",
+          "beginner": [
+            "Lehi tastes the fruit.",
+            "It is good!"
+          ],
+          "advanced": [
+            "Lehi tastes the fruit.",
+            "It is good. He feels joy."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-lehi-tree/p04.jpg",
+          "imageAlt": "Lehi calls family toward the bright tree",
+          "beginner": [
+            "Come, family!",
+            "Come to the tree!"
+          ],
+          "advanced": [
+            "Come, family!",
+            "Come to the good tree with me!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bom-enos-prays",
+      "category": "bom",
+      "title": "Enos Prays",
+      "author": "Book of Mormon · for children",
+      "blurb": "Enos prays and feels God's love.",
+      "image": "assets/stories/bom-enos-prays.jpg",
+      "imageAlt": "Enos kneels in a quiet green woods and prays",
+      "levels": {
+        "beginner": {
+          "title": "Enos Prays",
+          "moral": "You can pray."
+        },
+        "advanced": {
+          "title": "Enos Prays",
+          "moral": "Enos prayed, and God heard him."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bom-enos-prays/p01.jpg",
+          "imageAlt": "Enos walks alone in soft woods",
+          "beginner": [
+            "See Enos.",
+            "Enos walks."
+          ],
+          "advanced": [
+            "See Enos.",
+            "Enos walks in the woods."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-enos-prays/p02.jpg",
+          "imageAlt": "Enos kneels and begins to pray",
+          "beginner": [
+            "Enos prays.",
+            "He talks to God."
+          ],
+          "advanced": [
+            "Enos kneels and prays.",
+            "He talks to God."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-enos-prays/p03.jpg",
+          "imageAlt": "Soft light around praying Enos; peaceful face",
+          "beginner": [
+            "Enos prays and prays.",
+            "God hears him."
+          ],
+          "advanced": [
+            "Enos prays and prays.",
+            "God hears him and loves him."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-enos-prays/p04.jpg",
+          "imageAlt": "Enos stands peaceful and happy after prayer",
+          "beginner": [
+            "Enos feels peace.",
+            "Enos is glad!"
+          ],
+          "advanced": [
+            "Enos feels peace.",
+            "He is glad God heard his prayer."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bom-jesus-visits",
+      "category": "bom",
+      "title": "Jesus Visits the Children",
+      "author": "Book of Mormon · for children",
+      "blurb": "Jesus comes. He blesses the children.",
+      "image": "assets/stories/bom-jesus-visits.jpg",
+      "imageAlt": "Jesus blesses children with soft golden light",
+      "levels": {
+        "beginner": {
+          "title": "Jesus Visits the Children",
+          "moral": "Jesus loves children."
+        },
+        "advanced": {
+          "title": "Jesus Visits the Children",
+          "moral": "Jesus blessed the children with love."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bom-jesus-visits/p01.jpg",
+          "imageAlt": "Families look up with wonder and soft light",
+          "beginner": [
+            "See Jesus!",
+            "Jesus comes."
+          ],
+          "advanced": [
+            "See Jesus!",
+            "Jesus comes to the people."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-jesus-visits/p02.jpg",
+          "imageAlt": "Parents bring children gently to Jesus",
+          "beginner": [
+            "Bring the children.",
+            "Come to Jesus."
+          ],
+          "advanced": [
+            "Bring the little children.",
+            "Come close to Jesus."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-jesus-visits/p03.jpg",
+          "imageAlt": "Jesus blesses children one by one, tender scene",
+          "beginner": [
+            "Jesus blesses them.",
+            "One by one."
+          ],
+          "advanced": [
+            "Jesus blesses the children.",
+            "One by one, with love."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-jesus-visits/p04.jpg",
+          "imageAlt": "Children smile in soft light near Jesus",
+          "beginner": [
+            "The children are glad.",
+            "Jesus loves them!"
+          ],
+          "advanced": [
+            "The children are glad.",
+            "Jesus loves them so much!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bom-brave-and-true",
+      "category": "bom",
+      "title": "Brave and True",
+      "author": "Book of Mormon · for children",
+      "blurb": "Young friends are brave and true.",
+      "image": "assets/stories/bom-brave-and-true.jpg",
+      "imageAlt": "Young friends stand together brave and peaceful",
+      "levels": {
+        "beginner": {
+          "title": "Brave and True",
+          "moral": "Be brave and true."
+        },
+        "advanced": {
+          "title": "Brave and True",
+          "moral": "They were brave and true because they trusted God."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/bom-brave-and-true/p01.jpg",
+          "imageAlt": "Young friends stand together with kind faces",
+          "beginner": [
+            "See the young friends.",
+            "They are true."
+          ],
+          "advanced": [
+            "See the young friends.",
+            "They want to be true."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-brave-and-true/p02.jpg",
+          "imageAlt": "A mother teaches her son with love",
+          "beginner": [
+            "Moms teach them.",
+            "Trust God."
+          ],
+          "advanced": [
+            "Their moms teach them.",
+            "Trust God. Be true."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-brave-and-true/p03.jpg",
+          "imageAlt": "Young friends walk forward with courage, soft dawn",
+          "beginner": [
+            "They are brave.",
+            "They help."
+          ],
+          "advanced": [
+            "They are brave.",
+            "They help with faith."
+          ]
+        },
+        {
+          "image": "assets/stories/bom-brave-and-true/p04.jpg",
+          "imageAlt": "Peaceful homecoming; friends safe and glad",
+          "beginner": [
+            "They come home.",
+            "God kept them safe!"
+          ],
+          "advanced": [
+            "They come home glad.",
+            "God kept them safe."
           ]
         }
       ]

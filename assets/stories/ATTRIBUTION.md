@@ -22,6 +22,8 @@ Original early-reader texts written for Ellie Reads in a classic primer style (s
 | `nan-runs` | Nan Can Run |
 | `pip-and-dot` | Pip and Dot |
 | `see-the-sun` | See the Sun |
+| `dos-can-run` | Dos Can Run |
+| `primer-01-nan-can` … `primer-12-a-day-of-fun` | First Words Books 1–12 |
 
 ## Cover illustrations (story list thumbs)
 
@@ -46,6 +48,7 @@ Artist: Milo Winter (1886–1956). These images are public-domain scans of a 191
 | `nan-runs.jpg` | Nan Can Run |
 | `pip-and-dot.jpg` | Pip and Dot |
 | `see-the-sun.jpg` | See the Sun |
+| `dos-can-run.jpg` | Dos Can Run |
 
 Original kid-friendly watercolor-style covers created for Ellie Reads.
 
@@ -61,5 +64,6 @@ Original kid-friendly storybook illustrations for each story page live in:
 - `nan-runs/p01.jpg` … `p04.jpg`
 - `pip-and-dot/p01.jpg` … `p04.jpg`
 - `see-the-sun/p01.jpg` … `p04.jpg`
+- `dos-can-run/p01.jpg` … `p04.jpg`
 
 Created for Ellie Reads page-by-page reading (Aesop page art is not from Milo Winter plates; primer art is original for Ellie Reads).

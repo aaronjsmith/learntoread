@@ -3350,6 +3350,53 @@
       </div>
     </section>
 
+    <section class="screen" data-screen="flashcards" id="flashcardsScreen" hidden>
+      <div class="sight-toolbar">
+        <button type="button" class="secondary icon-btn icon-btn--wide js-back-home" aria-label="Home" data-speak="Home">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-home"/></svg>
+          <span class="btn-caption">Home</span>
+        </button>
+        <button type="button" class="secondary icon-btn icon-btn--wide" id="prevFlashcard" aria-label="Previous word" data-speak="Previous">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-prev"/></svg>
+          <span class="btn-caption">Prev</span>
+        </button>
+        <button type="button" class="icon-btn icon-btn--wide" id="nextFlashcard" aria-label="Next word" data-speak="Next">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-next"/></svg>
+          <span class="btn-caption">Next</span>
+        </button>
+      </div>
+      <div class="word-stage word-stage--flashcards">
+        <div class="sight-buddy" id="flashcardEllie" aria-hidden="true">
+          <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+        </div>
+        <div class="word-hear-wrap">
+          <button type="button" class="word-big" id="flashcardWordTitle" aria-label="Hear word" title="Tap to hear the word">—</button>
+          <span class="word-hear-cue" aria-hidden="true" title="Tap the word to hear it">
+            <svg viewBox="0 0 24 24"><use href="#icon-speaker"/></svg>
+          </span>
+        </div>
+        <p class="word-meta" id="flashcardWordProgress"></p>
+        <div class="lead-row" style="justify-content:center;">
+          <p class="lead" id="flashcardsLead" style="margin:0;text-align:center;">
+            Tap the word to hear it. Mark words you know!
+          </p>
+          <button type="button" class="speak-help-btn" data-speak-help="flashcards" title="Hear instructions" aria-label="Hear story words instructions">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+          </button>
+        </div>
+        <div class="flashcard-actions">
+          <button type="button" class="btn-with-icon" id="flashcardHearBtn" aria-label="Hear word" data-speak="Hear word">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+            <span>Hear word</span>
+          </button>
+          <button type="button" class="secondary btn-with-icon" id="flashcardKnowBtn" aria-label="I know it" data-speak="I know it">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>
+            <span>I know it!</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <section class="screen" data-screen="stories" id="storiesScreen" hidden>
       <div class="sight-toolbar">
         <button type="button" class="secondary icon-btn icon-btn--wide js-back-home" aria-label="Home" data-speak="Home">

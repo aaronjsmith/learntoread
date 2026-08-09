@@ -186,6 +186,97 @@
     { id: "z", letter: "Z", phoneme: "z", example: "zebra", emoji: "🦓" },
   ];
 
+  /**
+   * Speech-to-text spellings of isolated letter *sounds* (phonemes).
+   * Used for phonics mic mastery — not letter names or example words.
+   */
+  const PHONEME_SPEECH_ALIASES = {
+    ae: ["ae", "a", "ah", "aa", "aeh", "short a"],
+    eh: ["eh", "e", "ehh", "short e"],
+    ih: ["ih", "i", "ihh", "short i"],
+    aa: ["aa", "ah", "o", "aw", "ahh", "short o"],
+    ah: ["ah", "uh", "u", "uhh", "short u"],
+    b: ["b", "buh", "bah", "bu", "bih", "ba"],
+    k: ["k", "kuh", "cuh", "ka", "kah", "keh", "c", "ck"],
+    d: ["d", "duh", "dah", "dih", "da"],
+    f: ["f", "fff", "ff", "fuh", "fah", "ph"],
+    g: ["g", "guh", "gah", "gih", "ga"],
+    hh: ["h", "hh", "huh", "hah", "hhh", "ha"],
+    jh: ["j", "jh", "juh", "jah", "jih", "ja", "dge"],
+    l: ["l", "lll", "ll", "luh", "lah", "ul"],
+    m: ["m", "mmm", "mm", "muh", "mah"],
+    n: ["n", "nnn", "nn", "nuh", "nah"],
+    p: ["p", "puh", "pah", "pih", "pa"],
+    kw: ["kw", "qu", "qw", "q", "kwa", "kuhwuh"],
+    r: ["r", "rrr", "rr", "ruh", "rah", "er"],
+    s: ["s", "sss", "ss", "suh", "sah"],
+    t: ["t", "tuh", "tah", "tih", "ta"],
+    v: ["v", "vvv", "vv", "vuh", "vah"],
+    w: ["w", "wuh", "wah", "www", "wu", "wh"],
+    ks: ["ks", "x", "ccks", "kuhs"],
+    y: ["y", "yuh", "yah", "yih", "yu", "ya"],
+    z: ["z", "zzz", "zz", "zuh", "zah"],
+  };
+
+  /** Spoken letter *names* that must not count as saying the sound. */
+  const LETTER_NAME_SPEECH = {
+    a: ["ay", "aye", "ei"],
+    b: ["be", "bee", "bea"],
+    c: ["see", "sea", "cee", "ce"],
+    d: ["dee", "de", "dea"],
+    e: ["ee", "ea", "eee"],
+    f: ["ef", "eff"],
+    g: ["gee", "jee", "ge"],
+    h: ["aitch", "aitch", "haitch"],
+    i: ["eye", "aye", "ai"],
+    j: ["jay", "jaye"],
+    k: ["kay", "cay"],
+    l: ["el", "ell", "elle"],
+    m: ["em", "emm"],
+    n: ["en", "enn"],
+    o: ["oh", "owe"],
+    p: ["pee", "pe"],
+    q: ["cue", "queue", "kyu", "kyoo"],
+    r: ["are"],
+    s: ["ess", "es"],
+    t: ["tee", "tea", "te"],
+    u: ["you", "yu", "yew"],
+    v: ["vee", "ve"],
+    w: ["double u", "double you", "doubleyou", "doubleyu"],
+    x: ["ex", "eks"],
+    y: ["why", "wye"],
+    z: ["zee", "zed", "zea"],
+  };
+
+  /** Kid-facing prompt for “say the sound” (one clear spelling). */
+  const PHONEME_SOUND_HINT = {
+    ae: "ah",
+    eh: "eh",
+    ih: "ih",
+    aa: "ah",
+    ah: "uh",
+    b: "buh",
+    k: "kuh",
+    d: "duh",
+    f: "fff",
+    g: "guh",
+    hh: "huh",
+    jh: "juh",
+    l: "lll",
+    m: "mmm",
+    n: "nnn",
+    p: "puh",
+    kw: "kw",
+    r: "rrr",
+    s: "sss",
+    t: "tuh",
+    v: "vvv",
+    w: "wuh",
+    ks: "ks",
+    y: "yuh",
+    z: "zzz",
+  };
+
   const PHONEME_AUDIO_BASE = "sounds/phonemes/";
   const SFX_BASE = "sounds/sfx/";
   const phonemeAudioCache = new Map();
@@ -262,6 +353,8 @@
   let voices = [];
   let filteredVoices = [];
   let sightWords = [];
+  /** @type {{ word: string, display: string }[]} */
+  let flashcardWords = [];
   let stories = [];
   let activeStoryId = "";
   let storyPageIndex = 0;
@@ -289,10 +382,12 @@
     userName: "",
     previewText: DEFAULT_PREVIEW_TEXT,
     sightWordIndex: 0,
+    flashcardWordIndex: 0,
     phonicsIndex: 0,
     phonicsMastery: {},
     sightMastery: {},
     sightPracticeCounts: {},
+    flashcardMastery: {},
     storiesProgress: {},
     storyReadingLevel: "beginner",
     profileAge: null,
@@ -306,6 +401,36 @@
     pitch: 1.05,
     scrubIndex: -1,
   };
+
+  /** Tiny glue words skipped when the story-word deck gets large. */
+  const FLASHCARD_STOP_WORDS = new Set([
+    "a",
+    "an",
+    "the",
+    "to",
+    "of",
+    "and",
+    "or",
+    "for",
+    "with",
+    "as",
+    "by",
+    "from",
+    "at",
+  ]);
+
+  /** Story character / proper names float to the front of the deck. */
+  const FLASHCARD_NAME_PRIORITY = [
+    "nan",
+    "pip",
+    "dot",
+    "hare",
+    "tortoise",
+    "lion",
+    "mouse",
+    "fox",
+    "wolf",
+  ];
 
   /** Multi-profile store keyed by profile id. */
   const profilesStore = {
@@ -403,10 +528,12 @@
   function emptyLearningFields() {
     return {
       sightWordIndex: 0,
+      flashcardWordIndex: 0,
       phonicsIndex: 0,
       phonicsMastery: {},
       sightMastery: {},
       sightPracticeCounts: {},
+      flashcardMastery: {},
       storiesProgress: {},
       storyReadingLevel: "beginner",
     };
@@ -491,10 +618,12 @@
     p.grade = normalizeGrade(state.profileGrade);
     p.ellieColor = normalizeEllieColor(state.ellieColor);
     p.sightWordIndex = state.sightWordIndex | 0;
+    p.flashcardWordIndex = state.flashcardWordIndex | 0;
     p.phonicsIndex = state.phonicsIndex | 0;
     p.phonicsMastery = state.phonicsMastery || {};
     p.sightMastery = state.sightMastery || {};
     p.sightPracticeCounts = state.sightPracticeCounts || {};
+    p.flashcardMastery = state.flashcardMastery || {};
     p.storiesProgress = state.storiesProgress || {};
     p.storyReadingLevel = getStoryReadingLevel();
     p.updatedAt = new Date().toISOString();
@@ -507,6 +636,7 @@
     state.profileGrade = normalizeGrade(p.grade);
     state.ellieColor = normalizeEllieColor(p.ellieColor);
     state.sightWordIndex = Math.max(0, p.sightWordIndex | 0);
+    state.flashcardWordIndex = Math.max(0, p.flashcardWordIndex | 0);
     state.phonicsIndex = Math.max(0, p.phonicsIndex | 0);
     state.phonicsMastery =
       p.phonicsMastery && typeof p.phonicsMastery === "object"
@@ -519,6 +649,10 @@
     state.sightPracticeCounts =
       p.sightPracticeCounts && typeof p.sightPracticeCounts === "object"
         ? { ...p.sightPracticeCounts }
+        : {};
+    state.flashcardMastery =
+      p.flashcardMastery && typeof p.flashcardMastery === "object"
+        ? { ...p.flashcardMastery }
         : {};
     state.storiesProgress =
       p.storiesProgress && typeof p.storiesProgress === "object"
@@ -534,6 +668,7 @@
         Math.max(0, sightWords.length - 1)
       );
     }
+    clampFlashcardIndex();
     state.phonicsIndex = Math.min(
       state.phonicsIndex,
       Math.max(0, PHONICS_LETTERS.length - 1)
@@ -552,10 +687,12 @@
 
   function resetLearningStateOnly() {
     state.sightWordIndex = 0;
+    state.flashcardWordIndex = 0;
     state.phonicsIndex = 0;
     state.phonicsMastery = {};
     state.sightMastery = {};
     state.sightPracticeCounts = {};
+    state.flashcardMastery = {};
     state.storiesProgress = {};
     state.storyReadingLevel = "beginner";
     state.scrubIndex = -1;
@@ -597,6 +734,8 @@
     if (data && typeof data === "object") {
       if (Number.isFinite(data.sightWordIndex))
         profile.sightWordIndex = Math.max(0, data.sightWordIndex | 0);
+      if (Number.isFinite(data.flashcardWordIndex))
+        profile.flashcardWordIndex = Math.max(0, data.flashcardWordIndex | 0);
       if (Number.isFinite(data.phonicsIndex))
         profile.phonicsIndex = Math.max(0, data.phonicsIndex | 0);
       if (data.phonicsMastery && typeof data.phonicsMastery === "object") {
@@ -610,6 +749,9 @@
         typeof data.sightPracticeCounts === "object"
       ) {
         profile.sightPracticeCounts = { ...data.sightPracticeCounts };
+      }
+      if (data.flashcardMastery && typeof data.flashcardMastery === "object") {
+        profile.flashcardMastery = { ...data.flashcardMastery };
       }
       if (data.storiesProgress && typeof data.storiesProgress === "object") {
         profile.storiesProgress = { ...data.storiesProgress };
@@ -639,6 +781,8 @@
       });
       if (Number.isFinite(raw.sightWordIndex))
         p.sightWordIndex = Math.max(0, raw.sightWordIndex | 0);
+      if (Number.isFinite(raw.flashcardWordIndex))
+        p.flashcardWordIndex = Math.max(0, raw.flashcardWordIndex | 0);
       if (Number.isFinite(raw.phonicsIndex))
         p.phonicsIndex = Math.max(0, raw.phonicsIndex | 0);
       if (raw.phonicsMastery && typeof raw.phonicsMastery === "object") {
@@ -652,6 +796,9 @@
         typeof raw.sightPracticeCounts === "object"
       ) {
         p.sightPracticeCounts = { ...raw.sightPracticeCounts };
+      }
+      if (raw.flashcardMastery && typeof raw.flashcardMastery === "object") {
+        p.flashcardMastery = { ...raw.flashcardMastery };
       }
       if (raw.storiesProgress && typeof raw.storiesProgress === "object") {
         p.storiesProgress = { ...raw.storiesProgress };
@@ -970,16 +1117,22 @@
   function sectionPercents() {
     const phonicsTotal = PHONICS_LETTERS.length || 1;
     const sightTotal = Math.max(1, sightWords.length);
+    const flashTotal = Math.max(1, flashcardWords.length);
     const storiesTotal = Math.max(1, stories.length);
     const phonicsPct = Math.round(
       (countPhonicsMastered() / phonicsTotal) * 100
     );
     const sightPct = Math.round((countSightMastered() / sightTotal) * 100);
+    const flashcardsPct = Math.round(
+      (countFlashcardMastered() / flashTotal) * 100
+    );
     const storiesPct = Math.round(
       (countStoriesFinished() / storiesTotal) * 100
     );
-    const overallPct = Math.round((phonicsPct + sightPct + storiesPct) / 3);
-    return { phonicsPct, sightPct, storiesPct, overallPct };
+    const overallPct = Math.round(
+      (phonicsPct + sightPct + storiesPct + flashcardsPct) / 4
+    );
+    return { phonicsPct, sightPct, storiesPct, flashcardsPct, overallPct };
   }
 
   function setProgressBar(barEl, fillEl, pct) {
@@ -989,9 +1142,11 @@
   }
 
   function updateProgressUI() {
-    const { phonicsPct, sightPct, storiesPct, overallPct } = sectionPercents();
+    const { phonicsPct, sightPct, storiesPct, flashcardsPct, overallPct } =
+      sectionPercents();
     const phonicsDone = countPhonicsMastered();
     const sightDone = countSightMastered();
+    const flashDone = countFlashcardMastered();
     const storiesDone = countStoriesFinished();
 
     if (els.overallProgressLabel) {
@@ -1009,12 +1164,20 @@
       els.storiesProgressFill,
       storiesPct
     );
+    setProgressBar(
+      els.flashcardsProgressBar,
+      els.flashcardsProgressFill,
+      flashcardsPct
+    );
 
     if (els.phonicsReportText) {
       els.phonicsReportText.textContent = `${phonicsDone} of ${PHONICS_LETTERS.length} letter sounds mastered`;
     }
     if (els.sightReportText) {
       els.sightReportText.textContent = `${sightDone} of ${sightWords.length} words mastered`;
+    }
+    if (els.flashcardsReportText) {
+      els.flashcardsReportText.textContent = `${flashDone} of ${flashcardWords.length} words mastered`;
     }
     if (els.storiesReportText) {
       els.storiesReportText.textContent = `${storiesDone} of ${stories.length} stories finished`;
@@ -1116,6 +1279,146 @@
     refreshSightWordMasteryUi();
   }
 
+  function flashcardWordKey(word) {
+    return sightWordKey(word);
+  }
+
+  function isFlashcardMastered(word) {
+    const key = flashcardWordKey(word);
+    return !!(key && state.flashcardMastery[key]);
+  }
+
+  function countFlashcardMastered() {
+    if (!flashcardWords.length) return 0;
+    return flashcardWords.filter((w) => isFlashcardMastered(w.word)).length;
+  }
+
+  function getFlashcardEntry(i) {
+    if (!flashcardWords.length) return { word: "", display: "" };
+    return flashcardWords[
+      Math.min(Math.max(0, i), flashcardWords.length - 1)
+    ];
+  }
+
+  function clampFlashcardIndex() {
+    if (!flashcardWords.length) {
+      state.flashcardWordIndex = 0;
+      return;
+    }
+    state.flashcardWordIndex = Math.min(
+      Math.max(0, state.flashcardWordIndex | 0),
+      flashcardWords.length - 1
+    );
+  }
+
+  function refreshFlashcardMasteryUi() {
+    const entry = getFlashcardEntry(state.flashcardWordIndex);
+    const key = flashcardWordKey(entry.word);
+    const mastered = isFlashcardMastered(key);
+
+    if (els.flashcardWordTitle) {
+      els.flashcardWordTitle.classList.toggle("is-mastered", mastered);
+      if (key) {
+        els.flashcardWordTitle.setAttribute(
+          "aria-label",
+          mastered ? "Hear word (mastered)" : "Hear word"
+        );
+      }
+    }
+    if (els.flashcardKnowBtn) {
+      const label = els.flashcardKnowBtn.querySelector("span:last-child");
+      if (label) label.textContent = mastered ? "Known!" : "I know it!";
+      els.flashcardKnowBtn.disabled = mastered;
+    }
+    if (!els.flashcardWordProgress) return;
+    if (!flashcardWords.length) {
+      els.flashcardWordProgress.textContent = "No story words yet";
+      return;
+    }
+    els.flashcardWordProgress.textContent = mastered
+      ? `Word ${state.flashcardWordIndex + 1} of ${flashcardWords.length} · Mastered!`
+      : `Word ${state.flashcardWordIndex + 1} of ${flashcardWords.length}`;
+  }
+
+  function updateFlashcardUI() {
+    clampFlashcardIndex();
+    const entry = getFlashcardEntry(state.flashcardWordIndex);
+    if (els.flashcardWordTitle) {
+      els.flashcardWordTitle.textContent = entry.display || entry.word || "—";
+    }
+    refreshFlashcardMasteryUi();
+  }
+
+  function markFlashcardMastered(word) {
+    const key = flashcardWordKey(word);
+    if (!key) return false;
+    let newly = false;
+    if (!state.flashcardMastery[key]) {
+      state.flashcardMastery[key] = true;
+      newly = true;
+      persistProgress();
+      updateProgressUI();
+    }
+    refreshFlashcardMasteryUi();
+    return newly;
+  }
+
+  function hearCurrentFlashcard() {
+    const entry = getFlashcardEntry(state.flashcardWordIndex);
+    if (!entry.word) return;
+    speakWholeWord(entry.word);
+  }
+
+  /**
+   * Build a kid-friendly flashcard deck from Easy (beginner) story page text.
+   * Letters-only tokens length >= 2, case-insensitive dedupe; tiny stop words
+   * dropped when the raw set is large. Names first, then frequency, then A–Z.
+   */
+  function extractStoryFlashcardWords(storyList) {
+    const freq = new Map();
+    const list = Array.isArray(storyList) ? storyList : [];
+    for (const story of list) {
+      if (!story || !Array.isArray(story.pages)) continue;
+      for (const page of story.pages) {
+        const lines = page && Array.isArray(page.beginner) ? page.beginner : [];
+        for (const line of lines) {
+          const tokens = String(line || "").match(/[A-Za-z']+/g) || [];
+          for (const token of tokens) {
+            const cleaned = wordForSpeech(token).replace(/'/g, "");
+            if (!/^[a-z]{2,}$/.test(cleaned)) continue;
+            freq.set(cleaned, (freq.get(cleaned) || 0) + 1);
+          }
+        }
+      }
+    }
+    let keys = [...freq.keys()];
+    if (keys.length > 60) {
+      keys = keys.filter((w) => !FLASHCARD_STOP_WORDS.has(w));
+    }
+    const nameRank = new Map(
+      FLASHCARD_NAME_PRIORITY.map((name, i) => [name, i])
+    );
+    keys.sort((a, b) => {
+      const aName = nameRank.has(a);
+      const bName = nameRank.has(b);
+      if (aName && bName) return nameRank.get(a) - nameRank.get(b);
+      if (aName) return -1;
+      if (bName) return 1;
+      const freqDiff = (freq.get(b) || 0) - (freq.get(a) || 0);
+      if (freqDiff) return freqDiff;
+      return a.localeCompare(b);
+    });
+    return keys.map((word) => ({
+      word,
+      display: word.charAt(0).toUpperCase() + word.slice(1),
+    }));
+  }
+
+  function rebuildFlashcardDeck() {
+    flashcardWords = extractStoryFlashcardWords(stories);
+    clampFlashcardIndex();
+  }
+
   function bumpPhonics(id, field) {
     const rec = getPhonicsRecord(id);
     rec[field] = (rec[field] | 0) + 1;
@@ -1139,10 +1442,12 @@
       profileGrade: state.profileGrade,
       ellieColor: state.ellieColor,
       sightWordIndex: state.sightWordIndex,
+      flashcardWordIndex: state.flashcardWordIndex,
       phonicsIndex: state.phonicsIndex,
       phonicsMastery: state.phonicsMastery,
       sightMastery: state.sightMastery,
       sightPracticeCounts: state.sightPracticeCounts,
+      flashcardMastery: state.flashcardMastery,
       storiesProgress: state.storiesProgress,
       storyReadingLevel: getStoryReadingLevel(),
       voiceName: state.voiceName,
@@ -1278,6 +1583,10 @@
           ? newer.storyReadingLevel
           : older.storyReadingLevel,
       sightWordIndex: Math.max(local.sightWordIndex | 0, remote.sightWordIndex | 0),
+      flashcardWordIndex: Math.max(
+        local.flashcardWordIndex | 0,
+        remote.flashcardWordIndex | 0
+      ),
       phonicsIndex: Math.max(local.phonicsIndex | 0, remote.phonicsIndex | 0),
       phonicsMastery: mergePhonicsMasteryMaps(
         local.phonicsMastery,
@@ -1287,6 +1596,10 @@
       sightPracticeCounts: mergeCountMaps(
         local.sightPracticeCounts,
         remote.sightPracticeCounts
+      ),
+      flashcardMastery: mergeSightMasteryMaps(
+        local.flashcardMastery,
+        remote.flashcardMastery
       ),
       storiesProgress: mergeStoriesProgressMaps(
         local.storiesProgress,
@@ -2790,6 +3103,75 @@
     return stripped === t || stripped.split(" ").includes(t);
   }
 
+  function stripSpeechFillers(heard) {
+    return normalizeHeardText(heard)
+      .replace(
+        /^(the sound|the letter|it is|it's|i said|um+|uh+)\s+/i,
+        ""
+      )
+      .trim();
+  }
+
+  function phonicsSoundHint(entry) {
+    if (!entry) return "";
+    const phoneme = normalizePhonemeId(entry.phoneme);
+    return (
+      PHONEME_SOUND_HINT[phoneme] ||
+      (PHONEME_SPEECH_ALIASES[phoneme] && PHONEME_SPEECH_ALIASES[phoneme][0]) ||
+      phoneme ||
+      ""
+    );
+  }
+
+  function phonicsSoundAcceptList(entry) {
+    if (!entry) return [];
+    const phoneme = normalizePhonemeId(entry.phoneme);
+    const aliases = PHONEME_SPEECH_ALIASES[phoneme] || [];
+    const out = new Set();
+    if (phoneme) out.add(phoneme);
+    for (const a of aliases) {
+      const n = normalizeHeardText(a);
+      if (n) out.add(n);
+    }
+    const hint = phonicsSoundHint(entry);
+    if (hint) out.add(normalizeHeardText(hint));
+    return [...out];
+  }
+
+  /**
+   * Phonics mic mastery: match the letter *sound*, not the letter name
+   * or the example word (e.g. “ball”).
+   */
+  function heardMatchesLetterSound(heard, entry) {
+    if (!entry) return false;
+    const raw = stripSpeechFillers(heard);
+    if (!raw) return false;
+
+    const letterKey = String(entry.id || entry.letter || "")
+      .toLowerCase()
+      .trim();
+    const nameRejects = (LETTER_NAME_SPEECH[letterKey] || []).map((n) =>
+      normalizeHeardText(n)
+    );
+    if (nameRejects.includes(raw)) return false;
+
+    const example = normalizeHeardText(
+      String(entry.example || "").replace(/-/g, " ")
+    );
+    const exampleCompact = example.replace(/\s+/g, "");
+    if (example && (raw === example || raw === exampleCompact)) return false;
+    if (example && raw.split(" ").includes(example)) return false;
+
+    const accept = phonicsSoundAcceptList(entry);
+    if (!accept.length) return false;
+
+    // Exact phrase or whole-token match only (never substring — “ball” must
+    // not match “b”).
+    if (accept.includes(raw)) return true;
+    const tokens = raw.split(" ").filter(Boolean);
+    return tokens.some((tok) => accept.includes(tok));
+  }
+
   function setEllieMood(mood) {
     const nodes = [els.sightEllie, els.homeEllie, els.phonicsEllie].filter(
       Boolean
@@ -2935,7 +3317,12 @@
   }
 
   function setPhonicsListeningUi(listening) {
-    setMicButtonListening(els.phonicsSayBtn, listening, "Say it", "Listening…");
+    setMicButtonListening(
+      els.phonicsSayBtn,
+      listening,
+      "Say the sound",
+      "Listening…"
+    );
     setListenHint(els.phonicsListenHint, listening);
     if (els.phonicsHeard) {
       els.phonicsHeard.classList.toggle("is-listening", !!listening);
