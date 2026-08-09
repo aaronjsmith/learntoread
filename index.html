@@ -898,10 +898,54 @@
 
     .modal-actions {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       justify-content: flex-end;
       flex-wrap: wrap;
       margin-top: 20px;
+    }
+
+    .modal-actions button {
+      min-height: var(--touch-min);
+    }
+
+    .modal-actions .btn-with-icon {
+      flex: 1 1 auto;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 28px;
+      height: 28px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .checkbox-row {
+      min-height: 48px;
+      gap: 12px;
+    }
+
+    .section-report-icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .report-section-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .report-section-head h3 {
+      margin: 0;
+    }
+
+    .report-section-head .btn-icon {
+      width: 36px;
+      height: 36px;
+      color: var(--accent-dark);
     }
 
     .settings-grid {
@@ -1297,8 +1341,8 @@
 
     .report-letter-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
-      gap: 6px;
+      grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+      gap: 8px;
     }
 
     .report-letter {
@@ -1306,7 +1350,8 @@
       border: 2px solid #ffe0e8;
       background: #fffafb;
       text-align: center;
-      padding: 8px 2px 6px;
+      padding: 10px 2px 8px;
+      min-height: 48px;
       font-family: var(--display);
       font-weight: 700;
     }
@@ -1333,12 +1378,15 @@
     }
 
     .report-word-list li {
-      padding: 8px 12px;
+      padding: 12px 16px;
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
       border-radius: 999px;
       border: 2px solid #ffe0e8;
       background: #fff;
       font-weight: 800;
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       color: var(--muted);
     }
 
@@ -1443,6 +1491,104 @@
       <circle cx="44" cy="34" r="3" fill="#3ecfbe"/>
       <circle cx="36" cy="42" r="3" fill="#6bb7ff"/>
     </symbol>
+
+    <symbol id="icon-abc" viewBox="0 0 72 72">
+      <rect x="8" y="14" width="24" height="24" rx="7" fill="#ffc94a"/>
+      <rect x="40" y="14" width="24" height="24" rx="7" fill="#3ecfbe"/>
+      <rect x="24" y="40" width="24" height="24" rx="7" fill="#ff6b8a"/>
+      <text x="20" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#2a3550" font-family="Fredoka, Nunito, sans-serif">A</text>
+      <text x="52" y="32" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="Fredoka, Nunito, sans-serif">B</text>
+      <text x="36" y="58" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="Fredoka, Nunito, sans-serif">C</text>
+    </symbol>
+
+    <symbol id="icon-stars" viewBox="0 0 72 72">
+      <rect x="14" y="10" width="44" height="52" rx="8" fill="#ffe0e8"/>
+      <rect x="20" y="16" width="32" height="40" rx="4" fill="#fff"/>
+      <path d="M36 24l3.2 6.5 7.2 1-5.2 5.1 1.2 7.2L36 40.4l-6.4 3.4 1.2-7.2-5.2-5.1 7.2-1z" fill="#ffc94a"/>
+      <circle cx="28" cy="50" r="2.5" fill="#3ecfbe"/>
+      <circle cx="36" cy="50" r="2.5" fill="#ff6b8a"/>
+      <circle cx="44" cy="50" r="2.5" fill="#6bb7ff"/>
+    </symbol>
+
+    <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 11.5 12 4l8 7.5"/>
+      <path d="M7 10.5V20h10v-9.5"/>
+      <path d="M10 20v-5h4v5"/>
+    </symbol>
+
+    <symbol id="icon-prev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M15 5 8 12l7 7"/>
+    </symbol>
+
+    <symbol id="icon-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m9 5 7 7-7 7"/>
+    </symbol>
+
+    <symbol id="icon-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 10v4h4l5 4V6L7 10H3z"/>
+      <path d="M16 9a4 4 0 0 1 0 6"/>
+      <path d="M18.5 7a7 7 0 0 1 0 10"/>
+    </symbol>
+
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="m8 12.5 2.8 2.8L16.5 9"/>
+    </symbol>
+
+    <symbol id="icon-quiz" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.8 2.1c-.9.5-1.3 1-1.3 2"/>
+      <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>
+    </symbol>
+
+    <symbol id="icon-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 4h11l3 3v13H5z"/>
+      <path d="M9 4v5h7"/>
+      <path d="M9 17h6"/>
+    </symbol>
+
+    <symbol id="icon-load" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 8h16v12H4z"/>
+      <path d="M4 8l2.5-4h11L20 8"/>
+      <path d="M12 12v6"/>
+      <path d="m9 15 3 3 3-3"/>
+    </symbol>
+
+    <symbol id="icon-voice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v10"/>
+      <path d="M8 8v5a4 4 0 0 0 8 0V8"/>
+      <path d="M5 12a7 7 0 0 0 14 0"/>
+      <path d="M12 19v2"/>
+    </symbol>
+
+    <symbol id="icon-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v4"/>
+      <path d="M12 17v4"/>
+      <path d="M3 12h4"/>
+      <path d="M17 12h4"/>
+      <path d="m6 6 2.5 2.5"/>
+      <path d="m15.5 15.5 2.5 2.5"/>
+      <path d="m18 6-2.5 2.5"/>
+      <path d="m8.5 15.5 2.5 2.5" transform="rotate(90 9.75 16.75)"/>
+      <circle cx="12" cy="12" r="3.5"/>
+    </symbol>
+
+    <symbol id="icon-blend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 12h16"/>
+      <circle cx="7" cy="12" r="2.5" fill="currentColor" stroke="none"/>
+      <circle cx="17" cy="12" r="2.5"/>
+      <path d="M12 7v10"/>
+    </symbol>
+
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+      <path d="M7 7l10 10"/>
+      <path d="M17 7 7 17"/>
+    </symbol>
+
+    <symbol id="icon-preview" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/>
+    </symbol>
   </svg>
 
   <header class="app-header">
@@ -1454,15 +1600,18 @@
         <h1>Ellie Reads</h1>
       </div>
       <div class="header-actions">
-        <button type="button" class="secondary" id="exportBtn" title="Download progress as a JSON file">
-          Save JSON
+        <button type="button" class="icon-btn" id="exportBtn" title="Download progress as a JSON file" aria-label="Save progress JSON" data-speak="Save">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-save"/></svg>
+          <span class="btn-caption">Save</span>
         </button>
-        <button type="button" class="secondary" id="importBtn" title="Choose a progress JSON file from your device">
-          Load JSON
+        <button type="button" class="icon-btn" id="importBtn" title="Choose a progress JSON file from your device" aria-label="Load progress JSON" data-speak="Load">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-load"/></svg>
+          <span class="btn-caption">Load</span>
         </button>
         <input type="file" id="importInput" class="sr-only" accept="application/json,.json" aria-hidden="true" tabindex="-1" />
-        <button type="button" class="secondary" id="openSettings" title="Voice and speech settings">
-          Voice
+        <button type="button" class="icon-btn" id="openSettings" title="Voice and speech settings" aria-label="Voice settings" data-speak="Voice">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-voice"/></svg>
+          <span class="btn-caption">Voice</span>
         </button>
       </div>
     </div>
@@ -1494,6 +1643,7 @@
 
       <div class="section-reports" id="sectionReports">
         <div class="section-report">
+          <svg class="section-report-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-abc"/></svg>
           <h3>Phonics</h3>
           <p id="phonicsReportText">0 of 26 letter sounds mastered</p>
           <div class="progress-bar progress-bar--thin" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="phonicsProgressBar">
@@ -1501,6 +1651,7 @@
           </div>
         </div>
         <div class="section-report section-report--sight">
+          <svg class="section-report-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-book"/></svg>
           <h3>Sight words</h3>
           <p id="sightReportText">0 of 0 words mastered</p>
           <div class="progress-bar progress-bar--thin" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="sightProgressBar">
@@ -1510,28 +1661,28 @@
       </div>
 
       <p class="lead" id="homeFileHint" style="font-size: 0.95rem;">
-        Progress is saved automatically in this browser. Use <strong>Save JSON</strong> / <strong>Load JSON</strong> only if you want a backup copy.
+        Progress is saved automatically in this browser. Use the <strong>Save</strong> / <strong>Load</strong> icons only if you want a backup copy.
       </p>
       <div class="activity-grid">
-        <button type="button" class="activity-card" id="activityPhonics">
-          <svg class="activity-card-icon" viewBox="0 0 120 120" aria-hidden="true"><use href="#ellie-mini"/></svg>
-          <span>
+        <button type="button" class="activity-card" id="activityPhonics" aria-label="Phonics" data-speak="Phonics">
+          <svg class="activity-card-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-abc"/></svg>
+          <span class="activity-card-text">
             <h3>Phonics</h3>
-            <p>Learn each letter’s <strong>sound</strong>, practice saying it, then quiz with Ellie!</p>
+            <p>Letter sounds with Ellie</p>
           </span>
         </button>
-        <button type="button" class="activity-card" id="activitySightWords">
+        <button type="button" class="activity-card" id="activitySightWords" aria-label="Sight words" data-speak="Sight words">
           <svg class="activity-card-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-book"/></svg>
-          <span>
+          <span class="activity-card-text">
             <h3>Sight words</h3>
-            <p>Tap each letter for its <strong>sound</strong>. Slide to blend, tap the word to hear it, then say it with Ellie listening!</p>
+            <p>Tap, blend, then say the word</p>
           </span>
         </button>
-        <button type="button" class="activity-card" id="activityReportCard">
-          <svg class="activity-card-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-book"/></svg>
-          <span>
+        <button type="button" class="activity-card" id="activityReportCard" aria-label="Report card" data-speak="Report card">
+          <svg class="activity-card-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-stars"/></svg>
+          <span class="activity-card-text">
             <h3>Report card</h3>
-            <p>See your stars and mastery for phonics and sight words.</p>
+            <p>Your stars and progress</p>
           </span>
         </button>
       </div>
@@ -1539,9 +1690,18 @@
 
     <section class="screen" data-screen="phonics" id="phonicsScreen" hidden>
       <div class="sight-toolbar">
-        <button type="button" class="secondary js-back-home">← Home</button>
-        <button type="button" class="secondary" id="prevPhonicsLetter">Previous</button>
-        <button type="button" id="nextPhonicsLetter">Next letter</button>
+        <button type="button" class="secondary icon-btn icon-btn--wide js-back-home" aria-label="Home" data-speak="Home">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-home"/></svg>
+          <span class="btn-caption">Home</span>
+        </button>
+        <button type="button" class="secondary icon-btn icon-btn--wide" id="prevPhonicsLetter" aria-label="Previous letter" data-speak="Previous">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-prev"/></svg>
+          <span class="btn-caption">Prev</span>
+        </button>
+        <button type="button" class="icon-btn icon-btn--wide" id="nextPhonicsLetter" aria-label="Next letter" data-speak="Next">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-next"/></svg>
+          <span class="btn-caption">Next</span>
+        </button>
       </div>
       <div class="phonics-layout">
         <div>
@@ -1556,9 +1716,15 @@
           <p class="phonics-letter-big" id="phonicsLetterBig">A</p>
           <p class="phonics-example" id="phonicsExample">as in apple</p>
           <div class="phonics-actions">
-            <button type="button" id="phonicsPlaySound">Hear the sound</button>
-            <button type="button" class="secondary" id="phonicsISaidIt">I can say it!</button>
-            <button type="button" class="say-word-btn" id="phonicsSayBtn" aria-pressed="false">
+            <button type="button" class="btn-with-icon" id="phonicsPlaySound" aria-label="Hear the sound" data-speak="Hear">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+              <span>Hear</span>
+            </button>
+            <button type="button" class="secondary btn-with-icon" id="phonicsISaidIt" aria-label="I can say it" data-speak="I can say it">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>
+              <span>I can!</span>
+            </button>
+            <button type="button" class="say-word-btn" id="phonicsSayBtn" aria-pressed="false" aria-label="Say it into the microphone">
               <span class="say-mic" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="3" width="6" height="11" rx="3"/>
@@ -1583,7 +1749,10 @@
             <div class="phonics-quiz-choices" id="phonicsQuizChoices"></div>
           </div>
           <div class="phonics-actions" style="margin-top:14px;margin-bottom:0;">
-            <button type="button" class="secondary" id="phonicsStartQuiz">Quiz me!</button>
+            <button type="button" class="secondary btn-with-icon" id="phonicsStartQuiz" aria-label="Quiz me" data-speak="Quiz">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-quiz"/></svg>
+              <span>Quiz</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1591,26 +1760,38 @@
 
     <section class="screen" data-screen="sight" id="sightScreen" hidden>
       <div class="sight-toolbar">
-        <button type="button" class="secondary js-back-home">← Home</button>
-        <button type="button" class="secondary" id="prevWord">Previous</button>
-        <button type="button" id="nextWord">Next word</button>
+        <button type="button" class="secondary icon-btn icon-btn--wide js-back-home" aria-label="Home" data-speak="Home">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-home"/></svg>
+          <span class="btn-caption">Home</span>
+        </button>
+        <button type="button" class="secondary icon-btn icon-btn--wide" id="prevWord" aria-label="Previous word" data-speak="Previous">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-prev"/></svg>
+          <span class="btn-caption">Prev</span>
+        </button>
+        <button type="button" class="icon-btn icon-btn--wide" id="nextWord" aria-label="Next word" data-speak="Next">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-next"/></svg>
+          <span class="btn-caption">Next</span>
+        </button>
       </div>
       <div class="word-stage">
         <div class="sight-buddy" id="sightEllie" aria-hidden="true">
           <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
         </div>
-        <button type="button" class="word-big" id="sightWordTitle" aria-label="Hear whole word">—</button>
+        <button type="button" class="word-big" id="sightWordTitle" aria-label="Hear whole word" title="Tap to hear the whole word">—</button>
         <p class="word-meta" id="sightWordProgress"></p>
         <div class="letter-row" id="letterRow" role="group" aria-label="Letter sounds in the word"></div>
         <div class="scrub-wrap">
-          <label for="scrubSlider">Blend the sounds (slide across each letter)</label>
-          <input type="range" id="scrubSlider" min="0" max="0" value="0" />
+          <div class="scrub-label-row">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-blend"/></svg>
+            <label for="scrubSlider">Blend the sounds (slide across each letter)</label>
+          </div>
+          <input type="range" id="scrubSlider" min="0" max="0" value="0" aria-label="Blend letter sounds" />
           <p class="range-hint" style="margin-top:10px;text-align:center;">
-            Tap a letter for one sound. Use the slider to hear them in order.
+            Tap a letter for one sound. Slide to hear them in order.
           </p>
         </div>
         <div class="say-word">
-          <button type="button" class="say-word-btn" id="sayWordBtn" aria-pressed="false">
+          <button type="button" class="say-word-btn" id="sayWordBtn" aria-pressed="false" aria-label="Say the word into the microphone">
             <span class="say-mic" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="3" width="6" height="11" rx="3"/>
