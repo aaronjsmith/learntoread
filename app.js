@@ -2792,7 +2792,13 @@
       if (!keepQuiz) setPhonicsStatus("", "");
     }
 
-    if (els.phonicsLetterBig) els.phonicsLetterBig.textContent = entry.letter;
+    if (els.phonicsLetterBig) {
+      els.phonicsLetterBig.textContent = entry.letter;
+      els.phonicsLetterBig.setAttribute(
+        "aria-label",
+        `Hear the sound for ${entry.letter}`
+      );
+    }
     if (els.phonicsEmoji) {
       els.phonicsEmoji.textContent = entry.emoji || "";
       els.phonicsEmoji.hidden = !entry.emoji;
@@ -2826,6 +2832,7 @@
           phonicsQuizMode = false;
           persistProgress();
           updatePhonicsUI();
+          playPhonicsSound();
         });
         els.phonicsGrid.appendChild(btn);
       });
@@ -3684,6 +3691,9 @@
     });
 
     els.phonicsPlaySound.addEventListener("click", () => playPhonicsSound());
+    if (els.phonicsLetterBig) {
+      els.phonicsLetterBig.addEventListener("click", () => playPhonicsSound());
+    }
     els.phonicsISaidIt.addEventListener("click", () => markPhonicsPracticed());
     els.phonicsSayBtn.addEventListener("click", () => startPhonicsSayListening());
     els.phonicsStartQuiz.addEventListener("click", () => startPhonicsQuiz());
