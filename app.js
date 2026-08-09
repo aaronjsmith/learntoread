@@ -2964,6 +2964,7 @@
   }
 
   function openLevelModal(opts) {
+    if (!els.levelModal) return;
     if (els.nameModal) els.nameModal.hidden = true;
     if (els.welcomeModal) els.welcomeModal.hidden = true;
     pendingLevelChoice = {
@@ -3022,6 +3023,7 @@
     persistProgress();
     stopSayWordListening();
     stopStoryReading();
+    if (els.profilePickerModal) els.profilePickerModal.hidden = true;
     showScreen("home", { silent: true });
     refreshUiAfterProgressApply();
     if (els.sightScreen && !els.sightScreen.hidden) updateSightWordUI();
@@ -3688,10 +3690,24 @@
     els.nameForm = $("nameForm");
     els.nameInput = $("nameInput");
     els.homeGreeting = $("homeGreeting");
+    els.brandHome = $("brandHome");
+    els.openProfiles = $("openProfiles");
+    els.openProfilesCaption = $("openProfilesCaption");
+    els.profilePickerModal = $("profilePickerModal");
+    els.profilePickerList = $("profilePickerList");
+    els.profilePickerLead = $("profilePickerLead");
+    els.closeProfilePicker = $("closeProfilePicker");
+    els.profileAddBtn = $("profileAddBtn");
+    els.levelModal = $("levelModal");
+    els.gradeGrid = $("gradeGrid");
+    els.ageBandRow = $("ageBandRow");
+    els.ellieColorRow = $("ellieColorRow");
+    els.levelContinue = $("levelContinue");
     els.parentalGateModal = $("parentalGateModal");
     els.parentalGateWords = $("parentalGateWords");
     els.parentalGateFeedback = $("parentalGateFeedback");
     els.parentalGateCodeWord = $("parentalGateCodeWord");
+    els.parentalGateKidMsg = $("parentalGateKidMsg");
     els.closeParentalGate = $("closeParentalGate");
     els.settingsModal = $("settingsModal");
     els.openSettings = $("openSettings");
