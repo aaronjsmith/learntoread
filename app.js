@@ -757,10 +757,22 @@
     return stripped === t || stripped.split(" ").includes(t);
   }
 
+  function setEllieMood(mood) {
+    const nodes = [els.sightEllie, els.homeEllie].filter(Boolean);
+    for (const node of nodes) {
+      node.classList.remove("is-listen", "is-cheer", "is-think");
+      if (mood) node.classList.add(`is-${mood}`);
+    }
+  }
+
   function setSayWordStatus(message, kind) {
     if (!els.sayWordStatus) return;
     els.sayWordStatus.textContent = message || "";
     els.sayWordStatus.className = "say-word-status" + (kind ? ` is-${kind}` : "");
+    if (kind === "listening") setEllieMood("listen");
+    else if (kind === "success") setEllieMood("cheer");
+    else if (kind === "miss") setEllieMood("think");
+    else if (!kind) setEllieMood("");
   }
 
   function setSayWordListeningUi(listening) {
@@ -854,11 +866,11 @@
       const best = hypotheses[0] ? normalizeHeardText(hypotheses[0]) : "";
 
       if (matched) {
-        setSayWordStatus("Nice! You said it right.", "success");
+        setSayWordStatus("Yay! Ellie heard it — you got it!", "success");
       } else if (best) {
-        setSayWordStatus(`Heard “${best}”. Try again!`, "miss");
+        setSayWordStatus(`Ellie heard “${best}”. Try again!`, "miss");
       } else {
-        setSayWordStatus("Didn’t catch that. Try again.", "miss");
+        setSayWordStatus("Ellie didn’t catch that. Try again!", "miss");
       }
     };
 
@@ -900,8 +912,13 @@
 
   function updateHomeGreeting() {
     els.homeGreeting.textContent = state.userName
-      ? `Hi, ${state.userName}! Pick an activity.`
-      : "Pick an activity.";
+      ? `Hi, ${state.userName}! Pick an activity with Ellie.`
+      : "Pick an activity with Ellie.";
+    if (els.ellieBubble) {
+      els.ellieBubble.textContent = state.userName
+        ? `Hi, ${state.userName}! I’m Ellie — let’s read together!`
+        : "Hi! I’m Ellie — let’s read together!";
+    }
   }
 
   function updateSightWordUI() {
@@ -946,6 +963,7 @@
     setActiveLetter(state.scrubIndex);
 
     stopSayWordListening();
+    setEllieMood("");
     if (!SpeechRecognitionAPI) {
       els.sayWordBtn.disabled = true;
       setSayWordStatus(
@@ -1182,6 +1200,9 @@
     els.nextWord = $("nextWord");
     els.sayWordBtn = $("sayWordBtn");
     els.sayWordStatus = $("sayWordStatus");
+    els.sightEllie = $("sightEllie");
+    els.homeEllie = $("homeEllie");
+    els.ellieBubble = $("ellieBubble");
     els.exportBtn = $("exportBtn");
     els.importBtn = $("importBtn");
     els.importInput = $("importInput");
