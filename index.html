@@ -2018,6 +2018,94 @@
       color: #3a86c8;
     }
 
+    .section-report--vowels {
+      border-color: rgba(62, 207, 190, 0.45);
+      box-shadow: 0 6px 0 rgba(62, 207, 190, 0.16);
+    }
+
+    button.section-report--vowels:hover,
+    button.section-report--vowels:active {
+      background: #f2fcfa;
+    }
+
+    button.section-report--vowels:hover {
+      border-color: var(--mint);
+      box-shadow: 0 8px 0 rgba(62, 207, 190, 0.26);
+    }
+
+    button.section-report--vowels:active {
+      box-shadow: 0 4px 0 rgba(62, 207, 190, 0.16);
+    }
+
+    .section-report--vowels h3 {
+      color: var(--mint-dark);
+    }
+
+    .vowel-frame {
+      font-family: var(--display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      margin: 0 0 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .vowel-word-letter {
+      display: inline-block;
+    }
+
+    .vowel-word-letter--vowel {
+      color: var(--accent-dark);
+      background: var(--accent-soft);
+      border-radius: 12px;
+      padding: 0 0.12em;
+      margin: 0 0.04em;
+      box-shadow: 0 3px 0 rgba(255, 107, 138, 0.22);
+    }
+
+    .vowel-tile-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 4px 0 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .vowel-tile {
+      min-width: 52px;
+      min-height: 52px;
+      font-family: var(--display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 14px;
+      background: var(--sky);
+      color: #fff;
+      border: 3px solid transparent;
+      box-shadow: 0 4px 0 rgba(107, 183, 255, 0.4);
+    }
+
+    .vowel-tile:hover:not(:disabled) {
+      filter: brightness(1.05);
+    }
+
+    .vowel-tile.is-active {
+      background: var(--accent);
+      border-color: #fff;
+      box-shadow: 0 0 0 3px rgba(255, 107, 138, 0.35), 0 4px 0 rgba(240, 69, 106, 0.35);
+    }
+
+    .vowel-tile:disabled {
+      opacity: 0.28;
+      cursor: not-allowed;
+      box-shadow: 0 2px 0 rgba(107, 183, 255, 0.2);
+      filter: grayscale(0.2);
+    }
+
     .flashcard-actions {
       display: flex;
       flex-wrap: wrap;
