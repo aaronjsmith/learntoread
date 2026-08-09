@@ -1042,11 +1042,22 @@
   function updateCloudAuthUI() {
     if (!els.cloudAuthBtn) return;
     const cloud = getEllieCloud();
-    if (!cloud || !cloud.isConfigured()) {
-      els.cloudAuthBtn.hidden = true;
+    const ready = !!(cloud && cloud.isConfigured && cloud.isConfigured());
+    // Always show so parents can discover sync; explain setup if not ready.
+    els.cloudAuthBtn.hidden = false;
+    els.cloudAuthBtn.classList.toggle("icon-btn--needs-setup", !ready);
+    if (!ready) {
+      els.cloudAuthBtn.classList.remove("icon-btn--signed-in");
+      els.cloudAuthBtn.title =
+        "Google sync needs setup. Grown-ups: tap for instructions.";
+      els.cloudAuthBtn.setAttribute(
+        "aria-label",
+        "Google sync needs setup. Tap for instructions."
+      );
+      els.cloudAuthBtn.dataset.speak = "Google setup";
+      if (els.cloudAuthCaption) els.cloudAuthCaption.textContent = "Google";
       return;
     }
-    els.cloudAuthBtn.hidden = false;
     if (cloudUser) {
       els.cloudAuthBtn.classList.add("icon-btn--signed-in");
       const who = cloudUser.email || cloudUser.displayName || "Google";
@@ -1061,6 +1072,96 @@
       els.cloudAuthBtn.dataset.speak = "Google";
       if (els.cloudAuthCaption) els.cloudAuthCaption.textContent = "Google";
     }
+  }
+
+  function explainGoogleSetup() {
+    speakCue("Ask a grown-up to finish Google setup");
+    alert(
+      "Google sync isn’t set up yet.\n\n" +
+        "Grown-ups: create a Firebase web app, enable Google sign-in + Firestore, " +
+        "then put the web config into firebase-config.js (see README). " +
+        "Add this site’s domain (e.g. read.ensign.quest) under Authentication → Settings → Authorized domains.\n\n" +
+        "Until then, progress still saves in this browser, and Settings → Save JSON works as a backup."
+    );
+  }
+
+  function bindCloudAuth() {
+    updateCloudAuthUI();
+    const cloud = getEllieCloud();
+    if (cloud && cloud.isConfigured && cloud.isConfigured()) {
+      try {
+        cloud.ensureInit();
+        cloud.onAuthChange(async (user) => {
+          cloudUser = user || null;
+          updateCloudAuthUI();
+          if (user) {
+            await syncCloudWithLocal(user);
+          } else {
+            cloudAuthSpeakPending = false;
+          }
+        });
+      } catch (err) {
+        console.warn("Ellie cloud sync: auth bind failed", err);
+      }
+    }
+
+    if (!els.cloudAuthBtn || els.cloudAuthBtn.dataset.bound === "1") return;
+    els.cloudAuthBtn.dataset.bound = "1";
+    els.cloudAuthBtn.addEventListener("click", async () => {
+      const live = getEllieCloud();
+      const ready = !!(live && live.isConfigured && live.isConfigured());
+      if (!ready) {
+        explainGoogleSetup();
+        return;
+      }
+      if (cloudUser) {
+        speakCue("Sign out");
+        try {
+          await live.signOutUser();
+        } catch (err) {
+          console.warn("Ellie cloud sync: sign-out failed", err);
+        }
+        return;
+      }
+      speakCue("Google");
+      cloudAuthSpeakPending = true;
+      try {
+        await live.signInWithGoogle();
+      } catch (err) {
+        cloudAuthSpeakPending = false;
+        const code = err && err.code;
+        if (
+          code === "auth/popup-closed-by-user" ||
+          code === "auth/cancelled-popup-request"
+        ) {
+          return;
+        }
+        console.warn("Ellie cloud sync: sign-in failed", err);
+        const msg =
+          code === "auth/unauthorized-domain"
+            ? "This website domain isn’t allowed in Firebase yet. Add read.ensign.quest under Authentication → Settings → Authorized domains."
+            : code === "auth/popup-blocked"
+              ? "The sign-in popup was blocked. Allow popups for this site and try again."
+              : "Could not sign in with Google. Check Firebase Auth setup and authorized domains.";
+        speakCue("Try again");
+        alert(msg);
+      }
+    });
+  }
+
+  function whenCloudReady(cb) {
+    if (getEllieCloud()) {
+      cb();
+      return;
+    }
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries += 1;
+      if (getEllieCloud() || tries > 50) {
+        clearInterval(timer);
+        cb();
+      }
+    }, 50);
   }
 
   function refreshUiAfterProgressApply() {
@@ -1095,55 +1196,6 @@
     } finally {
       setCloudSyncing(false);
       cloudSyncPaused = false;
-    }
-  }
-
-  function bindCloudAuth() {
-    const cloud = getEllieCloud();
-    updateCloudAuthUI();
-    if (!cloud || !cloud.isConfigured()) return;
-    cloud.ensureInit();
-    cloud.onAuthChange(async (user) => {
-      cloudUser = user || null;
-      updateCloudAuthUI();
-      if (user) {
-        await syncCloudWithLocal(user);
-      } else {
-        cloudAuthSpeakPending = false;
-      }
-    });
-
-    if (els.cloudAuthBtn) {
-      els.cloudAuthBtn.addEventListener("click", async () => {
-        if (!cloud.isConfigured()) return;
-        if (cloudUser) {
-          speakCue("Sign out");
-          try {
-            await cloud.signOutUser();
-          } catch (err) {
-            console.warn("Ellie cloud sync: sign-out failed", err);
-          }
-          return;
-        }
-        speakCue("Google");
-        cloudAuthSpeakPending = true;
-        try {
-          await cloud.signInWithGoogle();
-        } catch (err) {
-          cloudAuthSpeakPending = false;
-          const code = err && err.code;
-          if (
-            code === "auth/popup-closed-by-user" ||
-            code === "auth/cancelled-popup-request"
-          ) {
-            return;
-          }
-          console.warn("Ellie cloud sync: sign-in failed", err);
-          alert(
-            "Could not sign in with Google. Check Firebase Auth setup and authorized domains."
-          );
-        }
-      });
     }
   }
 
@@ -3806,7 +3858,7 @@
       profilesStore.activeProfileId = "";
     }
     bindEvents();
-    bindCloudAuth();
+    whenCloudReady(() => bindCloudAuth());
 
     await loadWordsFromJson();
     await loadStoriesFromJson();

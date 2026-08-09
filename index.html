@@ -177,6 +177,11 @@
       opacity: 0.72;
     }
 
+    .header-actions .icon-btn--needs-setup {
+      opacity: 0.85;
+      border-style: dashed;
+    }
+
     .btn-icon--google {
       color: #4285f4;
     }
@@ -243,6 +248,12 @@
       min-width: var(--touch-min);
       min-height: var(--touch-min);
       padding: 8px 12px;
+    }
+
+    /* Author display:flex must not resurrect [hidden] controls (e.g. Google). */
+    .icon-btn[hidden],
+    button.icon-btn[hidden] {
+      display: none !important;
     }
 
     .icon-btn .btn-icon {
@@ -2570,7 +2581,7 @@
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-who"/></svg>
           <span class="btn-caption" id="openProfilesCaption">Who?</span>
         </button>
-        <button type="button" class="icon-btn icon-btn--google" id="cloudAuthBtn" hidden title="Sign in with Google to sync progress" aria-label="Sign in with Google" data-speak="Google">
+        <button type="button" class="icon-btn icon-btn--google" id="cloudAuthBtn" title="Sign in with Google to sync progress" aria-label="Sign in with Google" data-speak="Google">
           <svg class="btn-icon btn-icon--google" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-google"/></svg>
           <span class="btn-caption" id="cloudAuthCaption">Google</span>
         </button>
