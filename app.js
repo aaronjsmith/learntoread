@@ -1065,6 +1065,7 @@
 
   function refreshUiAfterProgressApply() {
     syncControlsFromState();
+    applyEllieTheme(state.ellieColor);
     updateHomeGreeting();
     updateProgressUI();
     updateStoryLevelPickersUI();
@@ -1159,7 +1160,12 @@
       const raw = localStorage.getItem(LS_PROGRESS);
       if (raw == null || !String(raw).trim()) return false;
       const data = JSON.parse(raw);
+      const needsMigrate =
+        !data.profiles ||
+        typeof data.profiles !== "object" ||
+        (data.version | 0) < PROGRESS_VERSION;
       applyProgressData(data, { persist: false });
+      if (needsMigrate) persistProgress();
       return true;
     } catch (_) {
       return false;
@@ -2145,14 +2151,12 @@
     const story = getStoryById(activeStoryId);
     if (!story) return;
     const content = getStoryLevelContent(story);
-    clearStoryKaraokeHighlight();
     updateStoryLevelPickersUI();
 
     if (els.storyImage) {
       els.storyImage.src = story.image || "";
       els.storyImage.alt = story.imageAlt || content.title || story.title;
     }
-    if (els.storyTitle) els.storyTitle.textContent = content.title || story.title;
     if (els.storyMeta) {
       const levelHint =
         content.level === "beginner" ? "Easy words" : "Longer story";
@@ -2160,25 +2164,8 @@
         ? `A fable by ${story.author} · ${levelHint}`
         : `A classic fable · ${levelHint}`;
     }
-    if (els.storyBody) {
-      els.storyBody.innerHTML = "";
-      els.storyBody.classList.toggle("is-beginner", content.level === "beginner");
-      els.storyBody.dataset.storyLevel = content.level;
-      content.paragraphs.forEach((line) => {
-        const p = document.createElement("p");
-        p.textContent = line;
-        els.storyBody.appendChild(p);
-      });
-    }
-    if (els.storyMoral) {
-      if (content.moral) {
-        els.storyMoral.hidden = false;
-        els.storyMoral.textContent = `Lesson: ${content.moral}`;
-      } else {
-        els.storyMoral.hidden = true;
-        els.storyMoral.textContent = "";
-      }
-    }
+    // Keep karaoke-ready word spans so tap-to-speak works in Easy + Longer.
+    prepareStoryKaraoke(content);
     if (els.storyCredit) {
       els.storyCredit.textContent =
         content.level === "beginner"
@@ -2864,6 +2851,313 @@
         ? `Hi, ${state.userName}! I’m Ellie — let’s read together!`
         : "Hi! I’m Ellie — let’s read together!";
     }
+    if (els.openProfilesCaption) {
+      const short = state.userName ? String(state.userName).slice(0, 8) : "Who?";
+      els.openProfilesCaption.textContent = short;
+    }
+    if (els.openProfiles) {
+      els.openProfiles.title = state.userName
+        ? `Who’s reading? (now ${state.userName})`
+        : "Who’s reading?";
+    }
+  }
+
+  function anyOnboardingModalOpen() {
+    return (
+      (els.welcomeModal && !els.welcomeModal.hidden) ||
+      (els.nameModal && !els.nameModal.hidden) ||
+      (els.levelModal && !els.levelModal.hidden)
+    );
+  }
+
+  function hideOnboardingModals() {
+    if (els.welcomeModal) els.welcomeModal.hidden = true;
+    if (els.nameModal) els.nameModal.hidden = true;
+    if (els.levelModal) els.levelModal.hidden = true;
+  }
+
+  function openNameModal(opts) {
+    hideOnboardingModals();
+    if (els.profilePickerModal) els.profilePickerModal.hidden = true;
+    els.nameModal.hidden = false;
+    els.nameInput.value = state.userName || "";
+    els.nameInput.focus();
+    if (opts && opts.forceSpeak) speakInstruction("name", { force: true });
+  }
+
+  function renderGradeGrid() {
+    if (!els.gradeGrid) return;
+    els.gradeGrid.innerHTML = "";
+    GRADE_KEYS.forEach((g) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.dataset.grade = g;
+      const main = document.createElement("span");
+      main.className = "grade-label";
+      main.textContent = g === "K" ? "K" : g;
+      const sub = document.createElement("span");
+      sub.className = "grade-sub";
+      sub.textContent = g === "K" ? "Kinder" : `Grade ${g}`;
+      btn.appendChild(main);
+      btn.appendChild(sub);
+      btn.setAttribute(
+        "aria-label",
+        g === "K" ? "Kindergarten" : `Grade ${g}`
+      );
+      btn.classList.toggle("is-selected", pendingLevelChoice.grade === g);
+      btn.addEventListener("click", () => {
+        pendingLevelChoice.grade = g;
+        pendingLevelChoice.ageBandId = "";
+        const band = AGE_BANDS.find((b) => b.grade === g);
+        if (band) pendingLevelChoice.age = band.age;
+        renderGradeGrid();
+        renderAgeBands();
+        speakCue(g === "K" ? "Kindergarten" : `Grade ${g}`);
+      });
+      els.gradeGrid.appendChild(btn);
+    });
+  }
+
+  function renderAgeBands() {
+    if (!els.ageBandRow) return;
+    els.ageBandRow.innerHTML = "";
+    AGE_BANDS.forEach((band) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.dataset.ageBand = band.id;
+      btn.textContent = band.label;
+      btn.setAttribute("aria-label", band.label);
+      btn.classList.toggle("is-selected", pendingLevelChoice.ageBandId === band.id);
+      btn.addEventListener("click", () => {
+        pendingLevelChoice.ageBandId = band.id;
+        pendingLevelChoice.age = band.age;
+        pendingLevelChoice.grade = band.grade;
+        renderGradeGrid();
+        renderAgeBands();
+        speakCue(band.label);
+      });
+      els.ageBandRow.appendChild(btn);
+    });
+  }
+
+  function renderEllieColorRow() {
+    if (!els.ellieColorRow) return;
+    els.ellieColorRow.innerHTML = "";
+    const selected = normalizeEllieColor(
+      pendingLevelChoice.ellieColor || state.ellieColor
+    );
+    ELLIE_COLOR_KEYS.forEach((key) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.dataset.ellieColor = key;
+      btn.style.setProperty("--swatch", ELLIE_COLOR_SWATCH[key] || ELLIE_COLOR_SWATCH.pink);
+      btn.setAttribute("aria-label", `${key} Ellie`);
+      btn.classList.toggle("is-selected", selected === key);
+      btn.addEventListener("click", () => {
+        pendingLevelChoice.ellieColor = key;
+        applyEllieTheme(key);
+        renderEllieColorRow();
+        speakCue(key);
+      });
+      els.ellieColorRow.appendChild(btn);
+    });
+  }
+
+  function openLevelModal(opts) {
+    if (els.nameModal) els.nameModal.hidden = true;
+    if (els.welcomeModal) els.welcomeModal.hidden = true;
+    pendingLevelChoice = {
+      grade: normalizeGrade(state.profileGrade),
+      age: normalizeAge(state.profileAge),
+      ageBandId: "",
+      ellieColor: normalizeEllieColor(state.ellieColor),
+    };
+    if (pendingLevelChoice.age != null && !pendingLevelChoice.ageBandId) {
+      const match = AGE_BANDS.find((b) => b.age === pendingLevelChoice.age);
+      if (match) pendingLevelChoice.ageBandId = match.id;
+    }
+    renderGradeGrid();
+    renderAgeBands();
+    renderEllieColorRow();
+    els.levelModal.hidden = false;
+    if (opts && opts.forceSpeak) speakInstruction("level", { force: true });
+  }
+
+  function completeLevelOnboarding() {
+    const grade = normalizeGrade(pendingLevelChoice.grade);
+    const age = normalizeAge(pendingLevelChoice.age);
+    if (!grade && age == null) {
+      speakCue("Pick a grade or age");
+      return false;
+    }
+    state.profileGrade = grade;
+    state.profileAge = age;
+    state.ellieColor = normalizeEllieColor(
+      pendingLevelChoice.ellieColor || state.ellieColor
+    );
+    applyEllieTheme(state.ellieColor);
+    const level = storyLevelForGradeOrAge(grade, age);
+    state.storyReadingLevel = level;
+    const p = ensureActiveProfile();
+    p.grade = grade;
+    p.age = age;
+    p.ellieColor = state.ellieColor;
+    p.storyReadingLevel = level;
+    persistProgress();
+    if (els.levelModal) els.levelModal.hidden = true;
+    updateHomeGreeting();
+    updateProgressUI();
+    updateStoryLevelPickersUI();
+    lastAutoSpokenInstructionKey = "";
+    speakInstruction("home", { force: true });
+    return true;
+  }
+
+  function switchToProfile(profileId, opts) {
+    const id = String(profileId || "").trim();
+    if (!id || !profilesStore.profiles[id]) return false;
+    syncActiveProfileFromState();
+    profilesStore.activeProfileId = id;
+    loadProfileIntoState(profilesStore.profiles[id]);
+    persistProgress();
+    stopSayWordListening();
+    stopStoryReading();
+    showScreen("home", { silent: true });
+    refreshUiAfterProgressApply();
+    if (els.sightScreen && !els.sightScreen.hidden) updateSightWordUI();
+    if (!(opts && opts.silent)) {
+      lastAutoSpokenInstructionKey = "";
+      speakInstruction("home", { force: true });
+    }
+    return true;
+  }
+
+  function beginAddProfileFlow() {
+    syncActiveProfileFromState();
+    const p = createEmptyProfile({ name: "" });
+    profilesStore.profiles[p.id] = p;
+    profilesStore.activeProfileId = p.id;
+    loadProfileIntoState(p);
+    persistProgress();
+    if (els.profilePickerModal) els.profilePickerModal.hidden = true;
+    refreshUiAfterProgressApply();
+    openNameModal({ forceSpeak: true });
+  }
+
+  function deleteProfileById(profileId) {
+    const id = String(profileId || "").trim();
+    if (!id || !profilesStore.profiles[id]) return false;
+    const count = Object.keys(profilesStore.profiles).length;
+    if (count <= 1) {
+      speakCue("Keep at least one reader");
+      return false;
+    }
+    const wasActive = profilesStore.activeProfileId === id;
+    delete profilesStore.profiles[id];
+    if (wasActive) {
+      const next = listProfilesSorted()[0];
+      profilesStore.activeProfileId = next.id;
+      loadProfileIntoState(next);
+    }
+    persistProgress();
+    refreshUiAfterProgressApply();
+    renderProfilePickerList();
+    speakCue("Deleted");
+    return true;
+  }
+
+  function renderProfilePickerList() {
+    if (!els.profilePickerList) return;
+    els.profilePickerList.innerHTML = "";
+    listProfilesSorted().forEach((profile) => {
+      const row = document.createElement("div");
+      row.style.display = "flex";
+      row.style.gap = "10px";
+      row.style.alignItems = "stretch";
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "profile-card";
+      if (profile.id === profilesStore.activeProfileId) {
+        btn.classList.add("is-active");
+      }
+      btn.setAttribute("role", "listitem");
+      const color = normalizeEllieColor(profile.ellieColor);
+      const avatar = document.createElement("span");
+      avatar.className = "profile-card-avatar";
+      avatar.style.background = ELLIE_COLOR_SWATCH[color] || ELLIE_COLOR_SWATCH.pink;
+      const initial = (profile.name || "?").trim().charAt(0).toUpperCase() || "?";
+      avatar.textContent = initial;
+      const meta = document.createElement("span");
+      meta.className = "profile-card-meta";
+      const nameEl = document.createElement("span");
+      nameEl.className = "profile-card-name";
+      nameEl.textContent = profile.name || "New reader";
+      const levelEl = document.createElement("span");
+      levelEl.className = "profile-card-level";
+      const lvl = profileLevelLabel(profile);
+      const storySpeak =
+        STORY_LEVEL_SPEAK[normalizeStoryLevel(profile.storyReadingLevel)] ||
+        "Easy";
+      levelEl.textContent = lvl ? `${lvl} · ${storySpeak}` : storySpeak;
+      meta.appendChild(nameEl);
+      meta.appendChild(levelEl);
+      btn.appendChild(avatar);
+      btn.appendChild(meta);
+      btn.addEventListener("click", () => {
+        speakCue(profile.name || "Reader");
+        switchToProfile(profile.id);
+        if (els.profilePickerModal) els.profilePickerModal.hidden = true;
+      });
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "profile-card-delete";
+      del.title = "Delete reader (grown-ups)";
+      del.setAttribute("aria-label", `Delete ${profile.name || "reader"}`);
+      del.innerHTML =
+        '<svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-trash"/></svg>';
+      del.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openParentalGate({
+          kidMsg: "Ellie says deleting a reader is for grown-ups.",
+          onSuccess: () => {
+            const ok = window.confirm(
+              `Delete ${profile.name || "this reader"} and their progress on this device?`
+            );
+            if (ok) deleteProfileById(profile.id);
+          },
+        });
+      });
+
+      row.appendChild(btn);
+      row.appendChild(del);
+      els.profilePickerList.appendChild(row);
+    });
+  }
+
+  function openProfilePicker() {
+    renderProfilePickerList();
+    if (els.profilePickerModal) els.profilePickerModal.hidden = false;
+    speakInstruction("profiles", { force: true });
+  }
+
+  function continueAfterNameOrLevel() {
+    const active = getActiveProfile();
+    if (!state.userName.trim()) {
+      openNameModal({ forceSpeak: true });
+      return;
+    }
+    if (!profileHasLevel(active) && !profileHasLevel({
+      grade: state.profileGrade,
+      age: state.profileAge,
+    })) {
+      openLevelModal({ forceSpeak: true });
+      return;
+    }
+    hideOnboardingModals();
+    updateHomeGreeting();
+    speakInstruction("home", { force: true });
   }
 
   function updateSightWordUI() {
@@ -2938,22 +3232,15 @@
       const text = await file.text();
       const data = JSON.parse(text);
       applyProgressData(data);
-      els.welcomeModal.hidden = true;
+      hideOnboardingModals();
+      if (els.profilePickerModal) els.profilePickerModal.hidden = true;
       syncControlsFromState();
       updateHomeGreeting();
       updateProgressUI();
       updateStoryLevelPickersUI();
-      if (!els.sightScreen.hidden) updateSightWordUI();
+      if (els.sightScreen && !els.sightScreen.hidden) updateSightWordUI();
       applyVoiceFilters();
-      if (!state.userName.trim()) {
-        els.nameModal.hidden = false;
-        els.nameInput.value = "";
-        els.nameInput.focus();
-        speakInstruction("name", { force: true });
-      } else {
-        els.nameModal.hidden = true;
-        speakInstruction("home", { force: true });
-      }
+      continueAfterNameOrLevel();
     } catch (_) {
       alert("Could not read that JSON file. Please pick a valid export.");
     }
@@ -2975,6 +3262,7 @@
     els.parentalGateModal.hidden = true;
     if (els.parentalGateFeedback) els.parentalGateFeedback.textContent = "";
     if (els.parentalGateWords) els.parentalGateWords.innerHTML = "";
+    parentalGateOnSuccess = null;
   }
 
   function openSettingsPanel() {
@@ -3008,8 +3296,13 @@
   function handleParentalGateChoice(word, btn) {
     if (word === PARENTAL_GATE_CODE_WORD) {
       if (els.parentalGateFeedback) els.parentalGateFeedback.textContent = "";
-      closeParentalGate();
-      openSettingsPanel();
+      const onSuccess = parentalGateOnSuccess;
+      parentalGateOnSuccess = null;
+      if (els.parentalGateModal) els.parentalGateModal.hidden = true;
+      if (els.parentalGateFeedback) els.parentalGateFeedback.textContent = "";
+      if (els.parentalGateWords) els.parentalGateWords.innerHTML = "";
+      if (typeof onSuccess === "function") onSuccess();
+      else openSettingsPanel();
       return;
     }
     playFeedbackSfx("miss");
@@ -3024,10 +3317,23 @@
     }
   }
 
-  function openParentalGate() {
+  /**
+   * @param {{ onSuccess?: () => void, kidMsg?: string } | undefined} opts
+   */
+  function openParentalGate(opts) {
+    const onSuccess =
+      opts && typeof opts.onSuccess === "function"
+        ? opts.onSuccess
+        : () => openSettingsPanel();
     if (!els.parentalGateModal) {
-      openSettingsPanel();
+      onSuccess();
       return;
+    }
+    parentalGateOnSuccess = onSuccess;
+    if (els.parentalGateKidMsg) {
+      els.parentalGateKidMsg.textContent =
+        (opts && opts.kidMsg) ||
+        "Ellie says Settings is for parents only.";
     }
     if (els.parentalGateFeedback) els.parentalGateFeedback.textContent = "";
     renderParentalGateWords();
@@ -3042,18 +3348,15 @@
     });
 
     els.welcomeStartFresh.addEventListener("click", () => {
+      speakCue("Start");
       resetStateForFreshStart();
       persistProgress();
       syncControlsFromState();
       applyVoiceFilters();
-      els.welcomeModal.hidden = true;
-      els.nameModal.hidden = false;
-      els.nameInput.value = state.userName || "";
-      els.nameInput.focus();
       updateHomeGreeting();
       updateProgressUI();
       updateStoryLevelPickersUI();
-      speakInstruction("name", { force: true });
+      openNameModal({ forceSpeak: true });
     });
 
     els.welcomeImportInput.addEventListener("change", (e) => {
@@ -3066,14 +3369,53 @@
       e.preventDefault();
       const name = els.nameInput.value.trim();
       if (!name) return;
+      speakCue("Next");
       state.userName = name;
       persistUserName(name);
+      const p = ensureActiveProfile();
+      p.name = name;
       persistProgress();
-      els.nameModal.hidden = true;
       updateHomeGreeting();
-      lastAutoSpokenInstructionKey = "";
-      speakInstruction("home", { force: true });
+      els.nameModal.hidden = true;
+      openLevelModal({ forceSpeak: true });
     });
+
+    if (els.levelContinue) {
+      els.levelContinue.addEventListener("click", () => {
+        completeLevelOnboarding();
+      });
+    }
+
+    if (els.openProfiles) {
+      els.openProfiles.addEventListener("click", () => {
+        speakCue("Who’s reading");
+        openProfilePicker();
+      });
+    }
+
+    if (els.closeProfilePicker) {
+      els.closeProfilePicker.addEventListener("click", () => {
+        speakCue("Done");
+        if (els.profilePickerModal) els.profilePickerModal.hidden = true;
+      });
+    }
+
+    if (els.profilePickerModal) {
+      els.profilePickerModal.addEventListener("click", (e) => {
+        if (e.target === els.profilePickerModal) {
+          els.profilePickerModal.hidden = true;
+        }
+      });
+    }
+
+    if (els.profileAddBtn) {
+      els.profileAddBtn.addEventListener("click", () => {
+        openParentalGate({
+          kidMsg: "Ellie says adding a reader is for grown-ups.",
+          onSuccess: () => beginAddProfileFlow(),
+        });
+      });
+    }
 
     els.importBtn.addEventListener("click", () => {
       speakCue("Load");
@@ -3087,7 +3429,10 @@
     });
 
     els.openSettings.addEventListener("click", () => {
-      openParentalGate();
+      openParentalGate({
+        kidMsg: "Ellie says Settings is for parents only.",
+        onSuccess: () => openSettingsPanel(),
+      });
     });
 
     if (els.closeParentalGate) {
@@ -3195,6 +3540,17 @@
       });
     }
 
+    const storyWordRoots = [els.storyTitle, els.storyBody, els.storyMoral].filter(
+      Boolean
+    );
+    storyWordRoots.forEach((root) => {
+      root.addEventListener("click", (e) => {
+        const wordEl = e.target.closest(".story-word");
+        if (!wordEl || !root.contains(wordEl)) return;
+        speakTappedStoryWord(wordEl);
+      });
+    });
+
     if (els.storyStopRead) {
       els.storyStopRead.addEventListener("click", () => {
         stopStoryReading();
@@ -3214,8 +3570,11 @@
       btn.addEventListener("click", () => {
         stopSayWordListening();
         stopStoryReading();
+        const alreadyHome = activeScreenName === "home";
         showScreen("home");
         updateProgressUI();
+        // Short nav cue when already on home (showScreen only speaks on change).
+        if (alreadyHome) speakCue("Home");
       });
     });
 
@@ -3394,6 +3753,7 @@
     els.sightProgressFill = $("sightProgressFill");
     els.phonicsGrid = $("phonicsGrid");
     els.phonicsLetterBig = $("phonicsLetterBig");
+    els.phonicsCue = $("phonicsCue");
     els.phonicsEmoji = $("phonicsEmoji");
     els.phonicsExample = $("phonicsExample");
     els.phonicsPlaySound = $("phonicsPlaySound");
@@ -3422,8 +3782,13 @@
 
   async function init() {
     cacheElements();
-    loadPersistedProfile();
+    loadPersistedPreviewText();
     const hasSavedProgress = loadPersistedProgress();
+    if (!hasSavedProgress) {
+      // Seed empty store only after Start fresh / first profile create.
+      profilesStore.profiles = {};
+      profilesStore.activeProfileId = "";
+    }
     bindEvents();
     bindCloudAuth();
 
@@ -3436,29 +3801,38 @@
     loadVoices();
 
     syncControlsFromState();
+    applyEllieTheme(state.ellieColor);
     updateHomeGreeting();
     updateProgressUI();
     updateStoryLevelPickersUI();
 
+    hideOnboardingModals();
+    if (els.levelModal) els.levelModal.hidden = true;
+    if (els.profilePickerModal) els.profilePickerModal.hidden = true;
+
     if (hasSavedProgress) {
       els.welcomeModal.hidden = true;
       if (!state.userName.trim()) {
-        els.nameModal.hidden = false;
-        els.nameInput.value = "";
-        els.nameInput.focus();
-      } else {
-        els.nameModal.hidden = true;
+        openNameModal({ forceSpeak: false });
+      } else if (
+        !profileHasLevel({
+          grade: state.profileGrade,
+          age: state.profileAge,
+        })
+      ) {
+        openLevelModal({ forceSpeak: false });
       }
     } else {
       els.welcomeModal.hidden = false;
-      els.nameModal.hidden = true;
     }
 
     showScreen("home", { silent: true });
     if (!els.welcomeModal.hidden) {
       speakInstruction("welcome", { force: true });
-    } else if (!els.nameModal.hidden) {
+    } else if (els.nameModal && !els.nameModal.hidden) {
       speakInstruction("name", { force: true });
+    } else if (els.levelModal && !els.levelModal.hidden) {
+      speakInstruction("level", { force: true });
     } else {
       speakInstruction("home", { force: true });
     }

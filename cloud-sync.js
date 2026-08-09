@@ -2,7 +2,10 @@
  * Google sign-in + Firestore progress sync for Ellie Reads.
  * Uses the Firebase modular SDK from CDN (no bundler).
  *
- * Document path: progress/{uid} — one JSON progress payload per user.
+ * Document path: progress/{uid} — one JSON progress payload per Google account.
+ * Payload may be v4 multi-profile:
+ *   { version: 4, activeProfileId, profiles: { [id]: profileProgress }, …device voice settings }
+ * Legacy v3 single-user payloads are migrated client-side on load/merge.
  */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 import {

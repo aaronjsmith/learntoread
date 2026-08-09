@@ -70,7 +70,36 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      margin: 0;
+      padding: 4px 8px 4px 4px;
+      min-height: 0;
       min-width: 0;
+      border: none;
+      border-radius: 16px;
+      background: transparent;
+      color: inherit;
+      box-shadow: none;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      font-weight: inherit;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s, transform 0.12s;
+    }
+
+    .brand:hover {
+      background: rgba(255, 107, 138, 0.1);
+    }
+
+    .brand:active {
+      transform: translateY(1px);
+      background: rgba(255, 107, 138, 0.16);
+    }
+
+    .brand:focus-visible {
+      outline: 3px solid var(--sky);
+      outline-offset: 2px;
     }
 
     .brand-mark {
@@ -78,6 +107,7 @@
       height: 44px;
       flex-shrink: 0;
       animation: bob 2.8s ease-in-out infinite;
+      pointer-events: none;
     }
 
     .brand-mark svg {
@@ -86,13 +116,15 @@
       display: block;
     }
 
-    header h1 {
+    header h1,
+    .brand-title {
       margin: 0;
       font-family: var(--display);
       font-size: 1.35rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--accent-dark);
+      pointer-events: none;
     }
 
     .header-actions {
@@ -1078,6 +1110,126 @@
       width: min(100%, 540px);
       max-height: min(92dvh, 720px);
       overflow: auto;
+    }
+
+    .modal--settings {
+      width: min(100%, 600px);
+      max-height: min(90dvh, 640px);
+      overflow: auto;
+      padding: 22px 24px 20px;
+    }
+
+    .modal--settings .modal-settings-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 6px;
+      color: var(--accent-dark);
+    }
+
+    .modal--settings .modal-settings-icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .modal--settings > h2 {
+      margin-bottom: 4px;
+    }
+
+    .modal--settings > .settings-lead {
+      margin: 0 0 12px;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .settings-layout {
+      display: grid;
+      gap: 14px 20px;
+    }
+
+    .settings-col {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .settings-col .field {
+      margin-bottom: 0;
+    }
+
+    .settings-col .settings-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .settings-col .settings-row label,
+    .settings-col .field > label {
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .settings-col .settings-row select,
+    .settings-col .field select,
+    .settings-col .field input[type="text"] {
+      width: 100%;
+      min-height: var(--touch-min);
+      padding: 14px 14px;
+      font-size: 1.05rem;
+      border-radius: 16px;
+      border: 3px solid #ffe0e8;
+      font-family: inherit;
+      background: #fffafb;
+    }
+
+    .settings-col .field select[size] {
+      min-height: 9.5rem;
+      padding: 8px;
+      overflow: auto;
+    }
+
+    .settings-col .checkbox-row {
+      min-height: var(--touch-min);
+      padding: 8px 12px;
+      border-radius: 16px;
+      background: #fffafb;
+      border: 3px solid #ffe0e8;
+    }
+
+    .settings-footer-block {
+      display: grid;
+      gap: 8px;
+      margin-top: 2px;
+      padding-top: 12px;
+      border-top: 2px dashed var(--accent-soft);
+    }
+
+    .modal--settings .modal-actions {
+      margin-top: 16px;
+      gap: 10px;
+    }
+
+    .modal--settings .modal-actions .btn-with-icon {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    @media (min-width: 560px) {
+      .settings-layout {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+      }
+
+      .settings-footer-block {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 559px) {
+      .modal--settings {
+        width: min(100%, 440px);
+        max-height: min(92dvh, 720px);
+      }
     }
 
     .profile-picker-list {
@@ -2407,12 +2559,12 @@
 
   <header class="app-header">
     <div class="header-row">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
+      <button type="button" class="brand js-back-home" id="brandHome" title="Home" aria-label="Home" data-speak="Home">
+        <span class="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-        </div>
-        <h1>Ellie Reads</h1>
-      </div>
+        </span>
+        <h1 class="brand-title">Ellie Reads</h1>
+      </button>
       <div class="header-actions">
         <button type="button" class="icon-btn" id="openProfiles" title="Who’s reading?" aria-label="Who’s reading?" data-speak="Who’s reading">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-who"/></svg>
@@ -2922,64 +3074,70 @@
   </div>
 
   <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
-    <div class="modal">
-      <div style="width:56px;height:56px;margin:0 auto 10px;color:var(--accent-dark);" aria-hidden="true">
-        <svg viewBox="0 0 24 24" style="width:100%;height:100%;display:block;"><use href="#icon-settings"/></svg>
+    <div class="modal modal--settings">
+      <div class="modal-settings-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><use href="#icon-settings"/></svg>
       </div>
       <h2 id="settingsTitle">Settings</h2>
-      <p class="settings-section-label">Voice</p>
-      <p>Pick a friendly voice for Ellie to use when saying whole words.</p>
-      <div class="settings-grid">
-        <div class="settings-row">
-          <label for="regionSelect">Region</label>
-          <select id="regionSelect" aria-label="Region">
-            <option value="">All Regions</option>
-            <option value="us">US</option>
-            <option value="gb">UK</option>
-            <option value="au">AU</option>
-            <option value="ca">CA</option>
-          </select>
+      <p class="settings-section-label" style="text-align:center;margin:0;">Voice</p>
+      <p class="settings-lead">Pick a friendly voice for Ellie to use when saying whole words.</p>
+      <div class="settings-layout">
+        <div class="settings-col settings-col--voice">
+          <div class="settings-row">
+            <label for="regionSelect">Region</label>
+            <select id="regionSelect" aria-label="Region">
+              <option value="">All Regions</option>
+              <option value="us">US</option>
+              <option value="gb">UK</option>
+              <option value="au">AU</option>
+              <option value="ca">CA</option>
+            </select>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="onlineToggle" checked />
+            <label for="onlineToggle">Online voices</label>
+          </div>
+          <div class="settings-row">
+            <label for="genderSelect">Gender</label>
+            <select id="genderSelect" aria-label="Gender filter">
+              <option value="both">Both</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="voiceSelect">Voice</label>
+            <select id="voiceSelect" size="5"></select>
+          </div>
         </div>
-        <div class="checkbox-row">
-          <input type="checkbox" id="onlineToggle" checked />
-          <label for="onlineToggle">Online voices</label>
+        <div class="settings-col settings-col--tune">
+          <div class="field">
+            <label for="rateRange">Speed <span id="rateValue">0.95</span></label>
+            <input type="range" id="rateRange" min="0.6" max="1.2" step="0.05" value="0.95" />
+            <p class="range-hint">Slower can help with first sounds.</p>
+          </div>
+          <div class="field">
+            <label for="pitchRange">Pitch <span id="pitchValue">1.05</span></label>
+            <input type="range" id="pitchRange" min="0.8" max="1.3" step="0.05" value="1.05" />
+          </div>
+          <div class="field">
+            <label for="settingsPreviewText">Preview text</label>
+            <input type="text" id="settingsPreviewText" maxlength="500" autocomplete="off" spellcheck="true" />
+          </div>
         </div>
-        <div class="settings-row">
-          <label for="genderSelect">Gender</label>
-          <select id="genderSelect" aria-label="Gender filter">
-            <option value="both">Both</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="voiceSelect">Voice</label>
-          <select id="voiceSelect" size="6" style="width:100%; min-height: 8rem;"></select>
-        </div>
-        <div class="field">
-          <label for="rateRange">Speed <span id="rateValue">0.95</span></label>
-          <input type="range" id="rateRange" min="0.6" max="1.2" step="0.05" value="0.95" />
-          <p class="range-hint">Slower can help with first sounds.</p>
-        </div>
-        <div class="field">
-          <label for="pitchRange">Pitch <span id="pitchValue">1.05</span></label>
-          <input type="range" id="pitchRange" min="0.8" max="1.3" step="0.05" value="1.05" />
-        </div>
-        <div class="field">
-          <label for="settingsPreviewText">Preview text</label>
-          <input type="text" id="settingsPreviewText" maxlength="500" autocomplete="off" spellcheck="true" />
-        </div>
-        <p class="settings-section-label">Progress backup</p>
-        <p class="range-hint" style="margin:0 0 4px;">Save or load a JSON backup on this device.</p>
-        <div class="settings-backup-row">
-          <button type="button" class="icon-btn" id="exportBtn" title="Download progress as a JSON file" aria-label="Save progress JSON" data-speak="Save">
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-save"/></svg>
-            <span class="btn-caption">Save JSON</span>
-          </button>
-          <button type="button" class="icon-btn" id="importBtn" title="Choose a progress JSON file from your device" aria-label="Load progress JSON" data-speak="Load">
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-load"/></svg>
-            <span class="btn-caption">Load JSON</span>
-          </button>
+        <div class="settings-footer-block">
+          <p class="settings-section-label" style="margin:0;">Progress backup</p>
+          <p class="range-hint" style="margin:0;">Save or load a JSON backup on this device.</p>
+          <div class="settings-backup-row">
+            <button type="button" class="icon-btn" id="exportBtn" title="Download progress as a JSON file" aria-label="Save progress JSON" data-speak="Save">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-save"/></svg>
+              <span class="btn-caption">Save JSON</span>
+            </button>
+            <button type="button" class="icon-btn" id="importBtn" title="Choose a progress JSON file from your device" aria-label="Load progress JSON" data-speak="Load">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-load"/></svg>
+              <span class="btn-caption">Load JSON</span>
+            </button>
+          </div>
         </div>
       </div>
       <div class="modal-actions">
