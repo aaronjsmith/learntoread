@@ -150,6 +150,7 @@
 
   let activeRecognition = null;
   let sayWordListening = false;
+  let lastPhonicsUiIndex = -1;
 
   /**
    * Longest-match-first patterns for splitting words into graphemes when JSON
@@ -1395,10 +1396,12 @@
     const entry = getPhonicsEntry(state.phonicsIndex);
     if (!entry) return;
 
-    stopSayWordListening();
-    clearHeardText(els.phonicsHeard, "Tap the mic and say it");
-    if (els.phonicsStatus && !keepQuiz) {
-      setPhonicsStatus("", "");
+    const letterChanged = state.phonicsIndex !== lastPhonicsUiIndex;
+    lastPhonicsUiIndex = state.phonicsIndex;
+    if (letterChanged) {
+      stopSayWordListening();
+      clearHeardText(els.phonicsHeard, "Tap the mic and say it");
+      if (!keepQuiz) setPhonicsStatus("", "");
     }
 
     if (els.phonicsLetterBig) els.phonicsLetterBig.textContent = entry.letter;
