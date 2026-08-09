@@ -267,7 +267,8 @@
       padding-right: 14px;
     }
 
-    button:hover {
+    /* Primary CTA darken only — card/surface buttons set their own hover. */
+    button:hover:not(.section-report):not(.activity-card):not(.word-big):not(.letter-tile):not(.say-word-btn):not(.icon-btn):not(.speak-help-btn):not(.story-card):not(.story-level-btn):not(.phonics-cue):not(.phonics-letter-big):not(.sight-word-emoji-btn):not(.profile-card):not(.story-word):not(.secondary) {
       background: var(--accent-dark);
     }
 
@@ -1764,7 +1765,14 @@
       color: inherit;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
-      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.15s ease;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    /* Keep light surfaces — global button:hover uses accent purple. */
+    button.section-report:hover,
+    button.section-report:active {
+      background: #f3fffc;
+      color: inherit;
     }
 
     button.section-report:hover {
@@ -1802,6 +1810,11 @@
       box-shadow: 0 6px 0 rgba(255, 107, 138, 0.12);
     }
 
+    button.section-report--sight:hover,
+    button.section-report--sight:active {
+      background: #fff8fa;
+    }
+
     button.section-report--sight:hover {
       border-color: var(--accent);
       box-shadow: 0 8px 0 rgba(255, 107, 138, 0.18);
@@ -1818,6 +1831,11 @@
     .section-report--stories {
       border-color: var(--sun-soft);
       box-shadow: 0 6px 0 rgba(255, 201, 74, 0.22);
+    }
+
+    button.section-report--stories:hover,
+    button.section-report--stories:active {
+      background: #fffbeb;
     }
 
     button.section-report--stories:hover {
