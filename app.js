@@ -807,6 +807,8 @@
     if (data && typeof data === "object") {
       if (Number.isFinite(data.sightWordIndex))
         profile.sightWordIndex = Math.max(0, data.sightWordIndex | 0);
+      if (Number.isFinite(data.vowelFamilyIndex))
+        profile.vowelFamilyIndex = Math.max(0, data.vowelFamilyIndex | 0);
       if (Number.isFinite(data.flashcardWordIndex))
         profile.flashcardWordIndex = Math.max(0, data.flashcardWordIndex | 0);
       if (Number.isFinite(data.phonicsIndex))
@@ -822,6 +824,15 @@
         typeof data.sightPracticeCounts === "object"
       ) {
         profile.sightPracticeCounts = { ...data.sightPracticeCounts };
+      }
+      if (
+        data.vowelFamilyPracticed &&
+        typeof data.vowelFamilyPracticed === "object"
+      ) {
+        profile.vowelFamilyPracticed = { ...data.vowelFamilyPracticed };
+      }
+      if (data.vowelWordMastery && typeof data.vowelWordMastery === "object") {
+        profile.vowelWordMastery = { ...data.vowelWordMastery };
       }
       if (data.flashcardMastery && typeof data.flashcardMastery === "object") {
         profile.flashcardMastery = { ...data.flashcardMastery };
@@ -854,6 +865,8 @@
       });
       if (Number.isFinite(raw.sightWordIndex))
         p.sightWordIndex = Math.max(0, raw.sightWordIndex | 0);
+      if (Number.isFinite(raw.vowelFamilyIndex))
+        p.vowelFamilyIndex = Math.max(0, raw.vowelFamilyIndex | 0);
       if (Number.isFinite(raw.flashcardWordIndex))
         p.flashcardWordIndex = Math.max(0, raw.flashcardWordIndex | 0);
       if (Number.isFinite(raw.phonicsIndex))
@@ -869,6 +882,15 @@
         typeof raw.sightPracticeCounts === "object"
       ) {
         p.sightPracticeCounts = { ...raw.sightPracticeCounts };
+      }
+      if (
+        raw.vowelFamilyPracticed &&
+        typeof raw.vowelFamilyPracticed === "object"
+      ) {
+        p.vowelFamilyPracticed = { ...raw.vowelFamilyPracticed };
+      }
+      if (raw.vowelWordMastery && typeof raw.vowelWordMastery === "object") {
+        p.vowelWordMastery = { ...raw.vowelWordMastery };
       }
       if (raw.flashcardMastery && typeof raw.flashcardMastery === "object") {
         p.flashcardMastery = { ...raw.flashcardMastery };
@@ -1515,11 +1537,14 @@
       profileGrade: state.profileGrade,
       ellieColor: state.ellieColor,
       sightWordIndex: state.sightWordIndex,
+      vowelFamilyIndex: state.vowelFamilyIndex,
       flashcardWordIndex: state.flashcardWordIndex,
       phonicsIndex: state.phonicsIndex,
       phonicsMastery: state.phonicsMastery,
       sightMastery: state.sightMastery,
       sightPracticeCounts: state.sightPracticeCounts,
+      vowelFamilyPracticed: state.vowelFamilyPracticed,
+      vowelWordMastery: state.vowelWordMastery,
       flashcardMastery: state.flashcardMastery,
       storiesProgress: state.storiesProgress,
       storyReadingLevel: getStoryReadingLevel(),
@@ -1656,6 +1681,10 @@
           ? newer.storyReadingLevel
           : older.storyReadingLevel,
       sightWordIndex: Math.max(local.sightWordIndex | 0, remote.sightWordIndex | 0),
+      vowelFamilyIndex: Math.max(
+        local.vowelFamilyIndex | 0,
+        remote.vowelFamilyIndex | 0
+      ),
       flashcardWordIndex: Math.max(
         local.flashcardWordIndex | 0,
         remote.flashcardWordIndex | 0
@@ -1669,6 +1698,14 @@
       sightPracticeCounts: mergeCountMaps(
         local.sightPracticeCounts,
         remote.sightPracticeCounts
+      ),
+      vowelFamilyPracticed: mergeSightMasteryMaps(
+        local.vowelFamilyPracticed,
+        remote.vowelFamilyPracticed
+      ),
+      vowelWordMastery: mergeSightMasteryMaps(
+        local.vowelWordMastery,
+        remote.vowelWordMastery
       ),
       flashcardMastery: mergeSightMasteryMaps(
         local.flashcardMastery,
@@ -3108,7 +3145,7 @@
     };
     groups.primer.sort((a, b) => primerOrder(a) - primerOrder(b) || String(a.id).localeCompare(String(b.id)));
 
-    const appendStoryCard = (story) => {
+    const appendStoryCard = (story, grid) => {
       const prog = getStoryProgress(story.id);
       const btn = document.createElement("button");
       btn.type = "button";
@@ -3122,42 +3159,57 @@
       img.alt = story.imageAlt || story.title;
       img.loading = "lazy";
 
-      const text = document.createElement("div");
       const h3 = document.createElement("h3");
       h3.textContent = story.title;
       const p = document.createElement("p");
-      p.textContent = story.blurb || "A short tale to read with Ellie.";
-      text.appendChild(h3);
-      text.appendChild(p);
-      if (prog.finished) {
-        const badge = document.createElement("span");
-        badge.className = "story-card-badge";
-        badge.textContent = "Finished!";
-        text.appendChild(badge);
-      }
+      p.textContent = prog.finished
+        ? "Finished!"
+        : story.blurb || "A short tale to read with Ellie.";
+
+      const bar = document.createElement("div");
+      bar.className = "progress-bar progress-bar--thin";
+      bar.setAttribute("role", "progressbar");
+      bar.setAttribute("aria-valuemin", "0");
+      bar.setAttribute("aria-valuemax", "100");
+      const pct = prog.finished ? 100 : 0;
+      bar.setAttribute("aria-valuenow", String(pct));
+      const fill = document.createElement("div");
+      fill.className = "progress-bar-fill";
+      fill.style.width = pct + "%";
+      bar.appendChild(fill);
 
       btn.appendChild(img);
-      btn.appendChild(text);
+      btn.appendChild(h3);
+      btn.appendChild(p);
+      btn.appendChild(bar);
       btn.addEventListener("click", () => {
         openStory(story.id);
       });
-      els.storiesList.appendChild(btn);
+      grid.appendChild(btn);
     };
 
     [...CATEGORY_ORDER, "other"].forEach((cat) => {
       const list = groups[cat];
       if (!list.length) return;
+      const block = document.createElement("div");
+      block.className = "stories-category-block";
+
       const heading = document.createElement("h3");
       heading.className = "stories-category";
       heading.textContent = CATEGORY_LABELS[cat] || "Stories";
-      els.storiesList.appendChild(heading);
+      block.appendChild(heading);
       if (CATEGORY_NOTES[cat]) {
         const note = document.createElement("p");
         note.className = "stories-category-note";
         note.textContent = CATEGORY_NOTES[cat];
-        els.storiesList.appendChild(note);
+        block.appendChild(note);
       }
-      list.forEach(appendStoryCard);
+
+      const grid = document.createElement("div");
+      grid.className = "stories-category-grid";
+      list.forEach((story) => appendStoryCard(story, grid));
+      block.appendChild(grid);
+      els.storiesList.appendChild(block);
     });
   }
 

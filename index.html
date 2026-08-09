@@ -526,12 +526,15 @@
       border: 3px solid var(--mint-soft);
       text-align: center;
       position: relative;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       flex: 1;
       min-height: 0;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: safe center;
       gap: 6px;
     }
 
@@ -1152,13 +1155,19 @@
     .modal--wide {
       width: min(100%, 540px);
       max-height: min(92dvh, 720px);
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     .modal--settings {
       width: min(100%, 600px);
       max-height: min(90dvh, 640px);
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       padding: 22px 24px 20px;
     }
 
@@ -1758,12 +1767,18 @@
       flex: 1;
       min-height: 0;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: minmax(0, 1fr);
       align-content: stretch;
       overflow-x: hidden;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
+      padding-bottom: 2px;
+    }
+
+    /* Odd last tile (5 cards) spans full width; even counts stay a clean 2-col grid. */
+    .section-reports > .section-report:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
     }
 
     @media (min-width: 560px) {
@@ -2039,6 +2054,17 @@
       overflow: hidden;
     }
 
+    .phonics-layout > * {
+      min-height: 0;
+    }
+
+    .phonics-layout > div:first-child {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
     @media (min-width: 640px) {
       .phonics-layout {
         grid-template-columns: 1fr 1.1fr;
@@ -2057,8 +2083,13 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
       gap: 6px;
+      flex: 1;
+      min-height: 0;
       max-height: 100%;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       align-content: start;
     }
 
@@ -2111,10 +2142,13 @@
       text-align: center;
       flex: 1;
       min-height: 0;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: safe center;
     }
 
     .phonics-letter-big {
@@ -2266,10 +2300,12 @@
     #storiesScreen > h2 {
       font-size: clamp(1.2rem, 3.8vw, 1.55rem);
       margin: 0;
+      flex-shrink: 0;
     }
 
     #storiesScreen .lead-row {
-      margin-bottom: 6px;
+      margin-bottom: 4px;
+      flex-shrink: 0;
     }
 
     #storiesScreen .lead {
@@ -2278,114 +2314,181 @@
     }
 
     #storiesScreen .story-level-picker {
-      margin-bottom: 4px;
+      margin-bottom: 6px;
+      flex-shrink: 0;
     }
 
     .stories-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 14px;
       flex: 1;
       min-height: 0;
       overflow-x: hidden;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
-      padding: 2px 2px 8px;
+      padding: 2px 2px 10px;
       overscroll-behavior: contain;
     }
 
+    .stories-category-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
     .stories-category {
-      margin: 10px 0 0;
+      margin: 0;
       padding: 0 2px;
       font-family: var(--display);
-      font-size: 1.02rem;
+      font-size: clamp(1.05rem, 3.2vw, 1.2rem);
       font-weight: 800;
       color: var(--accent-dark);
       letter-spacing: -0.01em;
-      flex-shrink: 0;
-    }
-
-    .stories-category:first-child {
-      margin-top: 0;
+      line-height: 1.2;
     }
 
     .stories-category-note {
-      margin: -2px 0 2px;
+      margin: -4px 0 0;
       padding: 0 2px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       line-height: 1.3;
+      font-weight: 700;
       color: var(--muted);
-      opacity: 0.95;
-      flex-shrink: 0;
+    }
+
+    .stories-category-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-content: start;
     }
 
     .story-card {
-      display: grid;
-      grid-template-columns: 56px 1fr;
-      gap: 10px;
-      align-items: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
       text-align: left;
       background: var(--surface);
       border: 3px solid var(--sun-soft);
-      border-radius: var(--radius);
-      padding: 8px;
+      border-radius: 18px;
+      padding: 10px 12px;
       box-shadow: 0 5px 0 rgba(255, 201, 74, 0.22);
       color: inherit;
-      transition: transform 0.12s, border-color 0.15s, box-shadow 0.12s;
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.15s ease, background 0.15s ease;
       min-height: 0;
-      flex-shrink: 0;
       width: 100%;
+      overflow: hidden;
+    }
+
+    button.story-card:hover,
+    button.story-card:active {
+      background: #fffbeb;
+      color: inherit;
     }
 
     .story-card:hover {
       transform: translateY(-2px);
       border-color: var(--sun);
-      box-shadow: 0 10px 0 rgba(255, 201, 74, 0.26);
-      color: var(--ink);
+      box-shadow: 0 8px 0 rgba(255, 201, 74, 0.3);
     }
 
     .story-card:active {
       transform: translateY(1px);
-      box-shadow: 0 5px 0 rgba(255, 201, 74, 0.2);
+      box-shadow: 0 4px 0 rgba(255, 201, 74, 0.22);
+    }
+
+    button.story-card:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
     }
 
     .story-card.is-finished {
       border-color: var(--mint);
-      box-shadow: 0 8px 0 rgba(62, 207, 190, 0.2);
+      box-shadow: 0 5px 0 rgba(62, 207, 190, 0.2);
+    }
+
+    button.story-card.is-finished:hover,
+    button.story-card.is-finished:active {
+      background: #f3fffc;
+    }
+
+    .story-card.is-finished:hover {
+      border-color: var(--mint);
+      box-shadow: 0 8px 0 rgba(62, 207, 190, 0.26);
+    }
+
+    .story-card.is-finished:active {
+      box-shadow: 0 4px 0 rgba(62, 207, 190, 0.2);
     }
 
     .story-card-thumb {
-      width: 56px;
-      height: 56px;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      max-height: 110px;
       object-fit: cover;
-      border-radius: 12px;
+      border-radius: 14px;
       border: 2px solid #ffe8c2;
       background: var(--sun-soft);
+      margin-bottom: 8px;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .story-card.is-finished .story-card-thumb {
+      border-color: rgba(62, 207, 190, 0.45);
     }
 
     .story-card h3 {
       margin: 0 0 4px;
       font-family: var(--display);
-      font-size: 1.15rem;
-      color: var(--accent-dark);
+      font-size: clamp(0.95rem, 2.8vw, 1.08rem);
+      color: #d49200;
+      line-height: 1.15;
+    }
+
+    .story-card.is-finished h3 {
+      color: var(--mint-dark);
     }
 
     .story-card p {
-      margin: 0;
-      font-size: 0.92rem;
+      margin: 0 0 8px;
+      font-size: clamp(0.78rem, 2.4vw, 0.88rem);
       font-weight: 700;
       color: var(--muted);
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .story-card .progress-bar {
+      margin-top: auto;
+      flex-shrink: 0;
     }
 
     .story-card-badge {
       display: inline-block;
-      margin-top: 8px;
-      padding: 3px 10px;
+      margin: 0 0 6px;
+      padding: 2px 8px;
       border-radius: 999px;
       background: var(--mint-soft);
       color: var(--mint-dark);
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       font-weight: 800;
+      width: fit-content;
+    }
+
+    @media (max-width: 360px) {
+      .stories-category-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .story-reader {
@@ -2543,9 +2646,8 @@
       line-height: 1.55;
       color: var(--ink);
       text-align: center;
-      flex: 1 1 auto;
-      min-height: 0;
-      overflow: visible;
+      /* Natural height so .story-reader scrolls (incl. Next page). */
+      flex: 0 0 auto;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
