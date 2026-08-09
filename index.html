@@ -3216,6 +3216,15 @@
       <text x="36" y="58" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="Fredoka, Nunito, sans-serif">C</text>
     </symbol>
 
+    <symbol id="icon-vowels" viewBox="0 0 72 72">
+      <rect x="8" y="18" width="16" height="36" rx="6" fill="#d5f7f2"/>
+      <rect x="28" y="14" width="16" height="44" rx="8" fill="#ff6b8a"/>
+      <rect x="48" y="18" width="16" height="36" rx="6" fill="#d5f7f2"/>
+      <text x="16" y="42" text-anchor="middle" font-size="16" font-weight="700" fill="#2ab3a3" font-family="Fredoka, Nunito, sans-serif">c</text>
+      <text x="36" y="44" text-anchor="middle" font-size="20" font-weight="700" fill="#fff" font-family="Fredoka, Nunito, sans-serif">a</text>
+      <text x="56" y="42" text-anchor="middle" font-size="16" font-weight="700" fill="#2ab3a3" font-family="Fredoka, Nunito, sans-serif">t</text>
+    </symbol>
+
     <symbol id="icon-stars" viewBox="0 0 72 72">
       <rect x="14" y="10" width="44" height="52" rx="8" fill="#ffe0e8"/>
       <rect x="20" y="16" width="32" height="40" rx="4" fill="#fff"/>
@@ -3421,6 +3430,14 @@
             <div class="progress-bar-fill" id="sightProgressFill"></div>
           </div>
         </button>
+        <button type="button" class="section-report section-report--vowels" id="homeOpenVowels" aria-label="Open Vowel words" data-speak="Vowel words">
+          <svg class="section-report-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-vowels"/></svg>
+          <h3>Vowel words</h3>
+          <p id="vowelReportText">0 of 0 families practiced</p>
+          <div class="progress-bar progress-bar--thin" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="vowelProgressBar">
+            <div class="progress-bar-fill" id="vowelProgressFill"></div>
+          </div>
+        </button>
         <button type="button" class="section-report section-report--stories" id="homeOpenStories" aria-label="Open Stories" data-speak="Stories">
           <svg class="section-report-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-story"/></svg>
           <h3>Stories</h3>
@@ -3586,6 +3603,64 @@
             <div class="say-heard-box is-empty" id="sayWordHeard" aria-live="polite" aria-labelledby="sayWordHeardLabel">Tap the mic and say the word</div>
           </div>
           <p class="say-word-status" id="sayWordStatus" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="vowels" id="vowelsScreen" hidden>
+      <div class="sight-toolbar">
+        <button type="button" class="secondary icon-btn icon-btn--wide js-back-home" aria-label="Home" data-speak="Home">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-home"/></svg>
+          <span class="btn-caption">Home</span>
+        </button>
+        <button type="button" class="secondary icon-btn icon-btn--wide" id="prevVowelFamily" aria-label="Previous word family" data-speak="Previous">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-prev"/></svg>
+          <span class="btn-caption">Prev</span>
+        </button>
+        <button type="button" class="icon-btn icon-btn--wide" id="nextVowelFamily" aria-label="Next word family" data-speak="Next">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-next"/></svg>
+          <span class="btn-caption">Next</span>
+        </button>
+      </div>
+      <div class="word-stage">
+        <div class="sight-buddy" id="vowelEllie" aria-hidden="true">
+          <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+        </div>
+        <p class="vowel-frame" id="vowelFrameLabel" aria-hidden="true">—</p>
+        <div class="word-hear-wrap">
+          <button type="button" class="word-big" id="vowelWordTitle" aria-label="Hear whole word" title="Tap to hear the whole word">—</button>
+          <span class="word-hear-cue" aria-hidden="true" title="Tap the word to hear it">
+            <svg viewBox="0 0 24 24"><use href="#icon-speaker"/></svg>
+          </span>
+        </div>
+        <p class="word-meta" id="vowelWordProgress"></p>
+        <div class="vowel-tile-row" id="vowelTileRow" role="group" aria-label="Change the middle vowel"></div>
+        <div class="lead-row" style="justify-content:center;margin-bottom:12px;">
+          <p class="range-hint" id="vowelLead" style="text-align:center;margin:0;">
+            Same letters — tap a vowel to make a new word.
+          </p>
+          <button type="button" class="speak-help-btn" data-speak-help="vowels" title="Hear instructions" aria-label="Hear vowel words instructions">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+          </button>
+        </div>
+        <div class="say-word">
+          <button type="button" class="say-word-btn" id="vowelSayWordBtn" aria-pressed="false" aria-label="Say the word into the microphone">
+            <span class="say-mic" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="3" width="6" height="11" rx="3"/>
+                <path d="M6 11a6 6 0 0 0 12 0"/>
+                <path d="M12 17v3"/>
+                <path d="M8 20h8"/>
+              </svg>
+            </span>
+            <span class="say-mic-label">Say the word</span>
+          </button>
+          <p class="say-listen-hint" id="vowelSayListenHint" aria-hidden="true">Listening…</p>
+          <div class="say-heard-panel">
+            <span class="say-heard-label" id="vowelSayHeardLabel">What Ellie heard</span>
+            <div class="say-heard-box is-empty" id="vowelSayHeard" aria-live="polite" aria-labelledby="vowelSayHeardLabel">Tap the mic and say the word</div>
+          </div>
+          <p class="say-word-status" id="vowelSayStatus" role="status" aria-live="polite"></p>
         </div>
       </div>
     </section>

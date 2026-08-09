@@ -4692,8 +4692,8 @@
       });
     });
 
-    if (els.activityReportCard) {
-      els.activityReportCard.addEventListener("click", () => {
+    if (els.headerProgressBtn) {
+      els.headerProgressBtn.addEventListener("click", () => {
         showScreen("report");
         updateReportCardUI();
       });
@@ -5051,6 +5051,7 @@
     els.homeOpenSight = $("homeOpenSight");
     els.homeOpenStories = $("homeOpenStories");
     els.homeOpenFlashcards = $("homeOpenFlashcards");
+    els.headerProgressBtn = $("headerProgressBtn");
     els.activityReportCard = $("activityReportCard");
     els.storiesReportText = $("storiesReportText");
     els.storiesProgressBar = $("storiesProgressBar");
