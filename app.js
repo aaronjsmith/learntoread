@@ -1992,10 +1992,14 @@
       case "story": {
         const story = getStoryById(activeStoryId);
         const content = getStoryLevelContent(story);
+        const page = getStoryPageContent(content);
         const title = content.title || (story && story.title) || "This story";
         const levelName =
           STORY_LEVEL_SPEAK[content.level] || STORY_LEVEL_SPEAK.beginner;
-        return `${title}. ${levelName} level. Turn the pages as you read. Look at the picture. Tap Read aloud to listen to this page. Tap I finished when you're done.`;
+        if (page.pageIndex > 0) {
+          return `Page ${page.pageIndex + 1} of ${page.pageCount}. Look at the picture. Tap Read aloud to hear this page.`;
+        }
+        return `${title}. ${levelName} level. Look at the picture. Turn the pages as you read. Tap Read aloud to listen. Tap I finished when you're done.`;
       }
       case "report":
         return "Report card. Here are your stars for letters, words, and stories.";
@@ -2202,19 +2206,38 @@
   }
 
   /**
-   * Render title / paragraphs / moral as karaoke word spans for read-aloud.
-   * Spoken chunk text matches on-screen text so boundary charIndex maps cleanly.
+   * Render paragraphs / moral as karaoke word spans for read-aloud.
+   * Title is only shown and spoken on the first page.
    */
   function prepareStoryKaraoke(content) {
     clearStoryKaraokeHighlight();
     const tracks = [];
     if (!content) return tracks;
 
-    if (els.storyTitle && content.title) {
-      const built = buildKaraokeMarkup(content.title);
-      els.storyTitle.textContent = "";
-      els.storyTitle.appendChild(built.frag);
-      tracks.push({ text: built.text, words: built.words });
+    const showTitle = !!(content.title && (content.isFirst || content.pageIndex === 0));
+    const titleRow = els.storyTitle && els.storyTitle.closest(".lead-row");
+    if (els.storyTitle) {
+      if (showTitle) {
+        const built = buildKaraokeMarkup(content.title);
+        els.storyTitle.hidden = false;
+        if (titleRow) titleRow.hidden = false;
+        els.storyTitle.textContent = "";
+        els.storyTitle.appendChild(built.frag);
+        // Do not speak the title on every Read aloud — kids already heard it
+        // when opening the story. Keep it tappable on page 1 only.
+      } else {
+        els.storyTitle.hidden = true;
+        els.storyTitle.textContent = content.title || "";
+        if (titleRow) titleRow.hidden = true;
+      }
+    }
+
+    if (els.storyLevelPicker) {
+      // Level choice belongs on page 1; later pages are just the story.
+      els.storyLevelPicker.hidden = !showTitle;
+    }
+    if (els.storyMeta) {
+      els.storyMeta.hidden = !showTitle;
     }
 
     if (els.storyBody) {
