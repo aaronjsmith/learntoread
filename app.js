@@ -104,6 +104,18 @@
   const phonemeAudioCache = new Map();
   let activePhonemeAudio = null;
 
+  const SpeechRecognitionAPI =
+    typeof window !== "undefined"
+      ? window.SpeechRecognition || window.webkitSpeechRecognition
+      : null;
+  const SpeechGrammarListAPI =
+    typeof window !== "undefined"
+      ? window.SpeechGrammarList || window.webkitSpeechGrammarList
+      : null;
+
+  let activeRecognition = null;
+  let sayWordListening = false;
+
   /**
    * Longest-match-first patterns for splitting words into graphemes when JSON
    * has no `letters` array (e.g. "the" → ["TH","E"], "ship" → ["SH","I","P"]).
@@ -458,6 +470,7 @@
   }
 
   function speakGraphemeSound(entry, graphemeIndex) {
+    stopSayWordListening();
     const id = phonemeIdForGrapheme(entry, graphemeIndex);
     const letters = lettersForEntry(entry);
     const label = letters[graphemeIndex] || "";
@@ -715,9 +728,174 @@
   }
 
   function showScreen(name) {
+    if (name !== "sight") stopSayWordListening();
     document.querySelectorAll("[data-screen]").forEach((el) => {
       el.hidden = el.getAttribute("data-screen") !== name;
     });
+  }
+
+  function normalizeHeardText(raw) {
+    return String(raw || "")
+      .toLowerCase()
+      .replace(/[’']/g, "")
+      .replace(/[^a-z0-9\s]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function heardMatchesTarget(heard, target) {
+    const h = normalizeHeardText(heard);
+    const t = normalizeHeardText(target);
+    if (!h || !t) return false;
+    if (h === t) return true;
+    const parts = h.split(" ");
+    if (parts.includes(t)) return true;
+    // Common filler kids/adults add before answering.
+    const stripped = h
+      .replace(/^(the word|it is|it's|i said|um+|uh+)\s+/i, "")
+      .trim();
+    return stripped === t || stripped.split(" ").includes(t);
+  }
+
+  function setSayWordStatus(message, kind) {
+    if (!els.sayWordStatus) return;
+    els.sayWordStatus.textContent = message || "";
+    els.sayWordStatus.className = "say-word-status" + (kind ? ` is-${kind}` : "");
+  }
+
+  function setSayWordListeningUi(listening) {
+    sayWordListening = listening;
+    if (!els.sayWordBtn) return;
+    els.sayWordBtn.setAttribute("aria-pressed", listening ? "true" : "false");
+    els.sayWordBtn.textContent = listening ? "Listening…" : "Say the word";
+  }
+
+  function stopSayWordListening() {
+    if (activeRecognition) {
+      try {
+        activeRecognition.onresult = null;
+        activeRecognition.onerror = null;
+        activeRecognition.onend = null;
+        activeRecognition.abort();
+      } catch (_) {}
+      activeRecognition = null;
+    }
+    if (sayWordListening) setSayWordListeningUi(false);
+  }
+
+  function collectRecognitionHypotheses(event) {
+    const out = [];
+    if (!event || !event.results) return out;
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      if (!result || !result.isFinal) continue;
+      for (let j = 0; j < result.length; j++) {
+        const alt = result[j];
+        if (alt && alt.transcript) out.push(alt.transcript);
+      }
+    }
+    return out;
+  }
+
+  function startSayWordListening() {
+    const entry = getWordEntry(state.sightWordIndex);
+    const target = (entry.word || "").trim();
+    if (!target) return;
+
+    if (!SpeechRecognitionAPI) {
+      setSayWordStatus(
+        "Speech recognition isn’t available in this browser. Try Chrome or Edge.",
+        "error"
+      );
+      return;
+    }
+
+    if (sayWordListening) {
+      stopSayWordListening();
+      setSayWordStatus("Canceled.", "");
+      return;
+    }
+
+    stopPhonemeAudio();
+    try {
+      speechSynthesis.cancel();
+    } catch (_) {}
+    stopSayWordListening();
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 5;
+    recognition.continuous = false;
+
+    if (SpeechGrammarListAPI) {
+      try {
+        const list = new SpeechGrammarListAPI();
+        const safe = normalizeHeardText(target).replace(/[^a-z0-9]/g, "");
+        if (safe) {
+          list.addFromString(
+            `#JSGF V1.0; grammar word; public <word> = ${safe} ;`,
+            1
+          );
+          recognition.grammars = list;
+        }
+      } catch (_) {
+        /* grammar optional */
+      }
+    }
+
+    activeRecognition = recognition;
+    setSayWordListeningUi(true);
+    setSayWordStatus("Listening… say the word clearly.", "listening");
+
+    recognition.onresult = (event) => {
+      const hypotheses = collectRecognitionHypotheses(event);
+      const matched = hypotheses.some((h) => heardMatchesTarget(h, target));
+      const best = hypotheses[0] ? normalizeHeardText(hypotheses[0]) : "";
+
+      if (matched) {
+        setSayWordStatus("Nice! You said it right.", "success");
+      } else if (best) {
+        setSayWordStatus(`Heard “${best}”. Try again!`, "miss");
+      } else {
+        setSayWordStatus("Didn’t catch that. Try again.", "miss");
+      }
+    };
+
+    recognition.onerror = (event) => {
+      const err = (event && event.error) || "";
+      if (err === "aborted") return;
+      if (err === "not-allowed" || err === "service-not-allowed") {
+        setSayWordStatus(
+          "Microphone permission is needed to check your reading.",
+          "error"
+        );
+      } else if (err === "no-speech") {
+        setSayWordStatus("No speech heard. Tap and try again.", "miss");
+      } else if (err === "audio-capture") {
+        setSayWordStatus("No microphone found.", "error");
+      } else if (err === "network") {
+        setSayWordStatus(
+          "Speech check needs a network connection in this browser.",
+          "error"
+        );
+      } else {
+        setSayWordStatus("Couldn’t listen right now. Try again.", "error");
+      }
+    };
+
+    recognition.onend = () => {
+      activeRecognition = null;
+      setSayWordListeningUi(false);
+    };
+
+    try {
+      recognition.start();
+    } catch (_) {
+      activeRecognition = null;
+      setSayWordListeningUi(false);
+      setSayWordStatus("Couldn’t start the microphone. Try again.", "error");
+    }
   }
 
   function updateHomeGreeting() {
@@ -766,6 +944,18 @@
     state.scrubIndex = Math.min(state.scrubIndex, max);
     els.scrubSlider.value = String(state.scrubIndex);
     setActiveLetter(state.scrubIndex);
+
+    stopSayWordListening();
+    if (!SpeechRecognitionAPI) {
+      els.sayWordBtn.disabled = true;
+      setSayWordStatus(
+        "Speech recognition isn’t available in this browser.",
+        "error"
+      );
+    } else {
+      els.sayWordBtn.disabled = !wordDisplay;
+      setSayWordStatus("", "");
+    }
   }
 
   function setActiveLetter(index) {
@@ -917,7 +1107,12 @@
       updateSightWordUI();
     });
 
+    els.sayWordBtn.addEventListener("click", () => {
+      startSayWordListening();
+    });
+
     els.sightWordTitle.addEventListener("click", () => {
+      stopSayWordListening();
       const entry = getWordEntry(state.sightWordIndex);
       if (entry.word) speakWholeWord(entry.word);
     });
@@ -985,6 +1180,8 @@
     els.scrubSlider = $("scrubSlider");
     els.prevWord = $("prevWord");
     els.nextWord = $("nextWord");
+    els.sayWordBtn = $("sayWordBtn");
+    els.sayWordStatus = $("sayWordStatus");
     els.exportBtn = $("exportBtn");
     els.importBtn = $("importBtn");
     els.importInput = $("importInput");

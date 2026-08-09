@@ -239,6 +239,54 @@
       text-align: left;
     }
 
+    .say-word {
+      max-width: 420px;
+      margin: 28px auto 0;
+      text-align: center;
+    }
+
+    .say-word-btn {
+      min-width: 12rem;
+    }
+
+    .say-word-btn[aria-pressed="true"] {
+      background: #ef4444;
+    }
+
+    .say-word-btn[aria-pressed="true"]:hover {
+      background: #dc2626;
+    }
+
+    .say-word-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .say-word-status {
+      margin: 12px 0 0;
+      min-height: 1.5em;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .say-word-status.is-listening {
+      color: #ef4444;
+    }
+
+    .say-word-status.is-success {
+      color: var(--success);
+    }
+
+    .say-word-status.is-miss {
+      color: #ea580c;
+    }
+
+    .say-word-status.is-error {
+      color: #b91c1c;
+    }
+
     .scrub-wrap label {
       display: block;
       font-size: 0.9rem;
@@ -399,7 +447,7 @@
       <div class="activity-grid">
         <button type="button" class="activity-card" id="activitySightWords">
           <h3>Sight words</h3>
-          <p>Tap each letter for its <strong>sound</strong>. Slide under the word to blend those sounds in order, then tap the word to hear it whole.</p>
+          <p>Tap each letter for its <strong>sound</strong>. Slide under the word to blend those sounds in order, tap the word to hear it whole, then use the mic to say it yourself.</p>
         </button>
       </div>
     </section>
@@ -420,6 +468,12 @@
           <p class="range-hint" style="margin-top:10px;text-align:center;">
             Tap a letter for one sound. Use the slider to hear them in order.
           </p>
+        </div>
+        <div class="say-word">
+          <button type="button" class="say-word-btn" id="sayWordBtn" aria-pressed="false">
+            Say the word
+          </button>
+          <p class="say-word-status" id="sayWordStatus" role="status" aria-live="polite"></p>
         </div>
       </div>
     </section>
