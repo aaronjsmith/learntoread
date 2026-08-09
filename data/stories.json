@@ -7,17 +7,36 @@
       "blurb": "Slow and steady can win the race.",
       "image": "assets/stories/tortoise-hare.jpg",
       "imageAlt": "A tortoise and a hare racing, illustration by Milo Winter",
-      "moral": "Slow and steady wins the race.",
-      "paragraphs": [
-        "A Hare liked to tease a Tortoise for being so slow.",
-        "“I am the fastest!” said the Hare. “You could never beat me.”",
-        "“Shall we race?” asked the Tortoise.",
-        "The Hare laughed, but he said yes. They lined up, and the race began.",
-        "The Hare ran far ahead. Then he lay down for a nap. “The Tortoise is so slow,” he thought. “I have plenty of time.”",
-        "The Tortoise kept walking, step by step. He did not stop.",
-        "When the Hare woke up, he ran as fast as he could. But the Tortoise had already crossed the finish line.",
-        "The Tortoise had won!"
-      ]
+      "levels": {
+        "beginner": {
+          "title": "The Tortoise and the Hare",
+          "moral": "Slow and steady wins.",
+          "paragraphs": [
+            "A hare is fast.",
+            "A tortoise is slow.",
+            "“Let’s race!” says the tortoise.",
+            "The hare runs far ahead.",
+            "Then the hare takes a nap.",
+            "The tortoise walks and walks.",
+            "He does not stop.",
+            "The tortoise wins!"
+          ]
+        },
+        "advanced": {
+          "title": "The Tortoise and the Hare",
+          "moral": "Slow and steady wins the race.",
+          "paragraphs": [
+            "A Hare liked to tease a Tortoise for being so slow.",
+            "“I am the fastest!” said the Hare. “You could never beat me.”",
+            "“Shall we race?” asked the Tortoise.",
+            "The Hare laughed, but he said yes. They lined up, and the race began.",
+            "The Hare ran far ahead. Then he lay down for a nap. “The Tortoise is so slow,” he thought. “I have plenty of time.”",
+            "The Tortoise kept walking, step by step. He did not stop.",
+            "When the Hare woke up, he ran as fast as he could. But the Tortoise had already crossed the finish line.",
+            "The Tortoise had won!"
+          ]
+        }
+      }
     },
     {
       "id": "lion-mouse",
@@ -26,17 +45,36 @@
       "blurb": "A tiny friend can help a big one.",
       "image": "assets/stories/lion-mouse.jpg",
       "imageAlt": "A lion and a mouse, illustration by Milo Winter",
-      "moral": "Little friends may prove great friends.",
-      "paragraphs": [
-        "One day a Lion was sleeping in the sun. A little Mouse ran across his nose.",
-        "The Lion woke up and caught the Mouse with his big paw.",
-        "“Please let me go!” cried the Mouse. “Someday I may help you.”",
-        "The Lion laughed. How could a tiny Mouse help a Lion? But he let the Mouse go.",
-        "Later, hunters caught the Lion in a strong net. He could not get free.",
-        "The little Mouse heard the Lion roar. She ran to help.",
-        "She chewed and chewed on the ropes until the Lion was free.",
-        "“Thank you, little friend,” said the Lion. “You were right!”"
-      ]
+      "levels": {
+        "beginner": {
+          "title": "The Lion and the Mouse",
+          "moral": "A little friend can help.",
+          "paragraphs": [
+            "A big lion naps in the sun.",
+            "A little mouse runs by.",
+            "The lion wakes up. He grabs the mouse.",
+            "“Let me go!” says the mouse. “I can help you.”",
+            "The lion lets the mouse go.",
+            "Later, men trap the lion in a net.",
+            "The mouse bites the ropes.",
+            "The lion is free!"
+          ]
+        },
+        "advanced": {
+          "title": "The Lion and the Mouse",
+          "moral": "Little friends may prove great friends.",
+          "paragraphs": [
+            "One day a Lion was sleeping in the sun. A little Mouse ran across his nose.",
+            "The Lion woke up and caught the Mouse with his big paw.",
+            "“Please let me go!” cried the Mouse. “Someday I may help you.”",
+            "The Lion laughed. How could a tiny Mouse help a Lion? But he let the Mouse go.",
+            "Later, hunters caught the Lion in a strong net. He could not get free.",
+            "The little Mouse heard the Lion roar. She ran to help.",
+            "She chewed and chewed on the ropes until the Lion was free.",
+            "“Thank you, little friend,” said the Lion. “You were right!”"
+          ]
+        }
+      }
     },
     {
       "id": "fox-grapes",
@@ -45,15 +83,33 @@
       "blurb": "What we cannot reach may seem sour.",
       "image": "assets/stories/fox-grapes.jpg",
       "imageAlt": "A fox looking up at grapes, illustration by Milo Winter",
-      "moral": "It is easy to hate what you cannot get.",
-      "paragraphs": [
-        "A hungry Fox saw some sweet grapes hanging high on a vine.",
-        "“Those grapes look perfect,” said the Fox. “I will get some.”",
-        "He jumped and jumped, but the grapes were too high.",
-        "He tried again and again. Still he could not reach them.",
-        "At last the Fox walked away. “Those grapes are probably sour,” he said.",
-        "But really, he only said that because he could not have them."
-      ]
+      "levels": {
+        "beginner": {
+          "title": "The Fox and the Grapes",
+          "moral": "Do not hate what you cannot get.",
+          "paragraphs": [
+            "A fox is hungry.",
+            "He sees grapes up high.",
+            "“I want those!” he says.",
+            "The fox jumps and jumps.",
+            "He can not get them.",
+            "“The grapes are bad,” he says.",
+            "But he just cannot reach them."
+          ]
+        },
+        "advanced": {
+          "title": "The Fox and the Grapes",
+          "moral": "It is easy to hate what you cannot get.",
+          "paragraphs": [
+            "A hungry Fox saw some sweet grapes hanging high on a vine.",
+            "“Those grapes look perfect,” said the Fox. “I will get some.”",
+            "He jumped and jumped, but the grapes were too high.",
+            "He tried again and again. Still he could not reach them.",
+            "At last the Fox walked away. “Those grapes are probably sour,” he said.",
+            "But really, he only said that because he could not have them."
+          ]
+        }
+      }
     },
     {
       "id": "ant-grasshopper",
@@ -62,17 +118,36 @@
       "blurb": "Work today to be ready for tomorrow.",
       "image": "assets/stories/ant-grasshopper.jpg",
       "imageAlt": "An ant and a grasshopper, illustration by Milo Winter",
-      "moral": "It is best to prepare for the days of need.",
-      "paragraphs": [
-        "All summer, an Ant worked hard. She carried food to her nest.",
-        "A Grasshopper sang and played in the warm sun.",
-        "“Why work so hard?” asked the Grasshopper. “Come and sing with me!”",
-        "“I am storing food for winter,” said the Ant. “You should do the same.”",
-        "But the Grasshopper only laughed and kept on singing.",
-        "When winter came, the ground was cold and bare. The Grasshopper had nothing to eat.",
-        "He went to the Ant. “Please share your food,” he said.",
-        "The Ant had worked all summer, so she had food. The Grasshopper wished he had worked too."
-      ]
+      "levels": {
+        "beginner": {
+          "title": "The Ant and the Grasshopper",
+          "moral": "Work now. Be ready later.",
+          "paragraphs": [
+            "An ant works hard.",
+            "She puts food in her nest.",
+            "A grasshopper sings in the sun.",
+            "“Come play!” he says.",
+            "The ant keeps working.",
+            "Winter comes. It is cold.",
+            "The grasshopper has no food.",
+            "The ant has food."
+          ]
+        },
+        "advanced": {
+          "title": "The Ant and the Grasshopper",
+          "moral": "It is best to prepare for the days of need.",
+          "paragraphs": [
+            "All summer, an Ant worked hard. She carried food to her nest.",
+            "A Grasshopper sang and played in the warm sun.",
+            "“Why work so hard?” asked the Grasshopper. “Come and sing with me!”",
+            "“I am storing food for winter,” said the Ant. “You should do the same.”",
+            "But the Grasshopper only laughed and kept on singing.",
+            "When winter came, the ground was cold and bare. The Grasshopper had nothing to eat.",
+            "He went to the Ant. “Please share your food,” he said.",
+            "The Ant had worked all summer, so she had food. The Grasshopper wished he had worked too."
+          ]
+        }
+      }
     },
     {
       "id": "boy-wolf",
@@ -81,17 +156,36 @@
       "blurb": "People stop listening when we tell fibs.",
       "image": "assets/stories/boy-wolf.jpg",
       "imageAlt": "A shepherd boy calling for help, illustration by Milo Winter",
-      "moral": "Liars are not believed even when they speak the truth.",
-      "paragraphs": [
-        "A Shepherd Boy watched sheep near a dark forest. He felt bored.",
-        "To amuse himself, he ran toward the village and shouted, “Wolf! Wolf!”",
-        "The villagers came running to help. But there was no wolf. The boy laughed.",
-        "A few days later, he did it again. “Wolf! Wolf!” The villagers ran to help, and again he laughed.",
-        "Then one evening, a real wolf came out of the forest!",
-        "The boy shouted, “Wolf! Wolf!” But this time the villagers did not come.",
-        "“He cannot fool us again,” they said.",
-        "The wolf scared the sheep, and the boy learned a hard lesson: if you tell fibs, people may not believe you when you tell the truth."
-      ]
+      "levels": {
+        "beginner": {
+          "title": "The Boy Who Cried Wolf",
+          "moral": "Tell the truth.",
+          "paragraphs": [
+            "A boy watches sheep.",
+            "He yells, “Wolf! Wolf!”",
+            "Men run to help.",
+            "There is no wolf. The boy laughs.",
+            "He yells again. Men run. No wolf.",
+            "Then a real wolf comes!",
+            "The boy yells, “Wolf!”",
+            "No one comes to help."
+          ]
+        },
+        "advanced": {
+          "title": "The Boy Who Cried Wolf",
+          "moral": "Liars are not believed even when they speak the truth.",
+          "paragraphs": [
+            "A Shepherd Boy watched sheep near a dark forest. He felt bored.",
+            "To amuse himself, he ran toward the village and shouted, “Wolf! Wolf!”",
+            "The villagers came running to help. But there was no wolf. The boy laughed.",
+            "A few days later, he did it again. “Wolf! Wolf!” The villagers ran to help, and again he laughed.",
+            "Then one evening, a real wolf came out of the forest!",
+            "The boy shouted, “Wolf! Wolf!” But this time the villagers did not come.",
+            "“He cannot fool us again,” they said.",
+            "The wolf scared the sheep, and the boy learned a hard lesson: if you tell fibs, people may not believe you when you tell the truth."
+          ]
+        }
+      }
     }
   ]
 }
