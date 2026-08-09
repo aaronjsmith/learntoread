@@ -1,8 +1,10 @@
 # Stories — attribution
 
-Story texts and cover illustrations in this folder are from public-domain sources suitable for free reuse in the United States. Per-page scene pictures are original illustrations created for Ellie Reads.
+Story texts and cover illustrations in this folder include public-domain Aesop materials and original Ellie Reads primer stories. Per-page scene pictures are original illustrations created for Ellie Reads.
 
 ## Texts
+
+### Aesop retellings
 
 Short early-reader retellings of traditional Aesop fables, adapted for young children from:
 
@@ -11,7 +13,19 @@ Short early-reader retellings of traditional Aesop fables, adapted for young chi
 
 Adaptations simplify wording for early readers while preserving the classic plots and morals. Project Gutenberg license notice (normative): this ebook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever; you may copy, give it away, or re-use it under the terms of the [Project Gutenberg License](https://www.gutenberg.org/license).
 
+### Primer stories (original)
+
+Original early-reader texts written for Ellie Reads in a classic primer style (short repetitive sentences, controlled vocabulary). Characters and wording are original—not copies of Bob Books, Dick and Jane, or other commercial primers.
+
+| Story id | Title |
+| --- | --- |
+| `nan-runs` | Nan Can Run |
+| `pip-and-dot` | Pip and Dot |
+| `see-the-sun` | See the Sun |
+
 ## Cover illustrations (story list thumbs)
+
+### Aesop covers (public domain)
 
 Color illustrations by **Milo Winter** from *The Æsop for Children* (Rand McNally, 1919), via Project Gutenberg ebook #19994 and Wikimedia Commons (public domain in the United States; published before 1929).
 
@@ -25,6 +39,16 @@ Color illustrations by **Milo Winter** from *The Æsop for Children* (Rand McNal
 
 Artist: Milo Winter (1886–1956). These images are public-domain scans of a 1919 U.S. publication.
 
+### Primer covers (original)
+
+| Local file | Story |
+| --- | --- |
+| `nan-runs.jpg` | Nan Can Run |
+| `pip-and-dot.jpg` | Pip and Dot |
+| `see-the-sun.jpg` | See the Sun |
+
+Original kid-friendly watercolor-style covers created for Ellie Reads.
+
 ## Per-page scene pictures
 
 Original kid-friendly storybook illustrations for each story page live in:
@@ -34,5 +58,8 @@ Original kid-friendly storybook illustrations for each story page live in:
 - `fox-grapes/p01.jpg` … `p04.jpg`
 - `ant-grasshopper/p01.jpg` … `p04.jpg`
 - `boy-wolf/p01.jpg` … `p04.jpg`
+- `nan-runs/p01.jpg` … `p04.jpg`
+- `pip-and-dot/p01.jpg` … `p04.jpg`
+- `see-the-sun/p01.jpg` … `p04.jpg`
 
-Created for Ellie Reads page-by-page reading (not from Milo Winter plates).
+Created for Ellie Reads page-by-page reading (Aesop page art is not from Milo Winter plates; primer art is original for Ellie Reads).

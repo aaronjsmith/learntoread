@@ -1,7 +1,848 @@
 {
   "stories": [
     {
+      "id": "primer-01-nan-can",
+      "category": "primer",
+      "seriesOrder": 1,
+      "title": "Book 1 · Nan Can",
+      "author": "Ellie Reads",
+      "blurb": "Short a words — Nan, can, ran, cat, mat.",
+      "image": "assets/stories/primer-01-nan-can.jpg",
+      "imageAlt": "Nan smiles beside a cat on a mat",
+      "levels": {
+        "beginner": {
+          "title": "Nan Can",
+          "moral": "Fun to read together."
+        },
+        "advanced": {
+          "title": "Nan Can",
+          "moral": "Short a words are fun to read."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-01-nan-can/p01.jpg",
+          "imageAlt": "Nan stands and smiles",
+          "beginner": [
+            "Nan.",
+            "See Nan."
+          ],
+          "advanced": [
+            "See Nan.",
+            "Nan can stand."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-01-nan-can/p02.jpg",
+          "imageAlt": "Nan runs on a path",
+          "beginner": [
+            "Nan can ran.",
+            "Nan ran."
+          ],
+          "advanced": [
+            "Nan can run.",
+            "Nan ran and ran."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-01-nan-can/p03.jpg",
+          "imageAlt": "A cat sits on a mat",
+          "beginner": [
+            "A cat.",
+            "A cat on a mat."
+          ],
+          "advanced": [
+            "See a cat.",
+            "The cat sat on a mat."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-01-nan-can/p04.jpg",
+          "imageAlt": "Nan pets the cat on the mat",
+          "beginner": [
+            "Nan can pat.",
+            "Pat the cat!"
+          ],
+          "advanced": [
+            "Nan can pat the cat.",
+            "Nan and the cat sat."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-02-nan-ran",
+      "category": "primer",
+      "seriesOrder": 2,
+      "title": "Book 2 · Nan Ran",
+      "author": "Ellie Reads",
+      "blurb": "More short a — see, a, the, ran, man, bag.",
+      "image": "assets/stories/primer-02-nan-ran.jpg",
+      "imageAlt": "Nan and Pip run happily on a sunny path",
+      "levels": {
+        "beginner": {
+          "title": "Nan Ran",
+          "moral": "Fun to run together."
+        },
+        "advanced": {
+          "title": "Nan Ran",
+          "moral": "Running with a friend is fun."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-02-nan-ran/p01.jpg",
+          "imageAlt": "Nan stands ready to run on a sunny path",
+          "beginner": [
+            "See Nan.",
+            "Nan can ran."
+          ],
+          "advanced": [
+            "See Nan.",
+            "Nan can run fast."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-02-nan-ran/p02.jpg",
+          "imageAlt": "Pip watches Nan run past",
+          "beginner": [
+            "See Pip.",
+            "Pip sees Nan."
+          ],
+          "advanced": [
+            "Pip sees Nan.",
+            "Nan ran past Pip."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-02-nan-ran/p03.jpg",
+          "imageAlt": "Pip runs after Nan",
+          "beginner": [
+            "Pip can ran.",
+            "Pip ran too."
+          ],
+          "advanced": [
+            "Pip can run too.",
+            "Pip ran after Nan."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-02-nan-ran/p04.jpg",
+          "imageAlt": "Nan and Pip run together and laugh",
+          "beginner": [
+            "Nan and Pip ran.",
+            "A fun dash!"
+          ],
+          "advanced": [
+            "Nan and Pip ran and ran.",
+            "They had a fun dash!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-03-pip-sits",
+      "category": "primer",
+      "seriesOrder": 3,
+      "title": "Book 3 · Pip Sits",
+      "author": "Ellie Reads",
+      "blurb": "Short i words — Pip, sit, dig, big, is, it.",
+      "image": "assets/stories/primer-03-pip-sits.jpg",
+      "imageAlt": "Pip sits in the grass with a big smile",
+      "levels": {
+        "beginner": {
+          "title": "Pip Sits",
+          "moral": "Fun to read together."
+        },
+        "advanced": {
+          "title": "Pip Sits",
+          "moral": "Short i words are fun to read."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-03-pip-sits/p01.jpg",
+          "imageAlt": "Pip sits on the grass",
+          "beginner": [
+            "Pip.",
+            "Pip sits."
+          ],
+          "advanced": [
+            "See Pip.",
+            "Pip sits in the grass."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-03-pip-sits/p02.jpg",
+          "imageAlt": "Pip digs in the dirt",
+          "beginner": [
+            "Pip can dig.",
+            "Dig, dig, dig!"
+          ],
+          "advanced": [
+            "Pip can dig.",
+            "Pip digs and digs."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-03-pip-sits/p03.jpg",
+          "imageAlt": "Pip finds a big stick",
+          "beginner": [
+            "It is big!",
+            "A big stick."
+          ],
+          "advanced": [
+            "Pip finds a stick.",
+            "It is a big stick!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-03-pip-sits/p04.jpg",
+          "imageAlt": "Pip sits with his big stick",
+          "beginner": [
+            "Pip sits.",
+            "Pip has it."
+          ],
+          "advanced": [
+            "Pip sits with it.",
+            "Pip likes his big stick."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-04-dot-hops",
+      "category": "primer",
+      "seriesOrder": 4,
+      "title": "Book 4 · Dot Hops",
+      "author": "Ellie Reads",
+      "blurb": "Short o words — Dot, hop, on, not, pot, top.",
+      "image": "assets/stories/primer-04-dot-hops.jpg",
+      "imageAlt": "Pip watches Dot the spotted rabbit hop",
+      "levels": {
+        "beginner": {
+          "title": "Dot Hops",
+          "moral": "Fun to hop together."
+        },
+        "advanced": {
+          "title": "Dot Hops",
+          "moral": "Friends like to hop and play."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-04-dot-hops/p01.jpg",
+          "imageAlt": "Pip looks across the yard and sees Dot",
+          "beginner": [
+            "See Pip.",
+            "Pip sees Dot."
+          ],
+          "advanced": [
+            "See Pip.",
+            "Pip sees Dot on the grass."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-04-dot-hops/p02.jpg",
+          "imageAlt": "Dot hops on the grass",
+          "beginner": [
+            "Dot can hop.",
+            "Hop, Dot, hop!"
+          ],
+          "advanced": [
+            "Dot can hop.",
+            "Hop, hop, hop goes Dot!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-04-dot-hops/p03.jpg",
+          "imageAlt": "Dot hops onto a flower pot",
+          "beginner": [
+            "Dot is on top.",
+            "On a pot!"
+          ],
+          "advanced": [
+            "Dot hops on a pot.",
+            "Dot is on top!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-04-dot-hops/p04.jpg",
+          "imageAlt": "Pip hops next to Dot",
+          "beginner": [
+            "Pip can hop.",
+            "Not on top!"
+          ],
+          "advanced": [
+            "Pip can hop too.",
+            "Pip hops with Dot — but not on the pot!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-05-fun-sun",
+      "category": "primer",
+      "seriesOrder": 5,
+      "title": "Book 5 · Fun in the Sun",
+      "author": "Ellie Reads",
+      "blurb": "Short u and e — fun, sun, run, up, get, red, yes.",
+      "image": "assets/stories/primer-05-fun-sun.jpg",
+      "imageAlt": "Nan and Pip play under a bright sun",
+      "levels": {
+        "beginner": {
+          "title": "Fun in the Sun",
+          "moral": "Fun to play outside."
+        },
+        "advanced": {
+          "title": "Fun in the Sun",
+          "moral": "A sunny day is a good day to play."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-05-fun-sun/p01.jpg",
+          "imageAlt": "Nan and Pip look out a window at the bright sun",
+          "beginner": [
+            "See the sun.",
+            "The sun is up."
+          ],
+          "advanced": [
+            "See the sun.",
+            "The sun is up in the sky."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-05-fun-sun/p02.jpg",
+          "imageAlt": "Nan and Pip go outside into the sunshine",
+          "beginner": [
+            "Yes! Get up.",
+            "Nan and Pip run."
+          ],
+          "advanced": [
+            "Yes! Get up, Nan and Pip.",
+            "They run out in the sun."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-05-fun-sun/p03.jpg",
+          "imageAlt": "Nan and Pip play with a red ball in the sun",
+          "beginner": [
+            "A red ball.",
+            "Fun in the sun!"
+          ],
+          "advanced": [
+            "Nan has a red ball.",
+            "They have fun in the sun."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-05-fun-sun/p04.jpg",
+          "imageAlt": "Nan and Pip wave goodbye as the sun gets low",
+          "beginner": [
+            "The sun is set.",
+            "Get in! Fun end."
+          ],
+          "advanced": [
+            "The sun is set low.",
+            "Nan and Pip get in. Fun ends."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-06-mix-it-up",
+      "category": "primer",
+      "seriesOrder": 6,
+      "title": "Book 6 · Mix It Up",
+      "author": "Ellie Reads",
+      "blurb": "Mixing short vowels — cat, Pip, Dot, sun, hop, ran.",
+      "image": "assets/stories/primer-06-mix-it-up.jpg",
+      "imageAlt": "Nan, Pip, and Dot play together in the yard",
+      "levels": {
+        "beginner": {
+          "title": "Mix It Up",
+          "moral": "Fun to read together."
+        },
+        "advanced": {
+          "title": "Mix It Up",
+          "moral": "Short vowel words mix and match."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-06-mix-it-up/p01.jpg",
+          "imageAlt": "Nan, Pip, and Dot gather in the yard",
+          "beginner": [
+            "Nan. Pip. Dot.",
+            "They can play."
+          ],
+          "advanced": [
+            "Nan, Pip, and Dot can play.",
+            "They mix it up!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-06-mix-it-up/p02.jpg",
+          "imageAlt": "Nan pats a cat while Pip digs",
+          "beginner": [
+            "Nan pats a cat.",
+            "Pip digs."
+          ],
+          "advanced": [
+            "Nan pats a cat on a mat.",
+            "Pip digs in the mud."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-06-mix-it-up/p03.jpg",
+          "imageAlt": "Dot hops while the sun shines",
+          "beginner": [
+            "Dot hops.",
+            "The sun is hot."
+          ],
+          "advanced": [
+            "Dot hops and hops.",
+            "The sun is hot, but Dot is not!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-06-mix-it-up/p04.jpg",
+          "imageAlt": "Everyone runs and laughs together",
+          "beginner": [
+            "Nan ran.",
+            "Pip ran. Fun!"
+          ],
+          "advanced": [
+            "Nan and Pip ran with Dot.",
+            "What fun they had!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-07-see-the-map",
+      "category": "primer",
+      "seriesOrder": 7,
+      "title": "Book 7 · See the Map",
+      "author": "Ellie Reads",
+      "blurb": "Sight words + CVC — see, the, to, go, and, map, bag.",
+      "image": "assets/stories/primer-07-see-the-map.jpg",
+      "imageAlt": "Nan and Pip look at a simple treasure map",
+      "levels": {
+        "beginner": {
+          "title": "See the Map",
+          "moral": "Fun to read together."
+        },
+        "advanced": {
+          "title": "See the Map",
+          "moral": "Sight words help the story go."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-07-see-the-map/p01.jpg",
+          "imageAlt": "Nan holds up a simple map",
+          "beginner": [
+            "See the map.",
+            "Nan has a map."
+          ],
+          "advanced": [
+            "See the map!",
+            "Nan has a map in her bag."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-07-see-the-map/p02.jpg",
+          "imageAlt": "Pip points at the map with Nan",
+          "beginner": [
+            "Pip can see.",
+            "Go to the X!"
+          ],
+          "advanced": [
+            "Pip can see the map too.",
+            "They will go to the big X."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-07-see-the-map/p03.jpg",
+          "imageAlt": "Nan and Pip walk to a tree marked on the map",
+          "beginner": [
+            "Nan and Pip go.",
+            "To the big tree."
+          ],
+          "advanced": [
+            "Nan and Pip go to the tree.",
+            "The map said to dig here."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-07-see-the-map/p04.jpg",
+          "imageAlt": "They dig and find a small tin of snacks",
+          "beginner": [
+            "Dig, dig!",
+            "A tin! Yes!"
+          ],
+          "advanced": [
+            "They dig and dig.",
+            "They find a tin — and snacks! Yes!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-08-we-can-help",
+      "category": "primer",
+      "seriesOrder": 8,
+      "title": "Book 8 · We Can Help",
+      "author": "Ellie Reads",
+      "blurb": "More sight words + CVC — we, can, help, her, him, get.",
+      "image": "assets/stories/primer-08-we-can-help.jpg",
+      "imageAlt": "Nan and Pip help carry a basket for a neighbor",
+      "levels": {
+        "beginner": {
+          "title": "We Can Help",
+          "moral": "Fun to help a friend."
+        },
+        "advanced": {
+          "title": "We Can Help",
+          "moral": "Helping makes a good day better."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-08-we-can-help/p01.jpg",
+          "imageAlt": "A neighbor drops apples from a basket",
+          "beginner": [
+            "Oh no!",
+            "The bag is rip."
+          ],
+          "advanced": [
+            "Oh no! The bag has a rip.",
+            "Apples tip and tip."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-08-we-can-help/p02.jpg",
+          "imageAlt": "Nan and Pip run to help pick up apples",
+          "beginner": [
+            "We can help!",
+            "Get the red ones."
+          ],
+          "advanced": [
+            "We can help her!",
+            "Nan and Pip get the red apples."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-08-we-can-help/p03.jpg",
+          "imageAlt": "They put apples back in a new basket",
+          "beginner": [
+            "In the tin.",
+            "In the bag."
+          ],
+          "advanced": [
+            "They put them in a tin.",
+            "Then they put the tin in a bag."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-08-we-can-help/p04.jpg",
+          "imageAlt": "The neighbor smiles and thanks Nan and Pip",
+          "beginner": [
+            "She is glad.",
+            "We can help!"
+          ],
+          "advanced": [
+            "She is so glad.",
+            "We can help — and that is fun!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-09-fish-and-wish",
+      "category": "primer",
+      "seriesOrder": 9,
+      "title": "Book 9 · Fish and Wish",
+      "author": "Ellie Reads",
+      "blurb": "Light digraphs — sh, th — fish, wish, with, that, shop.",
+      "image": "assets/stories/primer-09-fish-and-wish.jpg",
+      "imageAlt": "Nan and Pip look at fish in a shop tank",
+      "levels": {
+        "beginner": {
+          "title": "Fish and Wish",
+          "moral": "Fun to read together."
+        },
+        "advanced": {
+          "title": "Fish and Wish",
+          "moral": "Sh and th words are fun to try."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-09-fish-and-wish/p01.jpg",
+          "imageAlt": "Nan and Pip walk to a little fish shop",
+          "beginner": [
+            "To the shop.",
+            "See the fish!"
+          ],
+          "advanced": [
+            "Nan and Pip go to the shop.",
+            "They see fish in the tank."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-09-fish-and-wish/p02.jpg",
+          "imageAlt": "A little fish swims with a swish",
+          "beginner": [
+            "That fish!",
+            "It can swish."
+          ],
+          "advanced": [
+            "That fish can swish.",
+            "It swims with a big swish!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-09-fish-and-wish/p03.jpg",
+          "imageAlt": "Pip makes a wish at the tank",
+          "beginner": [
+            "Pip can wish.",
+            "Wish, wish, wish."
+          ],
+          "advanced": [
+            "Pip can wish.",
+            "He wishes for that fish."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-09-fish-and-wish/p04.jpg",
+          "imageAlt": "They leave happy, still smiling about the fish",
+          "beginner": [
+            "Not that fish.",
+            "But we had fun!"
+          ],
+          "advanced": [
+            "They do not get that fish.",
+            "But they had fun at the shop!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-10-the-big-trip",
+      "category": "primer",
+      "seriesOrder": 10,
+      "title": "Book 10 · The Big Trip",
+      "author": "Ellie Reads",
+      "blurb": "Slightly longer — a trip with Nan, Pip, and Dot.",
+      "image": "assets/stories/primer-10-the-big-trip.jpg",
+      "imageAlt": "Nan, Pip, and Dot pack for a short trip",
+      "levels": {
+        "beginner": {
+          "title": "The Big Trip",
+          "moral": "Fun to go on a trip."
+        },
+        "advanced": {
+          "title": "The Big Trip",
+          "moral": "A little trip can be a big adventure."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-10-the-big-trip/p01.jpg",
+          "imageAlt": "Nan packs a bag while Pip holds Dot",
+          "beginner": [
+            "Nan has a bag.",
+            "Pip has Dot."
+          ],
+          "advanced": [
+            "Nan packs a bag for the trip.",
+            "Pip holds Dot. They are set!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-10-the-big-trip/p02.jpg",
+          "imageAlt": "They walk along a path past hills",
+          "beginner": [
+            "They go on the path.",
+            "Up the hill."
+          ],
+          "advanced": [
+            "They go on the path.",
+            "Up the hill they trek with Dot."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-10-the-big-trip/p03.jpg",
+          "imageAlt": "They rest by a stream and share a snack",
+          "beginner": [
+            "Stop and sit.",
+            "A snack in the bag."
+          ],
+          "advanced": [
+            "They stop and sit by a stream.",
+            "Nan gets a snack from the bag."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-10-the-big-trip/p04.jpg",
+          "imageAlt": "They look out from the hilltop happily",
+          "beginner": [
+            "At the top!",
+            "What a big trip."
+          ],
+          "advanced": [
+            "At the top they see a lot!",
+            "What a big trip for Nan, Pip, and Dot."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-11-dot-is-lost",
+      "category": "primer",
+      "seriesOrder": 11,
+      "title": "Book 11 · Dot Is Lost",
+      "author": "Ellie Reads",
+      "blurb": "A short hunt — find, lost, call, bush, back.",
+      "image": "assets/stories/primer-11-dot-is-lost.jpg",
+      "imageAlt": "Nan and Pip look for Dot in the garden",
+      "levels": {
+        "beginner": {
+          "title": "Dot Is Lost",
+          "moral": "Fun to find a friend."
+        },
+        "advanced": {
+          "title": "Dot Is Lost",
+          "moral": "Stick together — and look with care."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-11-dot-is-lost/p01.jpg",
+          "imageAlt": "Pip looks around; Dot is not there",
+          "beginner": [
+            "Where is Dot?",
+            "Dot is lost!"
+          ],
+          "advanced": [
+            "Where is Dot?",
+            "Pip looks. Dot is lost!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-11-dot-is-lost/p02.jpg",
+          "imageAlt": "Nan and Pip call and search the yard",
+          "beginner": [
+            "Nan and Pip call.",
+            "Dot! Dot!"
+          ],
+          "advanced": [
+            "Nan and Pip call for Dot.",
+            "They look in the yard. Dot! Dot!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-11-dot-is-lost/p03.jpg",
+          "imageAlt": "A bush wiggles; something is inside",
+          "beginner": [
+            "A bush wiggles.",
+            "Is that Dot?"
+          ],
+          "advanced": [
+            "A bush wiggles and shakes.",
+            "Is that Dot in the bush?"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-11-dot-is-lost/p04.jpg",
+          "imageAlt": "Dot hops out of the bush; everyone hugs",
+          "beginner": [
+            "Yes! Dot hops out.",
+            "Dot is back!"
+          ],
+          "advanced": [
+            "Yes! Dot hops out of the bush.",
+            "Dot is back — and they hug!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primer-12-a-day-of-fun",
+      "category": "primer",
+      "seriesOrder": 12,
+      "title": "Book 12 · A Day of Fun",
+      "author": "Ellie Reads",
+      "blurb": "All skills together — a full fun day for friends.",
+      "image": "assets/stories/primer-12-a-day-of-fun.jpg",
+      "imageAlt": "Nan, Pip, and Dot enjoy a full day of play",
+      "levels": {
+        "beginner": {
+          "title": "A Day of Fun",
+          "moral": "Fun to play all day."
+        },
+        "advanced": {
+          "title": "A Day of Fun",
+          "moral": "A day with friends is the best day."
+        }
+      },
+      "pages": [
+        {
+          "image": "assets/stories/primer-12-a-day-of-fun/p01.jpg",
+          "imageAlt": "Morning sun; Nan, Pip, and Dot wake ready to play",
+          "beginner": [
+            "The sun is up.",
+            "Nan, Pip, and Dot get up."
+          ],
+          "advanced": [
+            "The sun is up in the sky.",
+            "Nan, Pip, and Dot get up for a day of fun."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-12-a-day-of-fun/p02.jpg",
+          "imageAlt": "They run, hop, and dig in the yard",
+          "beginner": [
+            "They ran and hop.",
+            "They dig and dig."
+          ],
+          "advanced": [
+            "They ran and hop in the yard.",
+            "They dig and find a big stick."
+          ]
+        },
+        {
+          "image": "assets/stories/primer-12-a-day-of-fun/p03.jpg",
+          "imageAlt": "They share a snack on a mat in the sun",
+          "beginner": [
+            "Sit on the mat.",
+            "A snack with friends."
+          ],
+          "advanced": [
+            "They sit on the mat in the sun.",
+            "A snack with friends is the best!"
+          ]
+        },
+        {
+          "image": "assets/stories/primer-12-a-day-of-fun/p04.jpg",
+          "imageAlt": "Evening; they wave and head home happy",
+          "beginner": [
+            "The sun is set.",
+            "What a fun day!"
+          ],
+          "advanced": [
+            "The sun is set low.",
+            "What a fun day for Nan, Pip, and Dot!"
+          ]
+        }
+      ]
+    },
+    {
       "id": "tortoise-hare",
+      "category": "fable",
       "title": "The Tortoise and the Hare",
       "author": "Aesop",
       "blurb": "Slow and steady can win the race.",
@@ -21,7 +862,10 @@
         {
           "image": "assets/stories/tortoise-hare/p01.jpg",
           "imageAlt": "A proud hare and a slow tortoise meet on a sunny path",
-          "beginner": ["A hare is fast.", "A tortoise is slow."],
+          "beginner": [
+            "A hare is fast.",
+            "A tortoise is slow."
+          ],
           "advanced": [
             "A Hare liked to tease a Tortoise for being so slow.",
             "“I am the fastest!” said the Hare. “You could never beat me.”"
@@ -30,7 +874,10 @@
         {
           "image": "assets/stories/tortoise-hare/p02.jpg",
           "imageAlt": "The tortoise challenges the hare to a race",
-          "beginner": ["“Let’s race!” says the tortoise.", "The hare runs far ahead."],
+          "beginner": [
+            "“Let’s race!” says the tortoise.",
+            "The hare runs far ahead."
+          ],
           "advanced": [
             "“Shall we race?” asked the Tortoise.",
             "The Hare laughed, but he said yes. They lined up, and the race began."
@@ -39,7 +886,10 @@
         {
           "image": "assets/stories/tortoise-hare/p03.jpg",
           "imageAlt": "The hare naps while the tortoise keeps walking",
-          "beginner": ["Then the hare takes a nap.", "The tortoise walks and walks."],
+          "beginner": [
+            "Then the hare takes a nap.",
+            "The tortoise walks and walks."
+          ],
           "advanced": [
             "The Hare ran far ahead. Then he lay down for a nap. “The Tortoise is so slow,” he thought. “I have plenty of time.”",
             "The Tortoise kept walking, step by step. He did not stop."
@@ -48,7 +898,10 @@
         {
           "image": "assets/stories/tortoise-hare/p04.jpg",
           "imageAlt": "The tortoise crosses the finish line first",
-          "beginner": ["He does not stop.", "The tortoise wins!"],
+          "beginner": [
+            "He does not stop.",
+            "The tortoise wins!"
+          ],
           "advanced": [
             "When the Hare woke up, he ran as fast as he could. But the Tortoise had already crossed the finish line.",
             "The Tortoise had won!"
@@ -58,6 +911,7 @@
     },
     {
       "id": "lion-mouse",
+      "category": "fable",
       "title": "The Lion and the Mouse",
       "author": "Aesop",
       "blurb": "A tiny friend can help a big one.",
@@ -77,7 +931,10 @@
         {
           "image": "assets/stories/lion-mouse/p01.jpg",
           "imageAlt": "A big lion naps while a little mouse runs nearby",
-          "beginner": ["A big lion naps in the sun.", "A little mouse runs by."],
+          "beginner": [
+            "A big lion naps in the sun.",
+            "A little mouse runs by."
+          ],
           "advanced": [
             "One day a Lion was sleeping in the sun. A little Mouse ran across his nose."
           ]
@@ -97,7 +954,10 @@
         {
           "image": "assets/stories/lion-mouse/p03.jpg",
           "imageAlt": "The lion frees the mouse, then later is trapped in a net",
-          "beginner": ["The lion lets the mouse go.", "Later, men trap the lion in a net."],
+          "beginner": [
+            "The lion lets the mouse go.",
+            "Later, men trap the lion in a net."
+          ],
           "advanced": [
             "The Lion laughed. How could a tiny Mouse help a Lion? But he let the Mouse go.",
             "Later, hunters caught the Lion in a strong net. He could not get free."
@@ -106,7 +966,10 @@
         {
           "image": "assets/stories/lion-mouse/p04.jpg",
           "imageAlt": "The mouse chews the ropes and frees the lion",
-          "beginner": ["The mouse bites the ropes.", "The lion is free!"],
+          "beginner": [
+            "The mouse bites the ropes.",
+            "The lion is free!"
+          ],
           "advanced": [
             "The little Mouse heard the Lion roar. She ran to help.",
             "She chewed and chewed on the ropes until the Lion was free.",
@@ -117,6 +980,7 @@
     },
     {
       "id": "fox-grapes",
+      "category": "fable",
       "title": "The Fox and the Grapes",
       "author": "Aesop",
       "blurb": "What we cannot reach may seem sour.",
@@ -136,7 +1000,10 @@
         {
           "image": "assets/stories/fox-grapes/p01.jpg",
           "imageAlt": "A hungry fox looks up at grapes on a vine",
-          "beginner": ["A fox is hungry.", "He sees grapes up high."],
+          "beginner": [
+            "A fox is hungry.",
+            "He sees grapes up high."
+          ],
           "advanced": [
             "A hungry Fox saw some sweet grapes hanging high on a vine."
           ]
@@ -144,7 +1011,10 @@
         {
           "image": "assets/stories/fox-grapes/p02.jpg",
           "imageAlt": "The fox jumps trying to reach the grapes",
-          "beginner": ["“I want those!” he says.", "The fox jumps and jumps."],
+          "beginner": [
+            "“I want those!” he says.",
+            "The fox jumps and jumps."
+          ],
           "advanced": [
             "“Those grapes look perfect,” said the Fox. “I will get some.”",
             "He jumped and jumped, but the grapes were too high."
@@ -153,7 +1023,9 @@
         {
           "image": "assets/stories/fox-grapes/p03.jpg",
           "imageAlt": "The fox fails to reach the grapes again and again",
-          "beginner": ["He can not get them."],
+          "beginner": [
+            "He can not get them."
+          ],
           "advanced": [
             "He tried again and again. Still he could not reach them."
           ]
@@ -161,7 +1033,10 @@
         {
           "image": "assets/stories/fox-grapes/p04.jpg",
           "imageAlt": "The fox walks away saying the grapes are sour",
-          "beginner": ["“The grapes are bad,” he says.", "But he just cannot reach them."],
+          "beginner": [
+            "“The grapes are bad,” he says.",
+            "But he just cannot reach them."
+          ],
           "advanced": [
             "At last the Fox walked away. “Those grapes are probably sour,” he said.",
             "But really, he only said that because he could not have them."
@@ -171,6 +1046,7 @@
     },
     {
       "id": "ant-grasshopper",
+      "category": "fable",
       "title": "The Ant and the Grasshopper",
       "author": "Aesop",
       "blurb": "Work today to be ready for tomorrow.",
@@ -190,7 +1066,10 @@
         {
           "image": "assets/stories/ant-grasshopper/p01.jpg",
           "imageAlt": "A busy ant carries food to her nest",
-          "beginner": ["An ant works hard.", "She puts food in her nest."],
+          "beginner": [
+            "An ant works hard.",
+            "She puts food in her nest."
+          ],
           "advanced": [
             "All summer, an Ant worked hard. She carried food to her nest."
           ]
@@ -198,7 +1077,10 @@
         {
           "image": "assets/stories/ant-grasshopper/p02.jpg",
           "imageAlt": "A grasshopper sings and asks the ant to play",
-          "beginner": ["A grasshopper sings in the sun.", "“Come play!” he says."],
+          "beginner": [
+            "A grasshopper sings in the sun.",
+            "“Come play!” he says."
+          ],
           "advanced": [
             "A Grasshopper sang and played in the warm sun.",
             "“Why work so hard?” asked the Grasshopper. “Come and sing with me!”"
@@ -207,7 +1089,10 @@
         {
           "image": "assets/stories/ant-grasshopper/p03.jpg",
           "imageAlt": "The ant keeps working while winter approaches",
-          "beginner": ["The ant keeps working.", "Winter comes. It is cold."],
+          "beginner": [
+            "The ant keeps working.",
+            "Winter comes. It is cold."
+          ],
           "advanced": [
             "“I am storing food for winter,” said the Ant. “You should do the same.”",
             "But the Grasshopper only laughed and kept on singing."
@@ -216,7 +1101,10 @@
         {
           "image": "assets/stories/ant-grasshopper/p04.jpg",
           "imageAlt": "In winter the grasshopper is hungry and the ant has food",
-          "beginner": ["The grasshopper has no food.", "The ant has food."],
+          "beginner": [
+            "The grasshopper has no food.",
+            "The ant has food."
+          ],
           "advanced": [
             "When winter came, the ground was cold and bare. The Grasshopper had nothing to eat.",
             "He went to the Ant. “Please share your food,” he said.",
@@ -227,6 +1115,7 @@
     },
     {
       "id": "boy-wolf",
+      "category": "fable",
       "title": "The Boy Who Cried Wolf",
       "author": "Aesop",
       "blurb": "People stop listening when we tell fibs.",
@@ -246,7 +1135,9 @@
         {
           "image": "assets/stories/boy-wolf/p01.jpg",
           "imageAlt": "A shepherd boy watches sheep near a forest",
-          "beginner": ["A boy watches sheep."],
+          "beginner": [
+            "A boy watches sheep."
+          ],
           "advanced": [
             "A Shepherd Boy watched sheep near a dark forest. He felt bored."
           ]
@@ -254,7 +1145,10 @@
         {
           "image": "assets/stories/boy-wolf/p02.jpg",
           "imageAlt": "The boy falsely cries wolf and villagers come running",
-          "beginner": ["He yells, “Wolf! Wolf!”", "Men run to help."],
+          "beginner": [
+            "He yells, “Wolf! Wolf!”",
+            "Men run to help."
+          ],
           "advanced": [
             "To amuse himself, he ran toward the village and shouted, “Wolf! Wolf!”",
             "The villagers came running to help. But there was no wolf. The boy laughed."
@@ -263,7 +1157,10 @@
         {
           "image": "assets/stories/boy-wolf/p03.jpg",
           "imageAlt": "The boy tricks the villagers again",
-          "beginner": ["There is no wolf. The boy laughs.", "He yells again. Men run. No wolf."],
+          "beginner": [
+            "There is no wolf. The boy laughs.",
+            "He yells again. Men run. No wolf."
+          ],
           "advanced": [
             "A few days later, he did it again. “Wolf! Wolf!” The villagers ran to help, and again he laughed."
           ]
@@ -271,7 +1168,11 @@
         {
           "image": "assets/stories/boy-wolf/p04.jpg",
           "imageAlt": "A real wolf appears and nobody comes to help",
-          "beginner": ["Then a real wolf comes!", "The boy yells, “Wolf!”", "No one comes to help."],
+          "beginner": [
+            "Then a real wolf comes!",
+            "The boy yells, “Wolf!”",
+            "No one comes to help."
+          ],
           "advanced": [
             "Then one evening, a real wolf came out of the forest!",
             "The boy shouted, “Wolf! Wolf!” But this time the villagers did not come.",

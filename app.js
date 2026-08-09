@@ -929,10 +929,13 @@
   }
 
   function updateStoryPageNavUI(page) {
-    if (!els.storyPageNav) return;
     const count = (page && page.pageCount) | 0;
     const show = count > 1;
-    els.storyPageNav.hidden = !show;
+    const isLast = !!(page && page.isLast);
+    if (els.storyPageNav) els.storyPageNav.hidden = !show;
+    if (els.storyContinueWrap) {
+      els.storyContinueWrap.hidden = !show || isLast;
+    }
     if (!show) return;
     const idx = ((page && page.pageIndex) | 0) + 1;
     if (els.storyPageLabel) {
@@ -942,7 +945,7 @@
       els.storyPrevPage.disabled = !!(page && page.isFirst);
     }
     if (els.storyNextPage) {
-      els.storyNextPage.disabled = !!(page && page.isLast);
+      els.storyNextPage.disabled = isLast;
     }
   }
 
@@ -1992,7 +1995,7 @@
       case "sight":
         return "Sight words. Tap a letter for one sound. Start the slider on the left, then slide to blend. Then say the word.";
       case "stories":
-        return "Stories. Pick Easy or Longer, then pick a short tale. Look at the picture, or tap Read aloud.";
+        return "Stories. Pick Easy or Longer, then pick a First Words or Fables tale. Look at the picture, or tap Read aloud.";
       case "story": {
         const story = getStoryById(activeStoryId);
         const content = getStoryLevelContent(story);
@@ -2586,12 +2589,25 @@
       els.storiesList.appendChild(empty);
       return;
     }
+
+    const CATEGORY_ORDER = ["primer", "fable"];
+    const CATEGORY_LABELS = {
+      primer: "First Words",
+      fable: "Fables",
+      other: "Stories",
+    };
+    const groups = { primer: [], fable: [], other: [] };
     stories.forEach((story) => {
+      const cat = String(story.category || "").trim();
+      if (cat === "primer" || cat === "fable") groups[cat].push(story);
+      else groups.other.push(story);
+    });
+
+    const appendStoryCard = (story) => {
       const prog = getStoryProgress(story.id);
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "story-card" + (prog.finished ? " is-finished" : "");
-      btn.setAttribute("role", "listitem");
       btn.setAttribute("aria-label", story.title);
       btn.dataset.speak = story.title;
 
@@ -2621,6 +2637,16 @@
         openStory(story.id);
       });
       els.storiesList.appendChild(btn);
+    };
+
+    [...CATEGORY_ORDER, "other"].forEach((cat) => {
+      const list = groups[cat];
+      if (!list.length) return;
+      const heading = document.createElement("h3");
+      heading.className = "stories-category";
+      heading.textContent = CATEGORY_LABELS[cat] || "Stories";
+      els.storiesList.appendChild(heading);
+      list.forEach(appendStoryCard);
     });
   }
 
@@ -4109,6 +4135,9 @@
     if (els.storyNextPage) {
       els.storyNextPage.addEventListener("click", () => goStoryPage(1));
     }
+    if (els.storyContinue) {
+      els.storyContinue.addEventListener("click", () => goStoryPage(1));
+    }
 
     const storyWordRoots = [els.storyTitle, els.storyBody, els.storyMoral].filter(
       Boolean
@@ -4410,6 +4439,8 @@
     els.storyBlendLetters = $("storyBlendLetters");
     els.storyBlendSlider = $("storyBlendSlider");
     els.storyMoral = $("storyMoral");
+    els.storyContinueWrap = $("storyContinueWrap");
+    els.storyContinue = $("storyContinue");
     els.storyPageNav = $("storyPageNav");
     els.storyPageLabel = $("storyPageLabel");
     els.storyPrevPage = $("storyPrevPage");
