@@ -36,11 +36,11 @@
           "image": "assets/stories/primer-01-nan-can/p02.jpg",
           "imageAlt": "Nan runs on a path",
           "beginner": [
-            "Nan can ran.",
-            "Nan ran."
+            "Nan ran.",
+            "Ran, Nan, ran!"
           ],
           "advanced": [
-            "Nan can run.",
+            "Nan ran fast.",
             "Nan ran and ran."
           ]
         },
@@ -95,11 +95,11 @@
           "imageAlt": "Nan stands ready to run on a sunny path",
           "beginner": [
             "See Nan.",
-            "Nan can ran."
+            "Nan ran."
           ],
           "advanced": [
             "See Nan.",
-            "Nan can run fast."
+            "Nan ran fast."
           ]
         },
         {
@@ -118,11 +118,11 @@
           "image": "assets/stories/primer-02-nan-ran/p03.jpg",
           "imageAlt": "Pip runs after Nan",
           "beginner": [
-            "Pip can ran.",
+            "Pip ran.",
             "Pip ran too."
           ],
           "advanced": [
-            "Pip can run too.",
+            "Pip ran too.",
             "Pip ran after Nan."
           ]
         },
@@ -515,7 +515,7 @@
           "imageAlt": "A neighbor drops apples from a basket",
           "beginner": [
             "Oh no!",
-            "The bag is rip."
+            "The bag has a rip."
           ],
           "advanced": [
             "Oh no! The bag has a rip.",

@@ -2590,18 +2590,30 @@
       return;
     }
 
-    const CATEGORY_ORDER = ["primer", "fable"];
+    const CATEGORY_ORDER = ["primer", "bible", "bom", "fable"];
     const CATEGORY_LABELS = {
       primer: "First Words",
+      bible: "Bible",
+      bom: "Book of Mormon",
       fable: "Fables",
       other: "Stories",
     };
-    const groups = { primer: [], fable: [], other: [] };
+    const CATEGORY_NOTES = {
+      primer: "Books 1–12 · grow with each story",
+    };
+    const groups = { primer: [], bible: [], bom: [], fable: [], other: [] };
     stories.forEach((story) => {
       const cat = String(story.category || "").trim();
-      if (cat === "primer" || cat === "fable") groups[cat].push(story);
+      if (cat === "primer" || cat === "bible" || cat === "bom" || cat === "fable") groups[cat].push(story);
       else groups.other.push(story);
     });
+    const primerOrder = (story) => {
+      const n = Number(story.seriesOrder);
+      if (Number.isFinite(n)) return n;
+      const m = String(story.id || "").match(/primer-(\d+)/i);
+      return m ? Number(m[1]) : 999;
+    };
+    groups.primer.sort((a, b) => primerOrder(a) - primerOrder(b) || String(a.id).localeCompare(String(b.id)));
 
     const appendStoryCard = (story) => {
       const prog = getStoryProgress(story.id);
@@ -2646,6 +2658,12 @@
       heading.className = "stories-category";
       heading.textContent = CATEGORY_LABELS[cat] || "Stories";
       els.storiesList.appendChild(heading);
+      if (CATEGORY_NOTES[cat]) {
+        const note = document.createElement("p");
+        note.className = "stories-category-note";
+        note.textContent = CATEGORY_NOTES[cat];
+        els.storiesList.appendChild(note);
+      }
       list.forEach(appendStoryCard);
     });
   }

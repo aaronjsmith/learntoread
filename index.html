@@ -1946,6 +1946,54 @@
       color: var(--accent-dark);
     }
 
+    .section-report--flashcards {
+      border-color: rgba(107, 183, 255, 0.45);
+      box-shadow: 0 6px 0 rgba(107, 183, 255, 0.18);
+    }
+
+    button.section-report--flashcards:hover,
+    button.section-report--flashcards:active {
+      background: #f3f9ff;
+    }
+
+    button.section-report--flashcards:hover {
+      border-color: var(--sky);
+      box-shadow: 0 8px 0 rgba(107, 183, 255, 0.28);
+    }
+
+    button.section-report--flashcards:active {
+      box-shadow: 0 4px 0 rgba(107, 183, 255, 0.18);
+    }
+
+    .section-report--flashcards h3 {
+      color: #3a86c8;
+    }
+
+    .flashcard-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+    }
+
+    .flashcard-actions .btn-with-icon {
+      min-width: 140px;
+    }
+
+    .word-stage--flashcards {
+      border-color: rgba(107, 183, 255, 0.4);
+      box-shadow: 0 8px 0 rgba(107, 183, 255, 0.16);
+    }
+
+    .word-stage--flashcards::before {
+      background:
+        radial-gradient(circle at 12% 16%, rgba(107, 183, 255, 0.22) 0 12%, transparent 13%),
+        radial-gradient(circle at 90% 20%, rgba(255, 107, 138, 0.12) 0 10%, transparent 11%);
+    }
+
     /* —— Phonics —— */
     .phonics-layout {
       display: grid;
@@ -2203,6 +2251,15 @@
 
     .stories-category:first-child {
       margin-top: 0;
+    }
+
+    .stories-category-note {
+      margin: 2px 0 8px;
+      padding: 0 2px;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      color: var(--ink-soft, #5c5346);
+      opacity: 0.9;
     }
 
     .story-card {
@@ -2939,6 +2996,16 @@
       <path d="M48 48h8M52 44v8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
     </symbol>
 
+    <symbol id="icon-flashcards" viewBox="0 0 72 72">
+      <rect x="14" y="18" width="36" height="42" rx="8" fill="#d5f7f2" transform="rotate(-10 32 39)"/>
+      <rect x="20" y="14" width="38" height="44" rx="8" fill="#ffe0e8"/>
+      <rect x="26" y="20" width="26" height="32" rx="5" fill="#fff"/>
+      <rect x="32" y="30" width="14" height="4" rx="2" fill="#6bb7ff"/>
+      <rect x="30" y="38" width="18" height="4" rx="2" fill="#ff6b8a"/>
+      <circle cx="52" cy="50" r="11" fill="#ffc94a"/>
+      <path d="M48.5 50.5h7M52 47v7" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+    </symbol>
+
     <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 11.5 12 4l8 7.5"/>
       <path d="M7 10.5V20h10v-9.5"/>
@@ -3120,6 +3187,14 @@
           <p id="storiesReportText">0 of 0 stories finished</p>
           <div class="progress-bar progress-bar--thin" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="storiesProgressBar">
             <div class="progress-bar-fill" id="storiesProgressFill"></div>
+          </div>
+        </button>
+        <button type="button" class="section-report section-report--flashcards" id="homeOpenFlashcards" aria-label="Open Story words" data-speak="Story words">
+          <svg class="section-report-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-flashcards"/></svg>
+          <h3>Story words</h3>
+          <p id="flashcardsReportText">0 of 0 words mastered</p>
+          <div class="progress-bar progress-bar--thin" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="flashcardsProgressBar">
+            <div class="progress-bar-fill" id="flashcardsProgressFill"></div>
           </div>
         </button>
         <button type="button" class="section-report section-report--report" id="activityReportCard" aria-label="Report card" data-speak="Report card">
