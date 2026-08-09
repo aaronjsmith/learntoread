@@ -65,6 +65,32 @@
     { word: "play", letters: ["P", "L", "AY"], phonemes: ["p", "l", "ey"] },
   ];
 
+  /** Visual scaffolds for sight words (hide after a few practices). */
+  const SIGHT_WORD_EMOJIS = {
+    hat: "🎩",
+    the: "👉",
+    and: "➕",
+    a: "🅰️",
+    to: "➡️",
+    is: "🟰",
+    you: "🫵",
+    it: "📦",
+    in: "📥",
+    said: "💬",
+    for: "🎁",
+    up: "⬆️",
+    look: "👀",
+    go: "🚶",
+    we: "👥",
+    can: "💪",
+    see: "👀",
+    my: "💙",
+    like: "❤️",
+    at: "📍",
+    play: "🎮",
+  };
+  const SIGHT_EMOJI_HIDE_AFTER = 3;
+
   /** Primary phonics sound for a grapheme when the word has no phonemes list. */
   const DEFAULT_GRAPHEME_PHONEME = {
     a: "ae",
@@ -256,6 +282,7 @@
     phonicsIndex: 0,
     phonicsMastery: {},
     sightMastery: {},
+    sightPracticeCounts: {},
     storiesProgress: {},
     storyReadingLevel: "beginner",
     profileAge: null,
@@ -369,6 +396,7 @@
       phonicsIndex: 0,
       phonicsMastery: {},
       sightMastery: {},
+      sightPracticeCounts: {},
       storiesProgress: {},
       storyReadingLevel: "beginner",
     };
@@ -456,6 +484,7 @@
     p.phonicsIndex = state.phonicsIndex | 0;
     p.phonicsMastery = state.phonicsMastery || {};
     p.sightMastery = state.sightMastery || {};
+    p.sightPracticeCounts = state.sightPracticeCounts || {};
     p.storiesProgress = state.storiesProgress || {};
     p.storyReadingLevel = getStoryReadingLevel();
     p.updatedAt = new Date().toISOString();
@@ -476,6 +505,10 @@
     state.sightMastery =
       p.sightMastery && typeof p.sightMastery === "object"
         ? { ...p.sightMastery }
+        : {};
+    state.sightPracticeCounts =
+      p.sightPracticeCounts && typeof p.sightPracticeCounts === "object"
+        ? { ...p.sightPracticeCounts }
         : {};
     state.storiesProgress =
       p.storiesProgress && typeof p.storiesProgress === "object"
@@ -512,6 +545,7 @@
     state.phonicsIndex = 0;
     state.phonicsMastery = {};
     state.sightMastery = {};
+    state.sightPracticeCounts = {};
     state.storiesProgress = {};
     state.storyReadingLevel = "beginner";
     state.scrubIndex = 0;
@@ -561,6 +595,12 @@
       if (data.sightMastery && typeof data.sightMastery === "object") {
         profile.sightMastery = { ...data.sightMastery };
       }
+      if (
+        data.sightPracticeCounts &&
+        typeof data.sightPracticeCounts === "object"
+      ) {
+        profile.sightPracticeCounts = { ...data.sightPracticeCounts };
+      }
       if (data.storiesProgress && typeof data.storiesProgress === "object") {
         profile.storiesProgress = { ...data.storiesProgress };
       }
@@ -596,6 +636,12 @@
       }
       if (raw.sightMastery && typeof raw.sightMastery === "object") {
         p.sightMastery = { ...raw.sightMastery };
+      }
+      if (
+        raw.sightPracticeCounts &&
+        typeof raw.sightPracticeCounts === "object"
+      ) {
+        p.sightPracticeCounts = { ...raw.sightPracticeCounts };
       }
       if (raw.storiesProgress && typeof raw.storiesProgress === "object") {
         p.storiesProgress = { ...raw.storiesProgress };
@@ -830,6 +876,50 @@
       : `Word ${state.sightWordIndex + 1} of ${sightWords.length}`;
   }
 
+  function emojiForSightWord(entry) {
+    if (!entry) return "";
+    const fromEntry = String(entry.emoji || "").trim();
+    if (fromEntry) return fromEntry;
+    const key = sightWordKey(entry.word);
+    return (key && SIGHT_WORD_EMOJIS[key]) || "";
+  }
+
+  function getSightPracticeCount(word) {
+    const key = sightWordKey(word);
+    if (!key) return 0;
+    return Math.max(0, (state.sightPracticeCounts || {})[key] | 0);
+  }
+
+  function shouldShowSightEmoji(word) {
+    return getSightPracticeCount(word) < SIGHT_EMOJI_HIDE_AFTER;
+  }
+
+  /** Count a successful spoken practice toward fading the emoji scaffold. */
+  function bumpSightPractice(word) {
+    const key = sightWordKey(word);
+    if (!key) return;
+    if (!state.sightPracticeCounts || typeof state.sightPracticeCounts !== "object") {
+      state.sightPracticeCounts = {};
+    }
+    const next = (state.sightPracticeCounts[key] | 0) + 1;
+    state.sightPracticeCounts[key] = next;
+    persistProgress();
+    updateSightWordEmojiUI();
+  }
+
+  function updateSightWordEmojiUI() {
+    if (!els.sightWordEmojiBtn || !els.sightWordEmoji) return;
+    const entry = getWordEntry(state.sightWordIndex);
+    const emoji = emojiForSightWord(entry);
+    const show = !!(emoji && shouldShowSightEmoji(entry.word));
+    els.sightWordEmoji.textContent = emoji;
+    els.sightWordEmojiBtn.hidden = !show;
+    els.sightWordEmojiBtn.setAttribute(
+      "aria-label",
+      show ? `Picture hint for ${sightWordKey(entry.word) || "word"}` : ""
+    );
+  }
+
   /**
    * Sight-word mastery is mic-only: call only after a successful spoken match.
    * Hearing the word, tapping letters, or phonics “I can say it!” must never grant this.
@@ -871,6 +961,7 @@
       phonicsIndex: state.phonicsIndex,
       phonicsMastery: state.phonicsMastery,
       sightMastery: state.sightMastery,
+      sightPracticeCounts: state.sightPracticeCounts,
       storiesProgress: state.storiesProgress,
       storyReadingLevel: getStoryReadingLevel(),
       voiceName: state.voiceName,
@@ -916,6 +1007,21 @@
     });
     Object.keys(right).forEach((k) => {
       if (right[k]) out[k] = true;
+    });
+    return out;
+  }
+
+  function mergeCountMaps(a, b) {
+    const out = {};
+    const keys = new Set([
+      ...Object.keys(a && typeof a === "object" ? a : {}),
+      ...Object.keys(b && typeof b === "object" ? b : {}),
+    ]);
+    keys.forEach((k) => {
+      out[k] = Math.max(
+        (a && a[k]) | 0,
+        (b && b[k]) | 0
+      );
     });
     return out;
   }
@@ -997,6 +1103,10 @@
         remote.phonicsMastery
       ),
       sightMastery: mergeSightMasteryMaps(local.sightMastery, remote.sightMastery),
+      sightPracticeCounts: mergeCountMaps(
+        local.sightPracticeCounts,
+        remote.sightPracticeCounts
+      ),
       storiesProgress: mergeStoriesProgressMaps(
         local.storiesProgress,
         remote.storiesProgress
@@ -2524,6 +2634,7 @@
       if (matched) {
         matchSettled = true;
         setSayWordStatus("Yay! Ellie heard it — you got it!", "success");
+        bumpSightPractice(target);
         markSightWordMastered(target);
         try {
           recognition.stop();
@@ -3228,6 +3339,7 @@
 
     els.sightWordTitle.textContent = wordDisplay || "—";
     refreshSightWordMasteryUi();
+    updateSightWordEmojiUI();
 
     els.letterRow.innerHTML = "";
     letters.forEach((ch, idx) => {
@@ -3705,11 +3817,21 @@
       startSayWordListening();
     });
 
-    els.sightWordTitle.addEventListener("click", () => {
+    function hearCurrentSightWord() {
       stopSayWordListening();
       const entry = getWordEntry(state.sightWordIndex);
-      if (entry.word) speakWholeWord(entry.word);
+      if (!entry.word) return;
+      speakWholeWord(entry.word);
+    }
+
+    els.sightWordTitle.addEventListener("click", () => {
+      hearCurrentSightWord();
     });
+    if (els.sightWordEmojiBtn) {
+      els.sightWordEmojiBtn.addEventListener("click", () => {
+        hearCurrentSightWord();
+      });
+    }
 
     /** Last scrub index that played a phoneme (Lotty-style: one sound per letter). */
     let lastScrubPhonemeIndex = -1;
@@ -3808,6 +3930,8 @@
     els.reportStoryList = $("reportStoryList");
     els.sightScreen = $("sightScreen");
     els.sightWordTitle = $("sightWordTitle");
+    els.sightWordEmojiBtn = $("sightWordEmojiBtn");
+    els.sightWordEmoji = $("sightWordEmoji");
     els.sightWordProgress = $("sightWordProgress");
     els.letterRow = $("letterRow");
     els.scrubSlider = $("scrubSlider");

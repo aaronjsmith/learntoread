@@ -2,107 +2,128 @@
   "sightWords": [
     {
       "word": "hat",
+      "emoji": "🎩",
       "letters": ["H", "A", "T"],
       "phonemes": ["hh", "ae", "t"]
     },
     {
       "word": "the",
+      "emoji": "👉",
       "letters": ["TH", "E"],
       "phonemes": ["dh", "ax"],
       "sounds": ["thuh", "uh"]
     },
     {
       "word": "and",
+      "emoji": "➕",
       "letters": ["A", "N", "D"],
       "phonemes": ["ae", "n", "d"]
     },
     {
       "word": "a",
+      "emoji": "🅰️",
       "letters": ["A"],
       "phonemes": ["ax"]
     },
     {
       "word": "to",
+      "emoji": "➡️",
       "letters": ["T", "O"],
       "phonemes": ["t", "uw"]
     },
     {
       "word": "is",
+      "emoji": "🟰",
       "letters": ["I", "S"],
       "phonemes": ["ih", "z"]
     },
     {
       "word": "you",
+      "emoji": "🫵",
       "letters": ["Y", "OU"],
       "phonemes": ["y", "uw"]
     },
     {
       "word": "it",
+      "emoji": "📦",
       "letters": ["I", "T"],
       "phonemes": ["ih", "t"]
     },
     {
       "word": "in",
+      "emoji": "📥",
       "letters": ["I", "N"],
       "phonemes": ["ih", "n"]
     },
     {
       "word": "said",
+      "emoji": "💬",
       "letters": ["S", "AI", "D"],
       "phonemes": ["s", "eh", "d"]
     },
     {
       "word": "for",
+      "emoji": "🎁",
       "letters": ["F", "OR"],
       "phonemes": ["f", "er"]
     },
     {
       "word": "up",
+      "emoji": "⬆️",
       "letters": ["U", "P"],
       "phonemes": ["ah", "p"]
     },
     {
       "word": "look",
+      "emoji": "👀",
       "letters": ["L", "OO", "K"],
       "phonemes": ["l", "uh", "k"]
     },
     {
       "word": "go",
+      "emoji": "🚶",
       "letters": ["G", "O"],
       "phonemes": ["g", "ow"]
     },
     {
       "word": "we",
+      "emoji": "👥",
       "letters": ["W", "E"],
       "phonemes": ["w", "iy"]
     },
     {
       "word": "can",
+      "emoji": "💪",
       "letters": ["C", "A", "N"],
       "phonemes": ["k", "ae", "n"]
     },
     {
       "word": "see",
+      "emoji": "👀",
       "letters": ["S", "EE"],
       "phonemes": ["s", "iy"]
     },
     {
       "word": "my",
+      "emoji": "💙",
       "letters": ["M", "Y"],
       "phonemes": ["m", "ay"]
     },
     {
       "word": "like",
+      "emoji": "❤️",
       "letters": ["L", "I", "KE"],
       "phonemes": ["l", "ay", "k"]
     },
     {
       "word": "at",
+      "emoji": "📍",
       "letters": ["A", "T"],
       "phonemes": ["ae", "t"]
     },
     {
       "word": "play",
+      "emoji": "🎮",
       "letters": ["P", "L", "AY"],
       "phonemes": ["p", "l", "ey"]
     }

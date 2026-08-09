@@ -560,6 +560,56 @@
       animation: think-tilt 0.8s ease-in-out 2;
     }
 
+    .sight-word-emoji-btn {
+      display: grid;
+      place-items: center;
+      width: min(100%, 220px);
+      margin: 4px auto 10px;
+      padding: 10px 14px 12px;
+      min-height: calc(var(--touch-min) + 1.5rem);
+      border: 2px solid rgba(255, 201, 74, 0.55);
+      border-radius: 18px;
+      background: linear-gradient(180deg, var(--sun-soft) 0%, #fff8e8 100%);
+      box-shadow: 0 4px 0 rgba(255, 201, 74, 0.18);
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+      -webkit-tap-highlight-color: transparent;
+      transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease,
+        border-color 0.12s ease;
+    }
+
+    .sight-word-emoji-btn:hover {
+      border-color: rgba(255, 201, 74, 0.9);
+      box-shadow: 0 5px 0 rgba(255, 201, 74, 0.28);
+    }
+
+    .sight-word-emoji-btn:active {
+      transform: translateY(2px) scale(0.985);
+      box-shadow: 0 2px 0 rgba(255, 201, 74, 0.18);
+    }
+
+    .sight-word-emoji-btn:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .sight-word-emoji-btn[hidden] {
+      display: none !important;
+    }
+
+    .sight-word-emoji {
+      font-size: clamp(3rem, 14vw, 4.4rem);
+      line-height: 1;
+      filter: drop-shadow(0 3px 0 rgba(42, 53, 80, 0.08));
+      pointer-events: none;
+      user-select: none;
+    }
+
     .word-hear-wrap {
       position: relative;
       z-index: 1;
@@ -2800,6 +2850,9 @@
         <div class="sight-buddy" id="sightEllie" aria-hidden="true">
           <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
         </div>
+        <button type="button" class="sight-word-emoji-btn" id="sightWordEmojiBtn" hidden aria-label="Picture hint">
+          <span class="sight-word-emoji" id="sightWordEmoji" aria-hidden="true"></span>
+        </button>
         <div class="word-hear-wrap">
           <button type="button" class="word-big" id="sightWordTitle" aria-label="Hear whole word" title="Tap to hear the whole word">—</button>
           <span class="word-hear-cue" aria-hidden="true" title="Tap the word to hear it">
