@@ -458,7 +458,8 @@
       text-align: center;
       background: none;
       border: none;
-      padding: 0;
+      padding: 10px 8px;
+      min-height: 72px;
       cursor: pointer;
       border-radius: var(--radius);
       box-shadow: none;
@@ -1221,6 +1222,13 @@
       line-height: 1;
       margin: 0;
       color: var(--accent-dark);
+      min-height: 1.05em;
+    }
+
+    .field input[type="text"],
+    .field select,
+    .settings-row select {
+      min-height: var(--touch-min);
     }
 
     .phonics-example {
@@ -1562,15 +1570,15 @@
     </symbol>
 
     <symbol id="icon-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 3v4"/>
-      <path d="M12 17v4"/>
-      <path d="M3 12h4"/>
-      <path d="M17 12h4"/>
-      <path d="m6 6 2.5 2.5"/>
-      <path d="m15.5 15.5 2.5 2.5"/>
-      <path d="m18 6-2.5 2.5"/>
-      <path d="m8.5 15.5 2.5 2.5" transform="rotate(90 9.75 16.75)"/>
-      <circle cx="12" cy="12" r="3.5"/>
+      <path d="M12 3v3"/>
+      <path d="M12 18v3"/>
+      <path d="M3 12h3"/>
+      <path d="M18 12h3"/>
+      <path d="m6.2 6.2 2.1 2.1"/>
+      <path d="m15.7 15.7 2.1 2.1"/>
+      <path d="m17.8 6.2-2.1 2.1"/>
+      <path d="m8.3 15.7-2.1 2.1"/>
+      <circle cx="12" cy="12" r="3.2"/>
     </symbol>
 
     <symbol id="icon-blend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1814,7 +1822,10 @@
 
     <section class="screen" data-screen="report" id="reportScreen" hidden>
       <div class="sight-toolbar">
-        <button type="button" class="secondary js-back-home">← Home</button>
+        <button type="button" class="secondary icon-btn icon-btn--wide js-back-home" aria-label="Home" data-speak="Home">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-home"/></svg>
+          <span class="btn-caption">Home</span>
+        </button>
       </div>
       <div class="report-card">
         <div class="report-grade">
@@ -1823,11 +1834,17 @@
           <p id="reportGradeSummary">Keep practicing with Ellie!</p>
         </div>
         <div class="report-section">
-          <h3>Phonics mastery</h3>
+          <div class="report-section-head">
+            <svg class="btn-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-abc"/></svg>
+            <h3>Phonics mastery</h3>
+          </div>
           <div class="report-letter-grid" id="reportLetterGrid"></div>
         </div>
         <div class="report-section">
-          <h3>Sight word mastery</h3>
+          <div class="report-section-head">
+            <svg class="btn-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-book"/></svg>
+            <h3>Sight word mastery</h3>
+          </div>
           <ul class="report-word-list" id="reportWordList"></ul>
         </div>
       </div>
@@ -1845,8 +1862,14 @@
         Start fresh, or optionally open a <strong>progress JSON</strong> backup you saved earlier.
       </p>
       <div class="modal-actions" style="flex-direction: column; align-items: stretch;">
-        <button type="button" id="welcomeStartFresh">Start fresh</button>
-        <button type="button" class="secondary" id="welcomeOpenFile">Open progress file…</button>
+        <button type="button" class="btn-with-icon" id="welcomeStartFresh" aria-label="Start fresh" data-speak="Start">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-spark"/></svg>
+          <span>Start fresh</span>
+        </button>
+        <button type="button" class="secondary btn-with-icon" id="welcomeOpenFile" aria-label="Open progress file" data-speak="Open file">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-load"/></svg>
+          <span>Open progress file…</span>
+        </button>
       </div>
       <input type="file" id="welcomeImportInput" class="sr-only" accept="application/json,.json" aria-hidden="true" tabindex="-1" />
     </div>
@@ -1865,7 +1888,10 @@
           <input type="text" id="nameInput" name="name" autocomplete="given-name" maxlength="40" required />
         </div>
         <div class="modal-actions">
-          <button type="submit">Let’s read!</button>
+          <button type="submit" class="btn-with-icon" aria-label="Let’s read" data-speak="Let’s read">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-spark"/></svg>
+            <span>Let’s read!</span>
+          </button>
         </div>
       </form>
     </div>
@@ -1873,6 +1899,9 @@
 
   <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
     <div class="modal">
+      <div style="width:56px;height:56px;margin:0 auto 10px;color:var(--accent-dark);" aria-hidden="true">
+        <svg viewBox="0 0 24 24" style="width:100%;height:100%;display:block;"><use href="#icon-voice"/></svg>
+      </div>
       <h2 id="settingsTitle">Voice settings</h2>
       <p>Pick a friendly voice for Ellie to use when saying whole words.</p>
       <div class="settings-grid">
@@ -1917,9 +1946,18 @@
         </div>
       </div>
       <div class="modal-actions">
-        <button type="button" class="secondary" id="closeSettings">Cancel</button>
-        <button type="button" class="secondary" id="settingsPreview">Preview</button>
-        <button type="button" id="settingsSave">Save</button>
+        <button type="button" class="secondary btn-with-icon" id="closeSettings" aria-label="Cancel" data-speak="Cancel">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close"/></svg>
+          <span>Cancel</span>
+        </button>
+        <button type="button" class="secondary btn-with-icon" id="settingsPreview" aria-label="Preview voice" data-speak="Preview">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-preview"/></svg>
+          <span>Preview</span>
+        </button>
+        <button type="button" class="btn-with-icon" id="settingsSave" aria-label="Save voice settings" data-speak="Save">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>
+          <span>Save</span>
+        </button>
       </div>
     </div>
   </div>

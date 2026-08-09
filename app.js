@@ -862,6 +862,13 @@
     speechSynthesis.speak(u);
   }
 
+  /** Short spoken cue for icon-first controls (non-readers). */
+  function speakCue(text) {
+    const line = String(text || "").trim();
+    if (!line) return;
+    speakText(line);
+  }
+
   function speakWholeWord(word) {
     speakText(word.toLowerCase());
   }
@@ -1593,10 +1600,12 @@
 
   function bindEvents() {
     els.welcomeOpenFile.addEventListener("click", () => {
+      speakCue("Open file");
       els.welcomeImportInput.click();
     });
 
     els.welcomeStartFresh.addEventListener("click", () => {
+      speakCue("Start");
       resetStateForFreshStart();
       persistProgress();
       syncControlsFromState();
@@ -1627,6 +1636,7 @@
     });
 
     els.importBtn.addEventListener("click", () => {
+      speakCue("Load");
       els.importInput.click();
     });
 
@@ -1637,6 +1647,7 @@
     });
 
     els.openSettings.addEventListener("click", () => {
+      speakCue("Voice");
       syncControlsFromState();
       applyVoiceFilters();
       els.settingsModal.hidden = false;
@@ -1685,22 +1696,26 @@
     });
 
     els.activitySightWords.addEventListener("click", () => {
+      speakCue("Sight words");
       showScreen("sight");
       updateSightWordUI();
     });
 
     els.activityPhonics.addEventListener("click", () => {
+      speakCue("Phonics");
       showScreen("phonics");
       updatePhonicsUI();
     });
 
     els.activityReportCard.addEventListener("click", () => {
+      speakCue("Report card");
       showScreen("report");
       updateReportCardUI();
     });
 
     document.querySelectorAll(".js-back-home").forEach((btn) => {
       btn.addEventListener("click", () => {
+        speakCue("Home");
         stopSayWordListening();
         showScreen("home");
         updateProgressUI();
@@ -1768,6 +1783,7 @@
     });
 
     els.exportBtn.addEventListener("click", () => {
+      speakCue("Save");
       const payload = {
         ...buildProgressPayload(),
         exportedAt: new Date().toISOString(),
