@@ -131,8 +131,11 @@
   ];
 
   const PHONEME_AUDIO_BASE = "sounds/phonemes/";
+  const SFX_BASE = "sounds/sfx/";
   const phonemeAudioCache = new Map();
+  const sfxAudioCache = new Map();
   let activePhonemeAudio = null;
+  let activeSfxAudio = null;
   let phonicsQuizMode = false;
   let phonicsListenMode = false;
 
@@ -579,6 +582,15 @@
         if (audio.readyState < 2) audio.load();
       } catch (_) {}
     }
+    for (const id of ["correct", "wrong"]) {
+      if (sfxAudioCache.has(id)) continue;
+      const audio = new Audio(`${SFX_BASE}${id}.mp3`);
+      audio.preload = "auto";
+      sfxAudioCache.set(id, audio);
+      try {
+        audio.load();
+      } catch (_) {}
+    }
   }
 
   /**
@@ -927,21 +939,96 @@
     }
   }
 
+  function stopSfxAudio() {
+    if (!activeSfxAudio) return;
+    try {
+      activeSfxAudio.pause();
+      activeSfxAudio.currentTime = 0;
+    } catch (_) {}
+    activeSfxAudio = null;
+  }
+
+  /** Play achievement (`correct`) or try-again (`wrong`) cue. */
+  function playFeedbackSfx(kind) {
+    const id = kind === "success" ? "correct" : kind === "miss" ? "wrong" : "";
+    if (!id) return;
+    let audio = sfxAudioCache.get(id);
+    if (!audio) {
+      audio = new Audio(`${SFX_BASE}${id}.mp3`);
+      audio.preload = "auto";
+      sfxAudioCache.set(id, audio);
+    }
+    stopSfxAudio();
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+    } catch (_) {}
+    activeSfxAudio = audio;
+    const p = audio.play();
+    if (p && typeof p.catch === "function") p.catch(() => {});
+  }
+
   function setSayWordStatus(message, kind) {
     if (!els.sayWordStatus) return;
     els.sayWordStatus.textContent = message || "";
     els.sayWordStatus.className = "say-word-status" + (kind ? ` is-${kind}` : "");
     if (kind === "listening") setEllieMood("listen");
-    else if (kind === "success") setEllieMood("cheer");
-    else if (kind === "miss") setEllieMood("think");
-    else if (!kind) setEllieMood("");
+    else if (kind === "success") {
+      setEllieMood("cheer");
+      playFeedbackSfx("success");
+    } else if (kind === "miss") {
+      setEllieMood("think");
+      playFeedbackSfx("miss");
+    } else if (!kind) setEllieMood("");
+  }
+
+  function setHeardText(box, text, opts) {
+    if (!box) return;
+    const listening = !!(opts && opts.listening);
+    const placeholder =
+      (opts && opts.placeholder) || "Tap the mic and say it";
+    const value = String(text || "").trim();
+    const empty = !value;
+    box.textContent = empty ? placeholder : value;
+    box.classList.toggle("is-empty", empty);
+    box.classList.toggle("is-listening", listening);
+  }
+
+  function clearHeardText(box, placeholder) {
+    setHeardText(box, "", {
+      placeholder: placeholder || "Tap the mic and say it",
+    });
+  }
+
+  function setListenHint(el, active) {
+    if (!el) return;
+    el.classList.toggle("is-active", !!active);
+    el.setAttribute("aria-hidden", active ? "false" : "true");
+  }
+
+  function setMicButtonListening(btn, listening, idleLabel, listenLabel) {
+    if (!btn) return;
+    btn.setAttribute("aria-pressed", listening ? "true" : "false");
+    const label = btn.querySelector(".say-mic-label");
+    if (label) {
+      label.textContent = listening
+        ? listenLabel || "Listening…"
+        : idleLabel || "Say it";
+    }
   }
 
   function setSayWordListeningUi(listening) {
     sayWordListening = listening;
-    if (!els.sayWordBtn) return;
-    els.sayWordBtn.setAttribute("aria-pressed", listening ? "true" : "false");
-    els.sayWordBtn.textContent = listening ? "Listening…" : "Say the word";
+    setMicButtonListening(
+      els.sayWordBtn,
+      listening,
+      "Say the word",
+      "Listening…"
+    );
+    setListenHint(els.sayWordListenHint, listening);
+    if (els.sayWordHeard) {
+      els.sayWordHeard.classList.toggle("is-listening", !!listening);
+    }
   }
 
   function stopSayWordListening() {
@@ -955,6 +1042,10 @@
       activeRecognition = null;
     }
     if (sayWordListening) setSayWordListeningUi(false);
+    if (phonicsListenMode) {
+      phonicsListenMode = false;
+      setPhonicsListeningUi(false);
+    }
   }
 
   function collectRecognitionHypotheses(event) {
@@ -969,6 +1060,25 @@
       }
     }
     return out;
+  }
+
+  function getRecognitionDisplayText(event) {
+    if (!event || !event.results) return "";
+    let text = "";
+    for (let i = 0; i < event.results.length; i++) {
+      const result = event.results[i];
+      const alt = result && result[0];
+      if (alt && alt.transcript) text += alt.transcript;
+    }
+    return text.trim();
+  }
+
+  function setPhonicsListeningUi(listening) {
+    setMicButtonListening(els.phonicsSayBtn, listening, "Say it", "Listening…");
+    setListenHint(els.phonicsListenHint, listening);
+    if (els.phonicsHeard) {
+      els.phonicsHeard.classList.toggle("is-listening", !!listening);
+    }
   }
 
   function startSayWordListening() {
@@ -998,7 +1108,7 @@
 
     const recognition = new SpeechRecognitionAPI();
     recognition.lang = "en-US";
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     recognition.maxAlternatives = 5;
     recognition.continuous = false;
 
@@ -1019,13 +1129,27 @@
     }
 
     activeRecognition = recognition;
+    clearHeardText(
+      els.sayWordHeard,
+      "Listening… say the word"
+    );
     setSayWordListeningUi(true);
     setSayWordStatus("Listening… say the word clearly.", "listening");
 
     recognition.onresult = (event) => {
+      const display = getRecognitionDisplayText(event);
+      if (display) {
+        setHeardText(els.sayWordHeard, display, { listening: true });
+      }
+
       const hypotheses = collectRecognitionHypotheses(event);
+      if (!hypotheses.length) return;
+
       const matched = hypotheses.some((h) => heardMatchesTarget(h, target));
       const best = hypotheses[0] ? normalizeHeardText(hypotheses[0]) : "";
+      if (best) {
+        setHeardText(els.sayWordHeard, best, { listening: false });
+      }
 
       if (matched) {
         setSayWordStatus("Yay! Ellie heard it — you got it!", "success");
@@ -1087,8 +1211,13 @@
     els.phonicsStatus.className =
       "phonics-status" + (kind ? ` is-${kind}` : "");
     if (kind === "listening") setEllieMood("listen");
-    else if (kind === "success") setEllieMood("cheer");
-    else if (kind === "miss") setEllieMood("think");
+    else if (kind === "success") {
+      setEllieMood("cheer");
+      playFeedbackSfx("success");
+    } else if (kind === "miss") {
+      setEllieMood("think");
+      playFeedbackSfx("miss");
+    }
   }
 
   function playPhonicsSound() {
@@ -1159,17 +1288,12 @@
     if (!SpeechRecognitionAPI) {
       setPhonicsStatus(
         "Speech isn’t available here — tap “I can say it!” instead.",
-        "miss"
+        "error"
       );
       return;
     }
     if (sayWordListening && phonicsListenMode) {
       stopSayWordListening();
-      phonicsListenMode = false;
-      if (els.phonicsSayBtn) {
-        els.phonicsSayBtn.setAttribute("aria-pressed", "false");
-        els.phonicsSayBtn.textContent = "Say it";
-      }
       setPhonicsStatus("Canceled.", "");
       return;
     }
@@ -1182,7 +1306,7 @@
 
     const recognition = new SpeechRecognitionAPI();
     recognition.lang = "en-US";
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     recognition.maxAlternatives = 5;
     recognition.continuous = false;
 
@@ -1196,28 +1320,37 @@
     phonicsListenMode = true;
     activeRecognition = recognition;
     sayWordListening = true;
-    if (els.phonicsSayBtn) {
-      els.phonicsSayBtn.setAttribute("aria-pressed", "true");
-      els.phonicsSayBtn.textContent = "Listening…";
-    }
+    clearHeardText(els.phonicsHeard, "Listening… say the letter");
+    setPhonicsListeningUi(true);
     setPhonicsStatus(
       `Say “${entry.letter}” or “${entry.example}”…`,
       "listening"
     );
 
     recognition.onresult = (event) => {
+      const display = getRecognitionDisplayText(event);
+      if (display) {
+        setHeardText(els.phonicsHeard, display, { listening: true });
+      }
+
       const hypotheses = collectRecognitionHypotheses(event);
+      if (!hypotheses.length) return;
+
       const matched = hypotheses.some((h) => {
         const n = normalizeHeardText(h);
         return accept.some(
           (a) => n === a || n.split(" ").includes(a) || n.includes(a)
         );
       });
+      const best = hypotheses[0] ? normalizeHeardText(hypotheses[0]) : "";
+      if (best) {
+        setHeardText(els.phonicsHeard, best, { listening: false });
+      }
+
       if (matched) {
         bumpPhonics(entry.id, "practiced");
         setPhonicsStatus(`Ellie heard you — nice ${entry.letter}!`, "success");
       } else {
-        const best = hypotheses[0] ? normalizeHeardText(hypotheses[0]) : "";
         setPhonicsStatus(
           best
             ? `Heard “${best}”. Try “${entry.letter}” or “${entry.example}”.`
@@ -1231,11 +1364,11 @@
       const err = (event && event.error) || "";
       if (err === "aborted") return;
       if (err === "not-allowed" || err === "service-not-allowed") {
-        setPhonicsStatus("Microphone permission is needed.", "miss");
+        setPhonicsStatus("Microphone permission is needed.", "error");
       } else if (err === "no-speech") {
         setPhonicsStatus("No speech heard. Try again.", "miss");
       } else {
-        setPhonicsStatus("Couldn’t listen. Try again.", "miss");
+        setPhonicsStatus("Couldn’t listen. Try again.", "error");
       }
     };
 
@@ -1243,10 +1376,7 @@
       activeRecognition = null;
       sayWordListening = false;
       phonicsListenMode = false;
-      if (els.phonicsSayBtn) {
-        els.phonicsSayBtn.setAttribute("aria-pressed", "false");
-        els.phonicsSayBtn.textContent = "Say it";
-      }
+      setPhonicsListeningUi(false);
     };
 
     try {
@@ -1255,7 +1385,8 @@
       activeRecognition = null;
       sayWordListening = false;
       phonicsListenMode = false;
-      setPhonicsStatus("Couldn’t start the microphone.", "miss");
+      setPhonicsListeningUi(false);
+      setPhonicsStatus("Couldn’t start the microphone.", "error");
     }
   }
 
@@ -1263,6 +1394,12 @@
     const keepQuiz = opts && opts.keepQuiz;
     const entry = getPhonicsEntry(state.phonicsIndex);
     if (!entry) return;
+
+    stopSayWordListening();
+    clearHeardText(els.phonicsHeard, "Tap the mic and say it");
+    if (els.phonicsStatus && !keepQuiz) {
+      setPhonicsStatus("", "");
+    }
 
     if (els.phonicsLetterBig) els.phonicsLetterBig.textContent = entry.letter;
     if (els.phonicsExample) {
@@ -1402,6 +1539,10 @@
 
     stopSayWordListening();
     setEllieMood("");
+    clearHeardText(
+      els.sayWordHeard,
+      "Tap the mic and say the word"
+    );
     if (!SpeechRecognitionAPI) {
       els.sayWordBtn.disabled = true;
       setSayWordStatus(
@@ -1674,6 +1815,8 @@
     els.nextWord = $("nextWord");
     els.sayWordBtn = $("sayWordBtn");
     els.sayWordStatus = $("sayWordStatus");
+    els.sayWordHeard = $("sayWordHeard");
+    els.sayWordListenHint = $("sayWordListenHint");
     els.sightEllie = $("sightEllie");
     els.homeEllie = $("homeEllie");
     els.ellieBubble = $("ellieBubble");
@@ -1693,6 +1836,8 @@
     els.phonicsISaidIt = $("phonicsISaidIt");
     els.phonicsSayBtn = $("phonicsSayBtn");
     els.phonicsStatus = $("phonicsStatus");
+    els.phonicsHeard = $("phonicsHeard");
+    els.phonicsListenHint = $("phonicsListenHint");
     els.phonicsQuiz = $("phonicsQuiz");
     els.phonicsQuizChoices = $("phonicsQuizChoices");
     els.phonicsStartQuiz = $("phonicsStartQuiz");
