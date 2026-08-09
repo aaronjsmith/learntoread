@@ -706,6 +706,337 @@
         animation: none !important;
       }
     }
+
+    /* —— Progress (header + sections) —— */
+    header.app-header {
+      flex-wrap: wrap;
+      padding: 10px 16px 12px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .header-progress {
+      width: 100%;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 2px dashed rgba(255, 107, 138, 0.25);
+    }
+
+    .progress-overall-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      font-family: var(--display);
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .progress-bar {
+      height: 14px;
+      border-radius: 999px;
+      background: #ffe8ef;
+      border: 2px solid #ffd0dc;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--mint), var(--sky), var(--accent));
+      transition: width 0.35s ease;
+    }
+
+    .progress-bar--thin {
+      height: 10px;
+    }
+
+    .section-reports {
+      display: grid;
+      gap: 12px;
+      margin: 0 0 22px;
+    }
+
+    @media (min-width: 560px) {
+      .section-reports {
+        grid-template-columns: 1fr 1fr;
+      }
+      .activity-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .section-report {
+      background: var(--surface);
+      border: 3px solid var(--mint-soft);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 6px 0 rgba(62, 207, 190, 0.14);
+      text-align: left;
+    }
+
+    .section-report h3 {
+      margin: 0 0 4px;
+      font-family: var(--display);
+      font-size: 1.05rem;
+      color: var(--mint-dark);
+    }
+
+    .section-report p {
+      margin: 0 0 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .section-report--sight {
+      border-color: var(--accent-soft);
+      box-shadow: 0 6px 0 rgba(255, 107, 138, 0.12);
+    }
+
+    .section-report--sight h3 {
+      color: var(--accent-dark);
+    }
+
+    /* —— Phonics —— */
+    .phonics-layout {
+      display: grid;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .phonics-layout {
+        grid-template-columns: 1fr 1.1fr;
+        align-items: start;
+      }
+    }
+
+    .phonics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+      gap: 8px;
+    }
+
+    .phonics-letter {
+      aspect-ratio: 1;
+      border-radius: 16px;
+      border: 3px solid #ffe0e8;
+      background: #fff;
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      padding: 0;
+      box-shadow: 0 3px 0 rgba(255, 107, 138, 0.16);
+      display: grid;
+      place-content: center;
+      position: relative;
+    }
+
+    .phonics-letter.is-active {
+      border-color: var(--sky);
+      background: #eef7ff;
+      box-shadow: 0 0 0 3px rgba(107, 183, 255, 0.35);
+    }
+
+    .phonics-letter.is-mastered {
+      border-color: var(--mint);
+      background: var(--mint-soft);
+    }
+
+    .phonics-letter-stars {
+      position: absolute;
+      bottom: 3px;
+      left: 0;
+      right: 0;
+      font-size: 0.55rem;
+      letter-spacing: 0.05em;
+      color: #e6a800;
+      line-height: 1;
+    }
+
+    .phonics-stage {
+      background: var(--surface);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 20px 16px 22px;
+      border: 3px solid var(--sun-soft);
+      box-shadow: 0 10px 0 rgba(255, 201, 74, 0.22);
+      text-align: center;
+    }
+
+    .phonics-letter-big {
+      font-family: var(--display);
+      font-size: clamp(4rem, 18vw, 6rem);
+      font-weight: 700;
+      line-height: 1;
+      margin: 0;
+      color: var(--accent-dark);
+    }
+
+    .phonics-example {
+      margin: 6px 0 14px;
+      font-weight: 800;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .phonics-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .phonics-quiz {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 2px dashed rgba(255, 201, 74, 0.55);
+    }
+
+    .phonics-quiz[hidden] {
+      display: none !important;
+    }
+
+    .phonics-quiz-choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .phonics-quiz-choices button {
+      min-width: 3.5rem;
+      font-family: var(--display);
+      font-size: 1.4rem;
+    }
+
+    .phonics-status {
+      min-height: 1.4em;
+      margin: 8px 0 0;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    .phonics-status.is-listening { color: var(--accent-dark); }
+    .phonics-status.is-success { color: var(--success); }
+    .phonics-status.is-miss { color: var(--miss); }
+
+    /* —— Report card —— */
+    .report-card {
+      background: var(--surface);
+      border-radius: calc(var(--radius) + 6px);
+      padding: 22px 18px 26px;
+      border: 3px solid var(--accent-soft);
+      box-shadow: 0 12px 0 rgba(255, 107, 138, 0.16);
+    }
+
+    .report-grade {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .report-grade-badge {
+      display: inline-grid;
+      place-content: center;
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--sun), var(--accent));
+      color: #fff;
+      font-family: var(--display);
+      font-size: 2.4rem;
+      font-weight: 700;
+      box-shadow: 0 6px 0 rgba(240, 69, 106, 0.28);
+      margin-bottom: 8px;
+    }
+
+    .report-grade h2 {
+      margin: 0;
+      font-family: var(--display);
+      font-size: 1.5rem;
+      color: var(--accent-dark);
+    }
+
+    .report-grade p {
+      margin: 6px 0 0;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .report-section {
+      margin-top: 18px;
+    }
+
+    .report-section h3 {
+      margin: 0 0 10px;
+      font-family: var(--display);
+      font-size: 1.15rem;
+      color: var(--ink);
+    }
+
+    .report-letter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+      gap: 6px;
+    }
+
+    .report-letter {
+      border-radius: 12px;
+      border: 2px solid #ffe0e8;
+      background: #fffafb;
+      text-align: center;
+      padding: 8px 2px 6px;
+      font-family: var(--display);
+      font-weight: 700;
+    }
+
+    .report-letter.is-mastered {
+      background: var(--mint-soft);
+      border-color: var(--mint);
+    }
+
+    .report-letter-stars {
+      display: block;
+      font-size: 0.55rem;
+      color: #e6a800;
+      margin-top: 2px;
+    }
+
+    .report-word-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .report-word-list li {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 2px solid #ffe0e8;
+      background: #fff;
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .report-word-list li.is-mastered {
+      background: var(--mint-soft);
+      border-color: var(--mint);
+      color: var(--mint-dark);
+    }
   </style>
 </head>
 <body>
@@ -805,23 +1136,34 @@
   </svg>
 
   <header class="app-header">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+    <div class="header-row">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+        </div>
+        <h1>Ellie Reads</h1>
       </div>
-      <h1>Ellie Reads</h1>
+      <div class="header-actions">
+        <button type="button" class="secondary" id="exportBtn" title="Download progress as a JSON file">
+          Save JSON
+        </button>
+        <button type="button" class="secondary" id="importBtn" title="Choose a progress JSON file from your device">
+          Load JSON
+        </button>
+        <input type="file" id="importInput" class="sr-only" accept="application/json,.json" aria-hidden="true" tabindex="-1" />
+        <button type="button" class="secondary" id="openSettings" title="Voice and speech settings">
+          Voice
+        </button>
+      </div>
     </div>
-    <div class="header-actions">
-      <button type="button" class="secondary" id="exportBtn" title="Download progress as a JSON file">
-        Save JSON
-      </button>
-      <button type="button" class="secondary" id="importBtn" title="Choose a progress JSON file from your device">
-        Load JSON
-      </button>
-      <input type="file" id="importInput" class="sr-only" accept="application/json,.json" aria-hidden="true" tabindex="-1" />
-      <button type="button" class="secondary" id="openSettings" title="Voice and speech settings">
-        Voice
-      </button>
+    <div class="header-progress" aria-label="Overall learning progress">
+      <div class="progress-overall-label">
+        <span>Your progress</span>
+        <span id="overallProgressLabel">0%</span>
+      </div>
+      <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="overallProgressBar">
+        <div class="progress-bar-fill" id="overallProgressFill"></div>
+      </div>
     </div>
   </header>
 
@@ -839,10 +1181,35 @@
       </div>
       <h2>Activities</h2>
       <p class="lead" id="homeGreeting">Pick an activity.</p>
-      <p class="lead" id="homeFileHint" style="font-size: 0.95rem; margin-top: -12px;">
+
+      <div class="section-reports" id="sectionReports">
+        <div class="section-report">
+          <h3>Phonics</h3>
+          <p id="phonicsReportText">0 of 26 letter sounds mastered</p>
+          <div class="progress-bar progress-bar--thin" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="phonicsProgressBar">
+            <div class="progress-bar-fill" id="phonicsProgressFill"></div>
+          </div>
+        </div>
+        <div class="section-report section-report--sight">
+          <h3>Sight words</h3>
+          <p id="sightReportText">0 of 0 words mastered</p>
+          <div class="progress-bar progress-bar--thin" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="sightProgressBar">
+            <div class="progress-bar-fill" id="sightProgressFill"></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="lead" id="homeFileHint" style="font-size: 0.95rem;">
         Progress is saved automatically in this browser. Use <strong>Save JSON</strong> / <strong>Load JSON</strong> only if you want a backup copy.
       </p>
       <div class="activity-grid">
+        <button type="button" class="activity-card" id="activityPhonics">
+          <svg class="activity-card-icon" viewBox="0 0 120 120" aria-hidden="true"><use href="#ellie-mini"/></svg>
+          <span>
+            <h3>Phonics</h3>
+            <p>Learn each letter’s <strong>sound</strong>, practice saying it, then quiz with Ellie!</p>
+          </span>
+        </button>
         <button type="button" class="activity-card" id="activitySightWords">
           <svg class="activity-card-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-book"/></svg>
           <span>
@@ -850,12 +1217,54 @@
             <p>Tap each letter for its <strong>sound</strong>. Slide to blend, tap the word to hear it, then say it with Ellie listening!</p>
           </span>
         </button>
+        <button type="button" class="activity-card" id="activityReportCard">
+          <svg class="activity-card-icon" viewBox="0 0 72 72" aria-hidden="true"><use href="#icon-book"/></svg>
+          <span>
+            <h3>Report card</h3>
+            <p>See your stars and mastery for phonics and sight words.</p>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="phonics" id="phonicsScreen" hidden>
+      <div class="sight-toolbar">
+        <button type="button" class="secondary js-back-home">← Home</button>
+        <button type="button" class="secondary" id="prevPhonicsLetter">Previous</button>
+        <button type="button" id="nextPhonicsLetter">Next letter</button>
+      </div>
+      <div class="phonics-layout">
+        <div>
+          <h2 style="margin-bottom:10px;">Letter sounds</h2>
+          <p class="lead" style="margin-bottom:12px;">Tap a letter. Hear it, practice it, then take a quick quiz!</p>
+          <div class="phonics-grid" id="phonicsGrid" role="list" aria-label="Alphabet letter sounds"></div>
+        </div>
+        <div class="phonics-stage">
+          <div class="sight-buddy" id="phonicsEllie" aria-hidden="true">
+            <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+          </div>
+          <p class="phonics-letter-big" id="phonicsLetterBig">A</p>
+          <p class="phonics-example" id="phonicsExample">as in apple</p>
+          <div class="phonics-actions">
+            <button type="button" id="phonicsPlaySound">Hear the sound</button>
+            <button type="button" class="secondary" id="phonicsISaidIt">I can say it!</button>
+            <button type="button" class="say-word-btn" id="phonicsSayBtn" aria-pressed="false">Say it</button>
+          </div>
+          <p class="phonics-status" id="phonicsStatus" role="status" aria-live="polite"></p>
+          <div class="phonics-quiz" id="phonicsQuiz" hidden>
+            <p class="lead" style="margin:0;">Which letter makes this sound?</p>
+            <div class="phonics-quiz-choices" id="phonicsQuizChoices"></div>
+          </div>
+          <div class="phonics-actions" style="margin-top:14px;margin-bottom:0;">
+            <button type="button" class="secondary" id="phonicsStartQuiz">Quiz me!</button>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="screen" data-screen="sight" id="sightScreen" hidden>
       <div class="sight-toolbar">
-        <button type="button" class="secondary" id="backHome">← Home</button>
+        <button type="button" class="secondary js-back-home">← Home</button>
         <button type="button" class="secondary" id="prevWord">Previous</button>
         <button type="button" id="nextWord">Next word</button>
       </div>
@@ -878,6 +1287,27 @@
             Say the word
           </button>
           <p class="say-word-status" id="sayWordStatus" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" data-screen="report" id="reportScreen" hidden>
+      <div class="sight-toolbar">
+        <button type="button" class="secondary js-back-home">← Home</button>
+      </div>
+      <div class="report-card">
+        <div class="report-grade">
+          <div class="report-grade-badge" id="reportGradeBadge">—</div>
+          <h2 id="reportGradeTitle">Report card</h2>
+          <p id="reportGradeSummary">Keep practicing with Ellie!</p>
+        </div>
+        <div class="report-section">
+          <h3>Phonics mastery</h3>
+          <div class="report-letter-grid" id="reportLetterGrid"></div>
+        </div>
+        <div class="report-section">
+          <h3>Sight word mastery</h3>
+          <ul class="report-word-list" id="reportWordList"></ul>
         </div>
       </div>
     </section>

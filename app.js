@@ -100,9 +100,41 @@
     zz: "z",
   };
 
+  /** A–Z letter-sound curriculum (primary phonics sounds). */
+  const PHONICS_LETTERS = [
+    { id: "a", letter: "A", phoneme: "ae", example: "apple" },
+    { id: "b", letter: "B", phoneme: "b", example: "ball" },
+    { id: "c", letter: "C", phoneme: "k", example: "cat" },
+    { id: "d", letter: "D", phoneme: "d", example: "dog" },
+    { id: "e", letter: "E", phoneme: "eh", example: "egg" },
+    { id: "f", letter: "F", phoneme: "f", example: "fish" },
+    { id: "g", letter: "G", phoneme: "g", example: "goat" },
+    { id: "h", letter: "H", phoneme: "hh", example: "hat" },
+    { id: "i", letter: "I", phoneme: "ih", example: "igloo" },
+    { id: "j", letter: "J", phoneme: "jh", example: "jam" },
+    { id: "k", letter: "K", phoneme: "k", example: "kite" },
+    { id: "l", letter: "L", phoneme: "l", example: "leaf" },
+    { id: "m", letter: "M", phoneme: "m", example: "moon" },
+    { id: "n", letter: "N", phoneme: "n", example: "nest" },
+    { id: "o", letter: "O", phoneme: "aa", example: "octopus" },
+    { id: "p", letter: "P", phoneme: "p", example: "pig" },
+    { id: "q", letter: "Q", phoneme: "kw", example: "queen" },
+    { id: "r", letter: "R", phoneme: "r", example: "rain" },
+    { id: "s", letter: "S", phoneme: "s", example: "sun" },
+    { id: "t", letter: "T", phoneme: "t", example: "tiger" },
+    { id: "u", letter: "U", phoneme: "ah", example: "umbrella" },
+    { id: "v", letter: "V", phoneme: "v", example: "van" },
+    { id: "w", letter: "W", phoneme: "w", example: "web" },
+    { id: "x", letter: "X", phoneme: "ks", example: "fox" },
+    { id: "y", letter: "Y", phoneme: "y", example: "yo-yo" },
+    { id: "z", letter: "Z", phoneme: "z", example: "zebra" },
+  ];
+
   const PHONEME_AUDIO_BASE = "sounds/phonemes/";
   const phonemeAudioCache = new Map();
   let activePhonemeAudio = null;
+  let phonicsQuizMode = false;
+  let phonicsListenMode = false;
 
   const SpeechRecognitionAPI =
     typeof window !== "undefined"
@@ -169,6 +201,9 @@
     userName: "",
     previewText: DEFAULT_PREVIEW_TEXT,
     sightWordIndex: 0,
+    phonicsIndex: 0,
+    phonicsMastery: {},
+    sightMastery: {},
     region: "",
     onlineOnly: true,
     gender: "both",
@@ -215,12 +250,118 @@
     if (!state.previewText) state.previewText = DEFAULT_PREVIEW_TEXT;
   }
 
+  function emptyPhonicsRecord() {
+    return { heard: 0, practiced: 0, quizWins: 0 };
+  }
+
+  function getPhonicsRecord(id) {
+    if (!state.phonicsMastery[id]) {
+      state.phonicsMastery[id] = emptyPhonicsRecord();
+    }
+    return state.phonicsMastery[id];
+  }
+
+  function phonicsStars(rec) {
+    if (!rec) return 0;
+    let stars = 0;
+    if (rec.heard > 0) stars += 1;
+    if (rec.practiced > 0) stars += 1;
+    if (rec.quizWins > 0) stars += 1;
+    return stars;
+  }
+
+  function isPhonicsMastered(id) {
+    return phonicsStars(getPhonicsRecord(id)) >= 3;
+  }
+
+  function starsLabel(n) {
+    return "★".repeat(n) + "☆".repeat(Math.max(0, 3 - n));
+  }
+
+  function countPhonicsMastered() {
+    return PHONICS_LETTERS.filter((L) => isPhonicsMastered(L.id)).length;
+  }
+
+  function countSightMastered() {
+    if (!sightWords.length) return 0;
+    return sightWords.filter((w) => {
+      const key = String(w.word || "")
+        .trim()
+        .toLowerCase();
+      return key && state.sightMastery[key];
+    }).length;
+  }
+
+  function sectionPercents() {
+    const phonicsTotal = PHONICS_LETTERS.length || 1;
+    const sightTotal = Math.max(1, sightWords.length);
+    const phonicsPct = Math.round(
+      (countPhonicsMastered() / phonicsTotal) * 100
+    );
+    const sightPct = Math.round((countSightMastered() / sightTotal) * 100);
+    const overallPct = Math.round((phonicsPct + sightPct) / 2);
+    return { phonicsPct, sightPct, overallPct };
+  }
+
+  function setProgressBar(barEl, fillEl, pct) {
+    const value = Math.max(0, Math.min(100, pct | 0));
+    if (fillEl) fillEl.style.width = `${value}%`;
+    if (barEl) barEl.setAttribute("aria-valuenow", String(value));
+  }
+
+  function updateProgressUI() {
+    const { phonicsPct, sightPct, overallPct } = sectionPercents();
+    const phonicsDone = countPhonicsMastered();
+    const sightDone = countSightMastered();
+
+    if (els.overallProgressLabel) {
+      els.overallProgressLabel.textContent = `${overallPct}%`;
+    }
+    setProgressBar(
+      els.overallProgressBar,
+      els.overallProgressFill,
+      overallPct
+    );
+    setProgressBar(els.phonicsProgressBar, els.phonicsProgressFill, phonicsPct);
+    setProgressBar(els.sightProgressBar, els.sightProgressFill, sightPct);
+
+    if (els.phonicsReportText) {
+      els.phonicsReportText.textContent = `${phonicsDone} of ${PHONICS_LETTERS.length} letter sounds mastered`;
+    }
+    if (els.sightReportText) {
+      els.sightReportText.textContent = `${sightDone} of ${sightWords.length} words mastered`;
+    }
+  }
+
+  function markSightWordMastered(word) {
+    const key = String(word || "")
+      .trim()
+      .toLowerCase();
+    if (!key) return;
+    if (!state.sightMastery[key]) {
+      state.sightMastery[key] = true;
+      persistProgress();
+      updateProgressUI();
+    }
+  }
+
+  function bumpPhonics(id, field) {
+    const rec = getPhonicsRecord(id);
+    rec[field] = (rec[field] | 0) + 1;
+    persistProgress();
+    updateProgressUI();
+    updatePhonicsUI({ keepQuiz: phonicsQuizMode });
+  }
+
   function buildProgressPayload() {
     return {
-      version: 1,
+      version: 2,
       savedAt: new Date().toISOString(),
       userName: state.userName,
       sightWordIndex: state.sightWordIndex,
+      phonicsIndex: state.phonicsIndex,
+      phonicsMastery: state.phonicsMastery,
+      sightMastery: state.sightMastery,
       voiceName: state.voiceName,
       region: state.region,
       onlineOnly: state.onlineOnly,
@@ -251,6 +392,9 @@
 
   function resetStateForFreshStart() {
     state.sightWordIndex = 0;
+    state.phonicsIndex = 0;
+    state.phonicsMastery = {};
+    state.sightMastery = {};
     state.scrubIndex = 0;
     state.region = "";
     state.onlineOnly = true;
@@ -273,6 +417,17 @@
         state.sightWordIndex,
         sightWords.length - 1
       );
+    if (Number.isFinite(data.phonicsIndex))
+      state.phonicsIndex = Math.max(
+        0,
+        Math.min(PHONICS_LETTERS.length - 1, data.phonicsIndex | 0)
+      );
+    if (data.phonicsMastery && typeof data.phonicsMastery === "object") {
+      state.phonicsMastery = { ...data.phonicsMastery };
+    }
+    if (data.sightMastery && typeof data.sightMastery === "object") {
+      state.sightMastery = { ...data.sightMastery };
+    }
     if (data.voiceName != null) state.voiceName = String(data.voiceName);
     if (data.region != null) state.region = String(data.region);
     if (typeof data.onlineOnly === "boolean")
@@ -728,10 +883,15 @@
   }
 
   function showScreen(name) {
-    if (name !== "sight") stopSayWordListening();
+    if (name !== "sight" && name !== "phonics") stopSayWordListening();
+    if (name !== "phonics") {
+      phonicsQuizMode = false;
+      phonicsListenMode = false;
+    }
     document.querySelectorAll("[data-screen]").forEach((el) => {
       el.hidden = el.getAttribute("data-screen") !== name;
     });
+    if (name === "home") updateProgressUI();
   }
 
   function normalizeHeardText(raw) {
@@ -758,7 +918,9 @@
   }
 
   function setEllieMood(mood) {
-    const nodes = [els.sightEllie, els.homeEllie].filter(Boolean);
+    const nodes = [els.sightEllie, els.homeEllie, els.phonicsEllie].filter(
+      Boolean
+    );
     for (const node of nodes) {
       node.classList.remove("is-listen", "is-cheer", "is-think");
       if (mood) node.classList.add(`is-${mood}`);
@@ -867,6 +1029,7 @@
 
       if (matched) {
         setSayWordStatus("Yay! Ellie heard it — you got it!", "success");
+        markSightWordMastered(target);
       } else if (best) {
         setSayWordStatus(`Ellie heard “${best}”. Try again!`, "miss");
       } else {
@@ -907,6 +1070,281 @@
       activeRecognition = null;
       setSayWordListeningUi(false);
       setSayWordStatus("Couldn’t start the microphone. Try again.", "error");
+    }
+  }
+
+  function getPhonicsEntry(i) {
+    const idx = Math.min(
+      Math.max(0, i | 0),
+      Math.max(0, PHONICS_LETTERS.length - 1)
+    );
+    return PHONICS_LETTERS[idx];
+  }
+
+  function setPhonicsStatus(message, kind) {
+    if (!els.phonicsStatus) return;
+    els.phonicsStatus.textContent = message || "";
+    els.phonicsStatus.className =
+      "phonics-status" + (kind ? ` is-${kind}` : "");
+    if (kind === "listening") setEllieMood("listen");
+    else if (kind === "success") setEllieMood("cheer");
+    else if (kind === "miss") setEllieMood("think");
+  }
+
+  function playPhonicsSound() {
+    const entry = getPhonicsEntry(state.phonicsIndex);
+    if (!entry) return;
+    stopSayWordListening();
+    playPhoneme(entry.phoneme, entry.letter.toLowerCase());
+    bumpPhonics(entry.id, "heard");
+    setPhonicsStatus(`That’s the sound for ${entry.letter}!`, "");
+  }
+
+  function markPhonicsPracticed() {
+    const entry = getPhonicsEntry(state.phonicsIndex);
+    if (!entry) return;
+    bumpPhonics(entry.id, "practiced");
+    setPhonicsStatus(`Great practice on ${entry.letter}!`, "success");
+    setEllieMood("cheer");
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i];
+      a[i] = a[j];
+      a[j] = t;
+    }
+    return a;
+  }
+
+  function startPhonicsQuiz() {
+    const entry = getPhonicsEntry(state.phonicsIndex);
+    if (!entry || !els.phonicsQuiz || !els.phonicsQuizChoices) return;
+    phonicsQuizMode = true;
+    stopSayWordListening();
+    playPhoneme(entry.phoneme, entry.letter.toLowerCase());
+    bumpPhonics(entry.id, "heard");
+
+    const distractors = shuffle(
+      PHONICS_LETTERS.filter((L) => L.id !== entry.id)
+    ).slice(0, 2);
+    const choices = shuffle([entry, ...distractors]);
+    els.phonicsQuiz.hidden = false;
+    els.phonicsQuizChoices.innerHTML = "";
+    choices.forEach((L) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = L.letter;
+      btn.addEventListener("click", () => {
+        if (L.id === entry.id) {
+          bumpPhonics(entry.id, "quizWins");
+          setPhonicsStatus(`Yes! ${entry.letter} makes that sound!`, "success");
+          phonicsQuizMode = false;
+          els.phonicsQuiz.hidden = true;
+        } else {
+          setPhonicsStatus(`Not ${L.letter}. Listen again and try!`, "miss");
+          playPhoneme(entry.phoneme, entry.letter.toLowerCase());
+        }
+      });
+      els.phonicsQuizChoices.appendChild(btn);
+    });
+    setPhonicsStatus("Listen, then pick the letter!", "listening");
+  }
+
+  function startPhonicsSayListening() {
+    const entry = getPhonicsEntry(state.phonicsIndex);
+    if (!entry) return;
+    if (!SpeechRecognitionAPI) {
+      setPhonicsStatus(
+        "Speech isn’t available here — tap “I can say it!” instead.",
+        "miss"
+      );
+      return;
+    }
+    if (sayWordListening && phonicsListenMode) {
+      stopSayWordListening();
+      phonicsListenMode = false;
+      if (els.phonicsSayBtn) {
+        els.phonicsSayBtn.setAttribute("aria-pressed", "false");
+        els.phonicsSayBtn.textContent = "Say it";
+      }
+      setPhonicsStatus("Canceled.", "");
+      return;
+    }
+
+    stopPhonemeAudio();
+    try {
+      speechSynthesis.cancel();
+    } catch (_) {}
+    stopSayWordListening();
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 5;
+    recognition.continuous = false;
+
+    const accept = [
+      entry.letter.toLowerCase(),
+      entry.id,
+      entry.example.toLowerCase().replace(/-/g, " "),
+      entry.example.toLowerCase().replace(/-/g, ""),
+    ];
+
+    phonicsListenMode = true;
+    activeRecognition = recognition;
+    sayWordListening = true;
+    if (els.phonicsSayBtn) {
+      els.phonicsSayBtn.setAttribute("aria-pressed", "true");
+      els.phonicsSayBtn.textContent = "Listening…";
+    }
+    setPhonicsStatus(
+      `Say “${entry.letter}” or “${entry.example}”…`,
+      "listening"
+    );
+
+    recognition.onresult = (event) => {
+      const hypotheses = collectRecognitionHypotheses(event);
+      const matched = hypotheses.some((h) => {
+        const n = normalizeHeardText(h);
+        return accept.some(
+          (a) => n === a || n.split(" ").includes(a) || n.includes(a)
+        );
+      });
+      if (matched) {
+        bumpPhonics(entry.id, "practiced");
+        setPhonicsStatus(`Ellie heard you — nice ${entry.letter}!`, "success");
+      } else {
+        const best = hypotheses[0] ? normalizeHeardText(hypotheses[0]) : "";
+        setPhonicsStatus(
+          best
+            ? `Heard “${best}”. Try “${entry.letter}” or “${entry.example}”.`
+            : "Try again!",
+          "miss"
+        );
+      }
+    };
+
+    recognition.onerror = (event) => {
+      const err = (event && event.error) || "";
+      if (err === "aborted") return;
+      if (err === "not-allowed" || err === "service-not-allowed") {
+        setPhonicsStatus("Microphone permission is needed.", "miss");
+      } else if (err === "no-speech") {
+        setPhonicsStatus("No speech heard. Try again.", "miss");
+      } else {
+        setPhonicsStatus("Couldn’t listen. Try again.", "miss");
+      }
+    };
+
+    recognition.onend = () => {
+      activeRecognition = null;
+      sayWordListening = false;
+      phonicsListenMode = false;
+      if (els.phonicsSayBtn) {
+        els.phonicsSayBtn.setAttribute("aria-pressed", "false");
+        els.phonicsSayBtn.textContent = "Say it";
+      }
+    };
+
+    try {
+      recognition.start();
+    } catch (_) {
+      activeRecognition = null;
+      sayWordListening = false;
+      phonicsListenMode = false;
+      setPhonicsStatus("Couldn’t start the microphone.", "miss");
+    }
+  }
+
+  function updatePhonicsUI(opts) {
+    const keepQuiz = opts && opts.keepQuiz;
+    const entry = getPhonicsEntry(state.phonicsIndex);
+    if (!entry) return;
+
+    if (els.phonicsLetterBig) els.phonicsLetterBig.textContent = entry.letter;
+    if (els.phonicsExample) {
+      els.phonicsExample.textContent = `as in ${entry.example}`;
+    }
+
+    if (els.phonicsGrid) {
+      els.phonicsGrid.innerHTML = "";
+      PHONICS_LETTERS.forEach((L, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "phonics-letter";
+        if (idx === state.phonicsIndex) btn.classList.add("is-active");
+        if (isPhonicsMastered(L.id)) btn.classList.add("is-mastered");
+        const stars = phonicsStars(getPhonicsRecord(L.id));
+        btn.innerHTML = `${L.letter}<span class="phonics-letter-stars">${starsLabel(stars)}</span>`;
+        btn.setAttribute(
+          "aria-label",
+          `${L.letter}, ${stars} of 3 stars${isPhonicsMastered(L.id) ? ", mastered" : ""}`
+        );
+        btn.addEventListener("click", () => {
+          state.phonicsIndex = idx;
+          phonicsQuizMode = false;
+          persistProgress();
+          updatePhonicsUI();
+        });
+        els.phonicsGrid.appendChild(btn);
+      });
+    }
+
+    if (!keepQuiz && els.phonicsQuiz) {
+      els.phonicsQuiz.hidden = true;
+      phonicsQuizMode = false;
+    }
+
+    if (!SpeechRecognitionAPI && els.phonicsSayBtn) {
+      els.phonicsSayBtn.disabled = true;
+    }
+  }
+
+  function gradeFromPercent(pct) {
+    if (pct >= 90) return { letter: "A+", title: "Reading superstar!" };
+    if (pct >= 80) return { letter: "A", title: "Awesome work!" };
+    if (pct >= 70) return { letter: "B", title: "Great progress!" };
+    if (pct >= 55) return { letter: "C", title: "Keep going!" };
+    if (pct >= 35) return { letter: "D", title: "You’re learning!" };
+    return { letter: "E", title: "Just getting started!" };
+  }
+
+  function updateReportCardUI() {
+    const { overallPct, phonicsPct, sightPct } = sectionPercents();
+    const grade = gradeFromPercent(overallPct);
+    if (els.reportGradeBadge) els.reportGradeBadge.textContent = grade.letter;
+    if (els.reportGradeTitle) els.reportGradeTitle.textContent = grade.title;
+    if (els.reportGradeSummary) {
+      els.reportGradeSummary.textContent = `Overall ${overallPct}% · Phonics ${phonicsPct}% · Sight words ${sightPct}%`;
+    }
+
+    if (els.reportLetterGrid) {
+      els.reportLetterGrid.innerHTML = "";
+      PHONICS_LETTERS.forEach((L) => {
+        const stars = phonicsStars(getPhonicsRecord(L.id));
+        const cell = document.createElement("div");
+        cell.className =
+          "report-letter" + (isPhonicsMastered(L.id) ? " is-mastered" : "");
+        cell.innerHTML = `${L.letter}<span class="report-letter-stars">${starsLabel(stars)}</span>`;
+        els.reportLetterGrid.appendChild(cell);
+      });
+    }
+
+    if (els.reportWordList) {
+      els.reportWordList.innerHTML = "";
+      sightWords.forEach((w) => {
+        const key = String(w.word || "")
+          .trim()
+          .toLowerCase();
+        if (!key) return;
+        const li = document.createElement("li");
+        li.textContent = key;
+        if (state.sightMastery[key]) li.classList.add("is-mastered");
+        els.reportWordList.appendChild(li);
+      });
     }
   }
 
@@ -994,6 +1432,7 @@
       els.welcomeModal.hidden = true;
       syncControlsFromState();
       updateHomeGreeting();
+      updateProgressUI();
       if (!els.sightScreen.hidden) updateSightWordUI();
       applyVoiceFilters();
       if (!state.userName.trim()) {
@@ -1023,6 +1462,7 @@
       els.nameInput.value = state.userName || "";
       els.nameInput.focus();
       updateHomeGreeting();
+      updateProgressUI();
     });
 
     els.welcomeImportInput.addEventListener("change", (e) => {
@@ -1105,8 +1545,22 @@
       updateSightWordUI();
     });
 
-    els.backHome.addEventListener("click", () => {
-      showScreen("home");
+    els.activityPhonics.addEventListener("click", () => {
+      showScreen("phonics");
+      updatePhonicsUI();
+    });
+
+    els.activityReportCard.addEventListener("click", () => {
+      showScreen("report");
+      updateReportCardUI();
+    });
+
+    document.querySelectorAll(".js-back-home").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        stopSayWordListening();
+        showScreen("home");
+        updateProgressUI();
+      });
     });
 
     els.prevWord.addEventListener("click", () => {
@@ -1124,6 +1578,25 @@
       persistProgress();
       updateSightWordUI();
     });
+
+    els.prevPhonicsLetter.addEventListener("click", () => {
+      if (state.phonicsIndex <= 0) return;
+      state.phonicsIndex--;
+      persistProgress();
+      updatePhonicsUI();
+    });
+
+    els.nextPhonicsLetter.addEventListener("click", () => {
+      if (state.phonicsIndex >= PHONICS_LETTERS.length - 1) return;
+      state.phonicsIndex++;
+      persistProgress();
+      updatePhonicsUI();
+    });
+
+    els.phonicsPlaySound.addEventListener("click", () => playPhonicsSound());
+    els.phonicsISaidIt.addEventListener("click", () => markPhonicsPracticed());
+    els.phonicsSayBtn.addEventListener("click", () => startPhonicsSayListening());
+    els.phonicsStartQuiz.addEventListener("click", () => startPhonicsQuiz());
 
     els.sayWordBtn.addEventListener("click", () => {
       startSayWordListening();
@@ -1190,7 +1663,8 @@
     els.rateValue = $("rateValue");
     els.pitchValue = $("pitchValue");
     els.activitySightWords = $("activitySightWords");
-    els.backHome = $("backHome");
+    els.activityPhonics = $("activityPhonics");
+    els.activityReportCard = $("activityReportCard");
     els.sightScreen = $("sightScreen");
     els.sightWordTitle = $("sightWordTitle");
     els.sightWordProgress = $("sightWordProgress");
@@ -1203,6 +1677,33 @@
     els.sightEllie = $("sightEllie");
     els.homeEllie = $("homeEllie");
     els.ellieBubble = $("ellieBubble");
+    els.overallProgressLabel = $("overallProgressLabel");
+    els.overallProgressBar = $("overallProgressBar");
+    els.overallProgressFill = $("overallProgressFill");
+    els.phonicsReportText = $("phonicsReportText");
+    els.phonicsProgressBar = $("phonicsProgressBar");
+    els.phonicsProgressFill = $("phonicsProgressFill");
+    els.sightReportText = $("sightReportText");
+    els.sightProgressBar = $("sightProgressBar");
+    els.sightProgressFill = $("sightProgressFill");
+    els.phonicsGrid = $("phonicsGrid");
+    els.phonicsLetterBig = $("phonicsLetterBig");
+    els.phonicsExample = $("phonicsExample");
+    els.phonicsPlaySound = $("phonicsPlaySound");
+    els.phonicsISaidIt = $("phonicsISaidIt");
+    els.phonicsSayBtn = $("phonicsSayBtn");
+    els.phonicsStatus = $("phonicsStatus");
+    els.phonicsQuiz = $("phonicsQuiz");
+    els.phonicsQuizChoices = $("phonicsQuizChoices");
+    els.phonicsStartQuiz = $("phonicsStartQuiz");
+    els.phonicsEllie = $("phonicsEllie");
+    els.prevPhonicsLetter = $("prevPhonicsLetter");
+    els.nextPhonicsLetter = $("nextPhonicsLetter");
+    els.reportGradeBadge = $("reportGradeBadge");
+    els.reportGradeTitle = $("reportGradeTitle");
+    els.reportGradeSummary = $("reportGradeSummary");
+    els.reportLetterGrid = $("reportLetterGrid");
+    els.reportWordList = $("reportWordList");
     els.exportBtn = $("exportBtn");
     els.importBtn = $("importBtn");
     els.importInput = $("importInput");
@@ -1223,6 +1724,7 @@
 
     syncControlsFromState();
     updateHomeGreeting();
+    updateProgressUI();
 
     if (hasSavedProgress) {
       els.welcomeModal.hidden = true;
