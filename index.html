@@ -397,66 +397,6 @@
       flex-shrink: 0;
     }
 
-    .ellie-stage {
-      width: min(120px, 28vw);
-      position: relative;
-      cursor: pointer;
-    }
-
-    .ellie-stage svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      filter: drop-shadow(0 12px 0 rgba(42, 53, 80, 0.08));
-      animation: bob 3.2s ease-in-out infinite;
-      transform-origin: 50% 80%;
-    }
-
-    .ellie-stage.is-listen svg {
-      animation: listen-wiggle 0.7s ease-in-out infinite;
-    }
-
-    .ellie-stage.is-cheer svg {
-      animation: cheer-bounce 0.55s ease-in-out 3;
-    }
-
-    .ellie-stage.is-think svg {
-      animation: think-tilt 0.8s ease-in-out 2;
-    }
-
-    .ellie-bubble {
-      margin: 4px 0 0;
-      padding: 8px 12px;
-      background: var(--surface);
-      border: 3px solid var(--accent-soft);
-      border-radius: 18px 18px 18px 6px;
-      font-family: var(--display);
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--accent-dark);
-      box-shadow: var(--shadow);
-      animation: pop-in 0.45s ease both;
-      cursor: pointer;
-    }
-
-    .home-friends {
-      display: none;
-    }
-
-    .friend {
-      width: 52px;
-      height: 52px;
-      animation: floaty 3.6s ease-in-out infinite;
-    }
-
-    .friend--sun {
-      animation-delay: 0.4s;
-    }
-
-    .friend--bird {
-      animation-delay: 0.9s;
-    }
-
     .activity-grid {
       display: grid;
       gap: 18px;
@@ -603,34 +543,6 @@
         radial-gradient(circle at 8% 12%, rgba(255, 201, 74, 0.22) 0 12%, transparent 13%),
         radial-gradient(circle at 92% 18%, rgba(255, 107, 138, 0.14) 0 10%, transparent 11%);
       pointer-events: none;
-    }
-
-    .sight-buddy {
-      width: 52px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-      flex-shrink: 0;
-    }
-
-    .sight-buddy svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      animation: bob 3s ease-in-out infinite;
-      transform-origin: 50% 85%;
-    }
-
-    .sight-buddy.is-listen svg {
-      animation: listen-wiggle 0.7s ease-in-out infinite;
-    }
-
-    .sight-buddy.is-cheer svg {
-      animation: cheer-bounce 0.55s ease-in-out 3;
-    }
-
-    .sight-buddy.is-think svg {
-      animation: think-tilt 0.8s ease-in-out 2;
     }
 
     .sight-word-emoji-btn {
@@ -1130,18 +1042,6 @@
       position: relative;
     }
 
-    .modal-ellie {
-      width: 72px;
-      margin: -8px auto 10px;
-    }
-
-    .modal-ellie svg {
-      width: 100%;
-      height: auto;
-      display: block;
-      animation: bob 2.6s ease-in-out infinite;
-    }
-
     .modal h2 {
       margin: 0 0 10px;
       font-family: var(--display);
@@ -1479,7 +1379,7 @@
 
     .grade-grid button,
     .age-band-row button,
-    .ellie-color-row button {
+    .theme-color-row button {
       font-family: var(--display);
       font-weight: 700;
       min-height: 64px;
@@ -1498,7 +1398,7 @@
 
     .grade-grid button.is-selected,
     .age-band-row button.is-selected,
-    .ellie-color-row button.is-selected {
+    .theme-color-row button.is-selected {
       background: var(--accent);
       color: #fff;
       border-color: var(--accent-dark);
@@ -1871,7 +1771,10 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: repeat(3, minmax(0, 1fr));
       align-content: stretch;
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     @media (min-width: 560px) {
@@ -3719,9 +3622,9 @@
           <span class="btn-caption">Home</span>
         </button>
       </div>
-      <h2 style="margin-bottom:8px;">Stories</h2>
-      <div class="lead-row" style="margin-bottom:16px;">
-        <p class="lead" id="storiesLead">Pick Easy or Longer, then choose a First Words or Fables tale. Look at the picture, read along, or tap Read aloud!</p>
+      <h2>Stories</h2>
+      <div class="lead-row">
+        <p class="lead" id="storiesLead">Pick Easy or Longer, then a First Words or Fables tale.</p>
         <button type="button" class="speak-help-btn" data-speak-help="stories" title="Hear instructions" aria-label="Hear stories instructions">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
         </button>
