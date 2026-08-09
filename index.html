@@ -2254,10 +2254,11 @@
     }
 
     .story-illustration-wrap {
-      margin: 0 auto 8px;
-      max-width: min(280px, 100%);
-      max-height: 18dvh;
-      border-radius: 14px;
+      margin: 0 auto 10px;
+      max-width: min(420px, 100%);
+      width: 100%;
+      max-height: min(36dvh, 320px);
+      border-radius: 16px;
       overflow: hidden;
       border: 3px solid #ffe8c2;
       background: var(--sun-soft);
@@ -2269,8 +2270,9 @@
       display: block;
       width: 100%;
       height: 100%;
-      max-height: 18dvh;
+      max-height: min(36dvh, 320px);
       object-fit: cover;
+      object-position: center;
       vertical-align: middle;
     }
 
@@ -2587,7 +2589,11 @@
       }
 
       .story-illustration-wrap {
-        max-height: 14dvh;
+        max-height: min(28dvh, 240px);
+      }
+
+      .story-illustration {
+        max-height: min(28dvh, 240px);
       }
 
       .sight-buddy {
