@@ -1151,10 +1151,10 @@
 
   function updateCloudAuthUI() {
     if (!els.cloudAuthBtn) return;
+    // Keep Google sync hidden until we turn it back on for parents.
+    els.cloudAuthBtn.hidden = true;
     const cloud = getEllieCloud();
     const ready = !!(cloud && cloud.isConfigured && cloud.isConfigured());
-    // Always show so parents can discover sync; explain setup if not ready.
-    els.cloudAuthBtn.hidden = false;
     els.cloudAuthBtn.classList.toggle("icon-btn--needs-setup", !ready);
     if (!ready) {
       els.cloudAuthBtn.classList.remove("icon-btn--signed-in");
@@ -1826,7 +1826,7 @@
       case "report":
         return "Report card. Here are your stars for letters, words, and stories.";
       case "welcome":
-        return "Welcome! Progress saves on this device. Tap Start, Open file for a backup, or Sign in with Google to sync.";
+        return "Welcome! Progress saves on this device. Tap Start, or Open file for a backup.";
       case "name":
         return "What is your name? Type it, then tap Next.";
       case "level":
