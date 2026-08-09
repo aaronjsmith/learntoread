@@ -231,6 +231,50 @@
       font-weight: 600;
     }
 
+    .lead-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 0 0 20px;
+    }
+
+    .lead-row .lead,
+    .lead-row .range-hint {
+      margin: 0;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .speak-help-btn {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      border-radius: 50%;
+      background: var(--sky);
+      color: #fff;
+      box-shadow: 0 3px 0 rgba(107, 183, 255, 0.45);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .speak-help-btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .speak-help-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 rgba(107, 183, 255, 0.45);
+    }
+
+    .speak-help-btn .btn-icon {
+      width: 22px;
+      height: 22px;
+    }
+
     .home-hero {
       display: grid;
       gap: 8px;
@@ -243,6 +287,7 @@
     .ellie-stage {
       width: min(220px, 58vw);
       position: relative;
+      cursor: pointer;
     }
 
     .ellie-stage svg {
@@ -278,6 +323,7 @@
       color: var(--accent-dark);
       box-shadow: var(--shadow);
       animation: pop-in 0.45s ease both;
+      cursor: pointer;
     }
 
     .home-friends {
@@ -1875,14 +1921,19 @@
         <div class="ellie-stage" id="homeEllie" aria-hidden="true">
           <svg viewBox="0 0 200 200"><use href="#ellie-full"/></svg>
         </div>
-        <p class="ellie-bubble" id="ellieBubble">Hi! I’m Ellie — let’s read together!</p>
+        <p class="ellie-bubble" id="ellieBubble" role="button" tabindex="0" title="Tap to hear instructions" aria-label="Hear home instructions">Hi! I’m Ellie — let’s read together!</p>
         <div class="home-friends" aria-hidden="true">
           <svg class="friend friend--sun" viewBox="0 0 64 64"><use href="#friend-sun"/></svg>
           <svg class="friend friend--bird" viewBox="0 0 64 64"><use href="#friend-bird"/></svg>
         </div>
       </div>
       <h2>Activities</h2>
-      <p class="lead" id="homeGreeting">Pick an activity.</p>
+      <div class="lead-row">
+        <p class="lead" id="homeGreeting">Pick an activity.</p>
+        <button type="button" class="speak-help-btn" data-speak-help="home" title="Hear instructions" aria-label="Hear home instructions">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+        </button>
+      </div>
 
       <div class="section-reports" id="sectionReports">
         <div class="section-report">
@@ -1964,7 +2015,12 @@
       <div class="phonics-layout">
         <div>
           <h2 style="margin-bottom:10px;">Letter sounds</h2>
-          <p class="lead" style="margin-bottom:12px;">Tap a letter. Hear it, practice it, then take a quick quiz!</p>
+          <div class="lead-row" style="margin-bottom:12px;">
+            <p class="lead" id="phonicsLead">Tap a letter. Hear it, practice it, then take a quick quiz!</p>
+            <button type="button" class="speak-help-btn" data-speak-help="phonics" title="Hear instructions" aria-label="Hear phonics instructions">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+            </button>
+          </div>
           <div class="phonics-grid" id="phonicsGrid" role="list" aria-label="Alphabet letter sounds"></div>
         </div>
         <div class="phonics-stage">
@@ -2052,9 +2108,14 @@
             <label for="scrubSlider">Blend the sounds (slide across each letter)</label>
           </div>
           <input type="range" id="scrubSlider" min="0" max="0" value="0" aria-label="Blend letter sounds" />
-          <p class="range-hint" style="margin-top:10px;text-align:center;">
-            Tap a letter for one sound. Slide to hear them in order.
-          </p>
+          <div class="lead-row" style="margin-top:10px;">
+            <p class="range-hint" id="sightLead" style="text-align:center;">
+              Tap a letter for one sound. Slide to hear them in order.
+            </p>
+            <button type="button" class="speak-help-btn" data-speak-help="sight" title="Hear instructions" aria-label="Hear sight word instructions">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+            </button>
+          </div>
         </div>
         <div class="say-word">
           <button type="button" class="say-word-btn" id="sayWordBtn" aria-pressed="false" aria-label="Say the word into the microphone">
@@ -2086,7 +2147,12 @@
         </button>
       </div>
       <h2 style="margin-bottom:8px;">Stories</h2>
-      <p class="lead" style="margin-bottom:16px;">Pick a short tale. Look at the picture, read along, or tap Read aloud!</p>
+      <div class="lead-row" style="margin-bottom:16px;">
+        <p class="lead" id="storiesLead">Pick a short tale. Look at the picture, read along, or tap Read aloud!</p>
+        <button type="button" class="speak-help-btn" data-speak-help="stories" title="Hear instructions" aria-label="Hear stories instructions">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+        </button>
+      </div>
       <div class="stories-list" id="storiesList" role="list" aria-label="Story list"></div>
     </section>
 
@@ -2105,7 +2171,12 @@
         <div class="story-illustration-wrap">
           <img class="story-illustration" id="storyImage" src="" alt="" />
         </div>
-        <h2 id="storyTitle">Story</h2>
+        <div class="lead-row" style="margin-bottom:8px;align-items:center;">
+          <h2 id="storyTitle" style="margin:0;flex:1;">Story</h2>
+          <button type="button" class="speak-help-btn" data-speak-help="story" title="Hear instructions" aria-label="Hear story instructions">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+          </button>
+        </div>
         <p class="story-meta" id="storyMeta"></p>
         <div class="story-body" id="storyBody"></div>
         <p class="story-moral" id="storyMoral" hidden></p>
@@ -2137,8 +2208,14 @@
       <div class="report-card">
         <div class="report-grade">
           <div class="report-grade-badge" id="reportGradeBadge">—</div>
-          <h2 id="reportGradeTitle">Report card</h2>
+          <div class="lead-row" style="justify-content:center;margin-bottom:8px;">
+            <h2 id="reportGradeTitle" style="margin:0;">Report card</h2>
+            <button type="button" class="speak-help-btn" data-speak-help="report" title="Hear instructions" aria-label="Hear report card instructions">
+              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+            </button>
+          </div>
           <p id="reportGradeSummary">Keep practicing with Ellie!</p>
+          <p class="lead" id="reportLead" style="margin:8px 0 0;font-size:0.98rem;">Your stars for letters, words, and stories.</p>
         </div>
         <div class="report-section">
           <div class="report-section-head">
@@ -2170,7 +2247,12 @@
       <div class="modal-ellie" aria-hidden="true">
         <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
       </div>
-      <h2 id="welcomeTitle">Welcome with Ellie!</h2>
+      <div class="lead-row" style="align-items:center;margin-bottom:10px;">
+        <h2 id="welcomeTitle" style="margin:0;flex:1;">Welcome with Ellie!</h2>
+        <button type="button" class="speak-help-btn" data-speak-help="welcome" title="Hear instructions" aria-label="Hear welcome instructions">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+        </button>
+      </div>
       <p>
         Progress is saved automatically in this browser (not on the website server).
         Start fresh, or optionally open a <strong>progress JSON</strong> backup you saved earlier.
@@ -2194,7 +2276,12 @@
       <div class="modal-ellie" aria-hidden="true">
         <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
       </div>
-      <h2 id="nameTitle">What is your name?</h2>
+      <div class="lead-row" style="align-items:center;margin-bottom:10px;">
+        <h2 id="nameTitle" style="margin:0;flex:1;">What is your name?</h2>
+        <button type="button" class="speak-help-btn" data-speak-help="name" title="Hear instructions" aria-label="Hear name instructions">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+        </button>
+      </div>
       <p>Ellie loves saying hello! Your name stays on this device, and is used in the suggested filename if you export a JSON backup.</p>
       <form id="nameForm">
         <div class="field">

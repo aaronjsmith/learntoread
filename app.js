@@ -138,6 +138,12 @@
   let activeSfxAudio = null;
   let phonicsQuizMode = false;
   let phonicsListenMode = false;
+  /** Current visible main screen name (`home`, `phonics`, …). */
+  let activeScreenName = "";
+  /** Last instruction key auto-spoken for this screen visit (anti-spam). */
+  let lastAutoSpokenInstructionKey = "";
+  /** Queued line if voices are not ready yet. */
+  let pendingInstructionText = null;
 
   const SpeechRecognitionAPI =
     typeof window !== "undefined"
@@ -943,6 +949,73 @@
     speakText(line);
   }
 
+  /**
+   * Short instructional lines for pre-readers (not full on-screen paragraphs).
+   * Keys match screens/modals and `data-speak-help` buttons.
+   */
+  function instructionLine(key) {
+    switch (key) {
+      case "home":
+        return state.userName
+          ? `Hi, ${state.userName}! Pick an activity with Ellie.`
+          : "Hi! I'm Ellie. Pick an activity.";
+      case "phonics":
+        return "Phonics. Tap a letter. Hear it, practice it, then take a quiz.";
+      case "sight":
+        return "Sight words. Tap a letter for one sound. Slide to blend. Then say the word.";
+      case "stories":
+        return "Stories. Pick a short tale. Look at the picture, or tap Read aloud.";
+      case "story": {
+        const story = getStoryById(activeStoryId);
+        const title = story && story.title ? story.title : "This story";
+        return `${title}. Look at the picture. Tap Read aloud to listen. Tap I finished when you're done.`;
+      }
+      case "report":
+        return "Report card. Here are your stars for letters, words, and stories.";
+      case "welcome":
+        return "Welcome! Progress saves on this device. Tap Start, or Open file for a backup.";
+      case "name":
+        return "What is your name? Type it, then tap Let's read.";
+      case "phonicsQuiz":
+        return "Listen. Which letter makes this sound?";
+      default:
+        return "";
+    }
+  }
+
+  /**
+   * Speak a short instruction. Once per screen visit unless `force` (help icon).
+   * Cancels prior TTS and stops phoneme audio via speakText.
+   */
+  function speakInstruction(key, opts) {
+    const force = !!(opts && opts.force);
+    const line = instructionLine(key);
+    if (!line) return null;
+
+    if (!force && lastAutoSpokenInstructionKey === key) return null;
+    if (!force) lastAutoSpokenInstructionKey = key;
+
+    if (!getSelectedVoice()) {
+      pendingInstructionText = line;
+      return null;
+    }
+    pendingInstructionText = null;
+    const speakOpts = {};
+    if (opts && typeof opts.onend === "function") speakOpts.onend = opts.onend;
+    if (opts && typeof opts.onerror === "function") speakOpts.onerror = opts.onerror;
+    return speakText(
+      line,
+      Object.keys(speakOpts).length ? speakOpts : undefined
+    );
+  }
+
+  function flushPendingInstruction() {
+    if (!pendingInstructionText || !getSelectedVoice()) return;
+    const line = pendingInstructionText;
+    pendingInstructionText = null;
+    speakText(line);
+  }
+
   function speakWholeWord(word) {
     speakText(word.toLowerCase());
   }
@@ -950,6 +1023,7 @@
   function loadVoices() {
     voices = speechSynthesis.getVoices();
     applyVoiceFilters();
+    flushPendingInstruction();
   }
 
   async function loadWordsFromJson() {
@@ -1116,7 +1190,6 @@
       btn.appendChild(img);
       btn.appendChild(text);
       btn.addEventListener("click", () => {
-        speakCue(story.title);
         openStory(story.id);
       });
       els.storiesList.appendChild(btn);
@@ -1183,17 +1256,26 @@
     }
   }
 
-  function showScreen(name) {
+  function showScreen(name, opts) {
     if (name !== "sight" && name !== "phonics") stopSayWordListening();
     if (name !== "phonics") {
       phonicsQuizMode = false;
       phonicsListenMode = false;
     }
     if (name !== "story") stopStoryReading();
+    const changed = name !== activeScreenName;
+    activeScreenName = name;
+    if (changed) lastAutoSpokenInstructionKey = "";
     document.querySelectorAll("[data-screen]").forEach((el) => {
       el.hidden = el.getAttribute("data-screen") !== name;
     });
     if (name === "home") updateProgressUI();
+    const silent = opts && opts.silent;
+    const welcomeOpen = els.welcomeModal && !els.welcomeModal.hidden;
+    const nameOpen = els.nameModal && !els.nameModal.hidden;
+    if (!silent && changed && !welcomeOpen && !nameOpen) {
+      speakInstruction(name);
+    }
   }
 
   function normalizeHeardText(raw) {
@@ -1550,7 +1632,6 @@
     if (!entry || !els.phonicsQuiz || !els.phonicsQuizChoices) return;
     phonicsQuizMode = true;
     stopSayWordListening();
-    playPhoneme(entry.phoneme, entry.letter.toLowerCase());
     bumpPhonics(entry.id, "heard");
 
     const distractors = shuffle(
@@ -1577,6 +1658,22 @@
       els.phonicsQuizChoices.appendChild(btn);
     });
     setPhonicsStatus("Listen, then pick the letter!", "listening");
+    // Speak the quiz cue first, then play the phoneme (avoid overlapping TTS/MP3).
+    let phonemeStarted = false;
+    const playQuizPhoneme = () => {
+      if (phonemeStarted || !phonicsQuizMode) return;
+      phonemeStarted = true;
+      playPhoneme(entry.phoneme, entry.letter.toLowerCase());
+    };
+    const uttered = speakInstruction("phonicsQuiz", {
+      force: true,
+      onend: playQuizPhoneme,
+      onerror: (ev) => {
+        if (ev && ev.error === "interrupted") return;
+        playQuizPhoneme();
+      },
+    });
+    if (!uttered) playQuizPhoneme();
   }
 
   function startPhonicsSayListening() {
@@ -1889,8 +1986,10 @@
         els.nameModal.hidden = false;
         els.nameInput.value = "";
         els.nameInput.focus();
+        speakInstruction("name", { force: true });
       } else {
         els.nameModal.hidden = true;
+        speakInstruction("home", { force: true });
       }
     } catch (_) {
       alert("Could not read that JSON file. Please pick a valid export.");
@@ -1904,7 +2003,6 @@
     });
 
     els.welcomeStartFresh.addEventListener("click", () => {
-      speakCue("Start");
       resetStateForFreshStart();
       persistProgress();
       syncControlsFromState();
@@ -1915,6 +2013,7 @@
       els.nameInput.focus();
       updateHomeGreeting();
       updateProgressUI();
+      speakInstruction("name", { force: true });
     });
 
     els.welcomeImportInput.addEventListener("change", (e) => {
@@ -1932,6 +2031,8 @@
       persistProgress();
       els.nameModal.hidden = true;
       updateHomeGreeting();
+      lastAutoSpokenInstructionKey = "";
+      speakInstruction("home", { force: true });
     });
 
     els.importBtn.addEventListener("click", () => {
@@ -1995,34 +2096,29 @@
     });
 
     els.activitySightWords.addEventListener("click", () => {
-      speakCue("Sight words");
       showScreen("sight");
       updateSightWordUI();
     });
 
     els.activityPhonics.addEventListener("click", () => {
-      speakCue("Phonics");
       showScreen("phonics");
       updatePhonicsUI();
     });
 
     if (els.activityStories) {
       els.activityStories.addEventListener("click", () => {
-        speakCue("Stories");
         showScreen("stories");
         updateStoriesListUI();
       });
     }
 
     els.activityReportCard.addEventListener("click", () => {
-      speakCue("Report card");
       showScreen("report");
       updateReportCardUI();
     });
 
     if (els.storyBackToList) {
       els.storyBackToList.addEventListener("click", () => {
-        speakCue("Stories");
         stopStoryReading();
         showScreen("stories");
         updateStoriesListUI();
@@ -2053,13 +2149,33 @@
 
     document.querySelectorAll(".js-back-home").forEach((btn) => {
       btn.addEventListener("click", () => {
-        speakCue("Home");
         stopSayWordListening();
         stopStoryReading();
         showScreen("home");
         updateProgressUI();
       });
     });
+
+    document.querySelectorAll("[data-speak-help]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.getAttribute("data-speak-help");
+        if (key) speakInstruction(key, { force: true });
+      });
+    });
+
+    const hearHomeAgain = () => speakInstruction("home", { force: true });
+    if (els.ellieBubble) {
+      els.ellieBubble.addEventListener("click", hearHomeAgain);
+      els.ellieBubble.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          hearHomeAgain();
+        }
+      });
+    }
+    if (els.homeEllie) {
+      els.homeEllie.addEventListener("click", hearHomeAgain);
+    }
 
     els.prevWord.addEventListener("click", () => {
       if (state.sightWordIndex <= 0) return;
@@ -2261,7 +2377,14 @@
       els.nameModal.hidden = true;
     }
 
-    showScreen("home");
+    showScreen("home", { silent: true });
+    if (!els.welcomeModal.hidden) {
+      speakInstruction("welcome", { force: true });
+    } else if (!els.nameModal.hidden) {
+      speakInstruction("name", { force: true });
+    } else {
+      speakInstruction("home", { force: true });
+    }
   }
 
   if (document.readyState === "loading") {
