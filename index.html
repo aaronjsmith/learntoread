@@ -84,6 +84,7 @@
       padding: 4px 8px 4px 4px;
       min-height: 0;
       min-width: 0;
+      flex: 1 1 auto;
       border: none;
       border-radius: 16px;
       background: transparent;
@@ -130,19 +131,24 @@
     .brand-title {
       margin: 0;
       font-family: var(--display);
-      font-size: 1.35rem;
+      font-size: clamp(1.05rem, 3.6vw, 1.35rem);
       font-weight: 700;
       letter-spacing: -0.02em;
       color: var(--accent-dark);
       pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
 
     .header-actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      flex-wrap: nowrap;
+      gap: 6px;
       align-items: center;
       justify-content: flex-end;
+      flex-shrink: 0;
     }
 
     .header-actions .icon-btn {
@@ -1744,8 +1750,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 8px;
       width: 100%;
+      min-width: 0;
     }
 
     .header-progress {
@@ -1754,11 +1761,35 @@
       align-items: stretch;
       justify-content: center;
       gap: 4px;
-      width: min(120px, 22vw);
-      min-width: 72px;
+      width: min(96px, 20vw);
+      min-width: 64px;
       margin: 0;
-      padding: 0;
-      border: none;
+      padding: 6px 8px;
+      border: 3px solid #ffe0e8;
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 4px 0 rgba(255, 107, 138, 0.18);
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      min-height: var(--touch-min);
+      transition: background 0.15s, transform 0.12s, box-shadow 0.12s;
+    }
+
+    .header-progress:hover {
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+      box-shadow: 0 5px 0 rgba(255, 107, 138, 0.2);
+    }
+
+    .header-progress:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 rgba(255, 107, 138, 0.18);
+    }
+
+    .header-progress:focus-visible {
+      outline: 3px solid var(--sky);
+      outline-offset: 2px;
     }
 
     .progress-overall-label {
@@ -1766,14 +1797,29 @@
       margin: 0;
       font-family: var(--display);
       font-weight: 700;
-      font-size: 0.78rem;
+      font-size: 0.72rem;
       line-height: 1;
       color: var(--ink);
       text-align: right;
     }
 
     .header-progress .progress-bar {
-      height: 10px;
+      height: 8px;
+    }
+
+    .header-actions .icon-btn {
+      min-width: 52px;
+      min-height: 52px;
+      padding: 6px 8px;
+    }
+
+    .header-actions .icon-btn .btn-icon {
+      width: 26px;
+      height: 26px;
+    }
+
+    .header-actions .btn-caption {
+      font-size: 0.65rem;
     }
 
     .progress-bar {
@@ -1803,20 +1849,13 @@
       flex: 1;
       min-height: 0;
       grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
       align-content: stretch;
+      overflow: hidden;
     }
 
     @media (min-width: 560px) {
-      .section-reports {
-        grid-template-columns: 1fr 1fr;
-      }
       .activity-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (min-width: 720px) {
-      .section-reports {
         grid-template-columns: 1fr 1fr;
       }
     }
@@ -1830,6 +1869,7 @@
       text-align: left;
       width: 100%;
       min-height: 0;
+      height: 100%;
       font: inherit;
       color: inherit;
       cursor: pointer;
@@ -1838,6 +1878,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      overflow: hidden;
     }
 
     /* Keep light surfaces — global button:hover uses accent purple. */
@@ -3249,7 +3290,7 @@
               <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>
               <span>I can!</span>
             </button>
-            <button type="button" class="say-word-btn" id="phonicsSayBtn" aria-pressed="false" aria-label="Say it into the microphone">
+            <button type="button" class="say-word-btn" id="phonicsSayBtn" aria-pressed="false" aria-label="Say the letter sound into the microphone">
               <span class="say-mic" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="3" width="6" height="11" rx="3"/>
@@ -3258,7 +3299,7 @@
                   <path d="M8 20h8"/>
                 </svg>
               </span>
-              <span class="say-mic-label">Say it</span>
+              <span class="say-mic-label">Say the sound</span>
             </button>
           </div>
           <div class="phonics-say">

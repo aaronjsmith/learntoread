@@ -156,6 +156,52 @@
     zz: "z",
   };
 
+  /**
+   * Magic-e (silent e) long vowel sounds: cake/grapes → ey, bike → ay, etc.
+   * Used when a word is split as V + Ce (matching sight-word style like like → I + KE).
+   */
+  const MAGIC_E_LONG_VOWEL = {
+    a: "ey",
+    e: "iy",
+    i: "ay",
+    o: "ow",
+    u: "yuw",
+  };
+
+  /** Single consonants that can sit between the vowel and silent e (not w/y). */
+  const MAGIC_E_CONSONANTS = "bcdfghjklmnpqrstvz";
+
+  /**
+   * Common words that look like VCe but keep a short/irregular vowel.
+   * (Keeps cat/hop-style shorts unaffected; only blocks false magic-e hits.)
+   */
+  const MAGIC_E_EXCEPTIONS = new Set([
+    "are",
+    "have",
+    "give",
+    "live",
+    "love",
+    "come",
+    "some",
+    "done",
+    "gone",
+    "none",
+    "were",
+    "where",
+    "there",
+    "here",
+    "one",
+    "once",
+    "else",
+    "false",
+    "move",
+    "prove",
+    "above",
+    "whose",
+    "lose",
+    "sure",
+  ]);
+
   /** A–Z letter-sound curriculum (primary phonics sounds). */
   const PHONICS_LETTERS = [
     { id: "a", letter: "A", phoneme: "ae", example: "apple", emoji: "🍎" },
@@ -1775,6 +1821,7 @@
     updateProgressUI();
     updateStoryLevelPickersUI();
     if (els.sightScreen && !els.sightScreen.hidden) updateSightWordUI();
+    if (els.flashcardsScreen && !els.flashcardsScreen.hidden) updateFlashcardUI();
     applyVoiceFilters();
   }
 
@@ -1879,7 +1926,8 @@
     return sightWords[Math.min(Math.max(0, i), sightWords.length - 1)];
   }
 
-  function segmentWordIntoGraphemes(raw) {
+  /** Digraph / letter longest-match split (no magic-e handling). */
+  function segmentGraphemesBasic(raw) {
     const word = (raw || "").trim();
     if (!word) return [];
     const lower = word.toLowerCase();
@@ -1904,6 +1952,96 @@
     return out;
   }
 
+  /** True when stem is a simple magic-e word (…VCe), e.g. cake, grape, bike. */
+  function isMagicEStem(stem) {
+    if (!stem || stem.length < 3 || MAGIC_E_EXCEPTIONS.has(stem)) return false;
+    if (stem[stem.length - 1] !== "e") return false;
+    const cons = stem[stem.length - 2];
+    const vowel = stem[stem.length - 3];
+    if (!MAGIC_E_LONG_VOWEL[vowel]) return false;
+    if (!MAGIC_E_CONSONANTS.includes(cons)) return false;
+    // Avoid vowel digraphs (house → …use with ou; please → …ase with ea).
+    if (stem.length >= 4 && "aeiou".includes(stem[stem.length - 4])) return false;
+    return true;
+  }
+
+  /**
+   * Parse trailing magic-e (+ optional plural s): grapes → grape + s.
+   * @returns {{ prefix: string, vowel: string, cons: string, pluralS: boolean } | null}
+   */
+  function parseMagicE(lower) {
+    if (!lower || MAGIC_E_EXCEPTIONS.has(lower)) return null;
+    let pluralS = false;
+    let stem = lower;
+    if (
+      stem.length >= 5 &&
+      stem.endsWith("s") &&
+      !stem.endsWith("ss") &&
+      isMagicEStem(stem.slice(0, -1))
+    ) {
+      pluralS = true;
+      stem = stem.slice(0, -1);
+    }
+    if (!isMagicEStem(stem)) return null;
+    return {
+      prefix: stem.slice(0, -3),
+      vowel: stem[stem.length - 3],
+      cons: stem[stem.length - 2],
+      pluralS,
+    };
+  }
+
+  /** Consonant sound for a Ce chunk (soft c/g before silent e). */
+  function magicEConsPhoneme(cons) {
+    const c = String(cons || "")
+      .toLowerCase()
+      .replace(/[^a-z]/g, "");
+    if (!c) return "";
+    if (c === "c") return "s";
+    if (c === "g") return "jh";
+    return DEFAULT_GRAPHEME_PHONEME[c] || "";
+  }
+
+  /**
+   * Letters + phoneme ids for a bare word (story blend, missing JSON fields).
+   * Magic-e: grapes → G R A PE S / g r ey p s (silent e not sounded alone).
+   */
+  function phonicsForWord(raw) {
+    const word = (raw || "").trim();
+    if (!word) return { letters: [], phonemes: [] };
+    const lower = word.toLowerCase().replace(/\s+/g, "");
+    const magic = parseMagicE(lower);
+    if (magic) {
+      const prefixRaw = word.slice(0, magic.prefix.length);
+      const prefixLetters = segmentGraphemesBasic(prefixRaw);
+      const vowelAt = magic.prefix.length;
+      const letters = [
+        ...prefixLetters,
+        word.slice(vowelAt, vowelAt + 1).toUpperCase(),
+        word.slice(vowelAt + 1, vowelAt + 3).toUpperCase(),
+      ];
+      const phonemes = [
+        ...prefixLetters.map((g) => defaultPhonemeForGrapheme(g)),
+        MAGIC_E_LONG_VOWEL[magic.vowel],
+        magicEConsPhoneme(magic.cons),
+      ];
+      if (magic.pluralS) {
+        letters.push(word.slice(-1).toUpperCase());
+        phonemes.push("s");
+      }
+      return { letters, phonemes };
+    }
+    const letters = segmentGraphemesBasic(word);
+    return {
+      letters,
+      phonemes: letters.map((g) => defaultPhonemeForGrapheme(g)),
+    };
+  }
+
+  function segmentWordIntoGraphemes(raw) {
+    return phonicsForWord(raw).letters;
+  }
+
   function lettersForEntry(entry) {
     const w = (entry.word || "").trim();
     if (!w) return [];
@@ -1914,7 +2052,7 @@
       const wordNorm = w.toLowerCase().replace(/\s+/g, "");
       if (joined === wordNorm) return normalized;
     }
-    return segmentWordIntoGraphemes(w);
+    return phonicsForWord(w).letters;
   }
 
   function normalizePhonemeId(raw) {
@@ -1931,6 +2069,10 @@
       .replace(/[^a-z]/g, "");
     if (!g) return "";
     if (DEFAULT_GRAPHEME_PHONEME[g]) return DEFAULT_GRAPHEME_PHONEME[g];
+    // Silent-e chunk (KE, PE, CE): sound the consonant, not short /ɛ/.
+    if (g.length === 2 && g[1] === "e") {
+      return magicEConsPhoneme(g[0]);
+    }
     if (g.length > 1) {
       const last = g[g.length - 1];
       if (DEFAULT_GRAPHEME_PHONEME[last]) return DEFAULT_GRAPHEME_PHONEME[last];
@@ -1939,7 +2081,7 @@
   }
 
   /**
-   * Phoneme id for a letter tile (from words.json or primary phonics defaults).
+   * Phoneme id for a letter tile (from words.json or magic-e / phonics defaults).
    */
   function phonemeIdForGrapheme(entry, graphemeIndex) {
     const letters = lettersForEntry(entry);
@@ -1949,6 +2091,13 @@
     if (Array.isArray(list) && list[idx] != null) {
       const id = normalizePhonemeId(list[idx]);
       if (id) return id;
+    }
+    const inferred = phonicsForWord(entry.word || "");
+    if (
+      inferred.letters.length === letters.length &&
+      inferred.letters.every((g, i) => g === letters[i])
+    ) {
+      return inferred.phonemes[idx] || "";
     }
     return defaultPhonemeForGrapheme(letters[idx]);
   }
@@ -2307,6 +2456,8 @@
         return "Phonics. Tap a letter. Hear it, practice it, then take a quiz.";
       case "sight":
         return "Sight words. Tap a letter for one sound. Start the slider on the left, then slide to blend. Then say the word.";
+      case "flashcards":
+        return "Story words. Tap the big word to hear it. Tap I know it when you can read it. Use Next for another word.";
       case "stories":
         return "Stories. Pick Easy or Longer, then pick a First Words or Fables tale. Look at the picture, or tap Read aloud.";
       case "story": {
@@ -2555,12 +2706,14 @@
       const list = data.stories;
       if (Array.isArray(list) && list.length) {
         stories = list.filter((s) => s && s.id && s.title);
+        rebuildFlashcardDeck();
         return;
       }
     } catch (_) {
       /* offline / missing */
     }
     stories = [];
+    rebuildFlashcardDeck();
   }
 
   function getStoryById(id) {
@@ -3173,9 +3326,12 @@
   }
 
   function setEllieMood(mood) {
-    const nodes = [els.sightEllie, els.homeEllie, els.phonicsEllie].filter(
-      Boolean
-    );
+    const nodes = [
+      els.sightEllie,
+      els.homeEllie,
+      els.phonicsEllie,
+      els.flashcardEllie,
+    ].filter(Boolean);
     for (const node of nodes) {
       node.classList.remove("is-listen", "is-cheer", "is-think");
       if (mood) node.classList.add(`is-${mood}`);
@@ -3558,7 +3714,7 @@
     if (!entry) return;
     if (!SpeechRecognitionAPI) {
       setPhonicsStatus(
-        "Speech isn’t available here — tap “I can say it!” instead.",
+        "Speech isn’t available here — tap “I can!” instead.",
         "error"
       );
       return;
@@ -3581,20 +3737,36 @@
     recognition.maxAlternatives = 5;
     recognition.continuous = false;
 
-    const accept = [
-      entry.letter.toLowerCase(),
-      entry.id,
-      entry.example.toLowerCase().replace(/-/g, " "),
-      entry.example.toLowerCase().replace(/-/g, ""),
-    ];
+    const soundHint = phonicsSoundHint(entry);
+    const soundAccept = phonicsSoundAcceptList(entry);
+
+    if (SpeechGrammarListAPI && soundAccept.length) {
+      try {
+        const list = new SpeechGrammarListAPI();
+        const terms = soundAccept
+          .map((a) => a.replace(/[^a-z0-9]/g, ""))
+          .filter(Boolean);
+        if (terms.length) {
+          list.addFromString(
+            `#JSGF V1.0; grammar sound; public <sound> = ${terms.join(" | ")} ;`,
+            1
+          );
+          recognition.grammars = list;
+        }
+      } catch (_) {
+        /* grammar optional */
+      }
+    }
 
     phonicsListenMode = true;
     activeRecognition = recognition;
     sayWordListening = true;
-    clearHeardText(els.phonicsHeard, "Listening… say the letter");
+    clearHeardText(els.phonicsHeard, "Listening… say the sound");
     setPhonicsListeningUi(true);
     setPhonicsStatus(
-      `Say “${entry.letter}” or “${entry.example}”…`,
+      soundHint
+        ? `Say the sound for ${entry.letter} — like “${soundHint}”…`
+        : `Say the sound for ${entry.letter}…`,
       "listening"
     );
 
@@ -3607,12 +3779,7 @@
       const hypotheses = collectRecognitionHypotheses(event);
       if (!hypotheses.length) return;
 
-      const matched = hypotheses.some((h) => {
-        const n = normalizeHeardText(h);
-        return accept.some(
-          (a) => n === a || n.split(" ").includes(a) || n.includes(a)
-        );
-      });
+      const matched = hypotheses.some((h) => heardMatchesLetterSound(h, entry));
       const best = hypotheses[0] ? normalizeHeardText(hypotheses[0]) : "";
       if (best) {
         setHeardText(els.phonicsHeard, best, { listening: false });
@@ -3620,12 +3787,14 @@
 
       if (matched) {
         bumpPhonics(entry.id, "practiced");
-        setPhonicsStatus(`Ellie heard you — nice ${entry.letter}!`, "success");
-      } else {
         setPhonicsStatus(
-          best
-            ? `Heard “${best}”. Try “${entry.letter}” or “${entry.example}”.`
-            : "Try again!",
+          `Ellie heard the ${entry.letter} sound — great!`,
+          "success"
+        );
+      } else {
+        const tip = soundHint ? ` Try the sound “${soundHint}”.` : "";
+        setPhonicsStatus(
+          best ? `Heard “${best}”.${tip}` : `Try the sound again!${tip}`,
           "miss"
         );
       }
@@ -3740,12 +3909,13 @@
   }
 
   function updateReportCardUI() {
-    const { overallPct, phonicsPct, sightPct, storiesPct } = sectionPercents();
+    const { overallPct, phonicsPct, sightPct, storiesPct, flashcardsPct } =
+      sectionPercents();
     const grade = gradeFromPercent(overallPct);
     if (els.reportGradeBadge) els.reportGradeBadge.textContent = grade.letter;
     if (els.reportGradeTitle) els.reportGradeTitle.textContent = grade.title;
     if (els.reportGradeSummary) {
-      els.reportGradeSummary.textContent = `Overall ${overallPct}% · Phonics ${phonicsPct}% · Sight words ${sightPct}% · Stories ${storiesPct}%`;
+      els.reportGradeSummary.textContent = `Overall ${overallPct}% · Phonics ${phonicsPct}% · Sight words ${sightPct}% · Story words ${flashcardsPct}% · Stories ${storiesPct}%`;
     }
 
     if (els.reportLetterGrid) {
@@ -4472,6 +4642,12 @@
       updateStoriesListUI();
     }
 
+    function openFlashcardsActivity() {
+      rebuildFlashcardDeck();
+      showScreen("flashcards");
+      updateFlashcardUI();
+    }
+
     if (els.activitySightWords) {
       els.activitySightWords.addEventListener("click", () => {
         openSightActivity();
@@ -4498,6 +4674,11 @@
     }
     if (els.homeOpenStories) {
       els.homeOpenStories.addEventListener("click", () => openStoriesActivity());
+    }
+    if (els.homeOpenFlashcards) {
+      els.homeOpenFlashcards.addEventListener("click", () =>
+        openFlashcardsActivity()
+      );
     }
 
     document.querySelectorAll(".story-level-picker").forEach((picker) => {
@@ -4696,6 +4877,50 @@
       updateSightWordUI();
     });
 
+    if (els.prevFlashcard) {
+      els.prevFlashcard.addEventListener("click", () => {
+        if (state.flashcardWordIndex <= 0) return;
+        state.flashcardWordIndex--;
+        persistProgress();
+        updateFlashcardUI();
+      });
+    }
+    if (els.nextFlashcard) {
+      els.nextFlashcard.addEventListener("click", () => {
+        if (state.flashcardWordIndex >= flashcardWords.length - 1) return;
+        state.flashcardWordIndex++;
+        persistProgress();
+        updateFlashcardUI();
+      });
+    }
+    if (els.flashcardWordTitle) {
+      els.flashcardWordTitle.addEventListener("click", () => {
+        hearCurrentFlashcard();
+      });
+    }
+    if (els.flashcardHearBtn) {
+      els.flashcardHearBtn.addEventListener("click", () => {
+        hearCurrentFlashcard();
+      });
+    }
+    if (els.flashcardKnowBtn) {
+      els.flashcardKnowBtn.addEventListener("click", () => {
+        const entry = getFlashcardEntry(state.flashcardWordIndex);
+        if (!entry.word || isFlashcardMastered(entry.word)) return;
+        markFlashcardMastered(entry.word);
+        setEllieMood("cheer");
+        playFeedbackSfx("success");
+        speakCue("I know it");
+        if (state.flashcardWordIndex < flashcardWords.length - 1) {
+          state.flashcardWordIndex++;
+          persistProgress();
+          updateFlashcardUI();
+        } else {
+          refreshFlashcardMasteryUi();
+        }
+      });
+    }
+
     els.prevPhonicsLetter.addEventListener("click", () => {
       if (state.phonicsIndex <= 0) return;
       state.phonicsIndex--;
@@ -4825,10 +5050,22 @@
     els.homeOpenPhonics = $("homeOpenPhonics");
     els.homeOpenSight = $("homeOpenSight");
     els.homeOpenStories = $("homeOpenStories");
+    els.homeOpenFlashcards = $("homeOpenFlashcards");
     els.activityReportCard = $("activityReportCard");
     els.storiesReportText = $("storiesReportText");
     els.storiesProgressBar = $("storiesProgressBar");
     els.storiesProgressFill = $("storiesProgressFill");
+    els.flashcardsReportText = $("flashcardsReportText");
+    els.flashcardsProgressBar = $("flashcardsProgressBar");
+    els.flashcardsProgressFill = $("flashcardsProgressFill");
+    els.flashcardsScreen = $("flashcardsScreen");
+    els.flashcardWordTitle = $("flashcardWordTitle");
+    els.flashcardWordProgress = $("flashcardWordProgress");
+    els.flashcardHearBtn = $("flashcardHearBtn");
+    els.flashcardKnowBtn = $("flashcardKnowBtn");
+    els.flashcardEllie = $("flashcardEllie");
+    els.prevFlashcard = $("prevFlashcard");
+    els.nextFlashcard = $("nextFlashcard");
     els.storiesList = $("storiesList");
     els.storiesLevelPicker = $("storiesLevelPicker");
     els.storyLevelPicker = $("storyLevelPicker");
@@ -4925,6 +5162,7 @@
     await loadWordsFromJson();
     await loadStoriesFromJson();
     clampWordIndex();
+    clampFlashcardIndex();
     preloadPhonemeAudio();
 
     speechSynthesis.onvoiceschanged = loadVoices;
