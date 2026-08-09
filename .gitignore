@@ -5,3 +5,12 @@ node_modules/
 .DS_Store
 *.log
 .tmp-video/
+
+# Local secrets / overrides (never commit private keys)
+.env
+.env.*
+!.env.example
+firebase-config.local.js
+*firebase-adminsdk*.json
+serviceAccount*.json
+*-credentials.json

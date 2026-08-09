@@ -1053,6 +1053,13 @@
       box-shadow: 0 2px 0 rgba(255, 201, 74, 0.4);
     }
 
+    .parental-gate-words button:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      max-width: 12rem;
+      width: 100%;
+      justify-self: center;
+    }
+
     .parental-gate-words button.is-wrong {
       animation: think-tilt 0.45s ease-in-out;
       background: #ffe8dc;
@@ -2069,9 +2076,8 @@
     </symbol>
 
     <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="3.2"/>
-      <path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M18 6l-1.6 1.6M7.6 16.4 6 18"/>
-      <path d="M19.4 15a7.5 7.5 0 0 0 .1-6l-2.1.6a5.4 5.4 0 0 1-.1 4.8l2.1.6zM4.6 9a7.5 7.5 0 0 0-.1 6l2.1-.6a5.4 5.4 0 0 1 .1-4.8L4.6 9zM9 4.6a7.5 7.5 0 0 0-3.5 2.9l1.8 1.2A5.4 5.4 0 0 1 10 5.8L9 4.6zM15 19.4a7.5 7.5 0 0 0 3.5-2.9l-1.8-1.2a5.4 5.4 0 0 1-2.5 1.5l.8 2.6z"/>
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
     </symbol>
 
     <symbol id="icon-google" viewBox="0 0 24 24">
@@ -2124,19 +2130,11 @@
           <svg class="btn-icon btn-icon--google" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-google"/></svg>
           <span class="btn-caption" id="cloudAuthCaption">Google</span>
         </button>
-        <button type="button" class="icon-btn" id="exportBtn" title="Download progress as a JSON file" aria-label="Save progress JSON" data-speak="Save">
-          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-save"/></svg>
-          <span class="btn-caption">Save</span>
-        </button>
-        <button type="button" class="icon-btn" id="importBtn" title="Choose a progress JSON file from your device" aria-label="Load progress JSON" data-speak="Load">
-          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-load"/></svg>
-          <span class="btn-caption">Load</span>
+        <button type="button" class="icon-btn" id="openSettings" title="Settings (grown-ups)" aria-label="Settings" data-speak="Settings">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-settings"/></svg>
+          <span class="btn-caption">Settings</span>
         </button>
         <input type="file" id="importInput" class="sr-only" accept="application/json,.json" aria-hidden="true" tabindex="-1" />
-        <button type="button" class="icon-btn" id="openSettings" title="Voice and speech settings" aria-label="Voice settings" data-speak="Voice">
-          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-voice"/></svg>
-          <span class="btn-caption">Voice</span>
-        </button>
       </div>
     </div>
     <div class="header-progress" aria-label="Overall learning progress">
@@ -2198,7 +2196,7 @@
       </div>
 
       <p class="lead" id="homeFileHint" style="font-size: 0.95rem;">
-        Progress is saved automatically in this browser. Use the <strong>Save</strong> / <strong>Load</strong> icons only if you want a backup copy.
+        Progress is saved automatically in this browser. Grown-ups can open <strong>Settings</strong> to save or load a backup copy.
       </p>
       <div class="activity-grid">
         <button type="button" class="activity-card" id="activityPhonics" aria-label="Phonics" data-speak="Phonics">
@@ -2557,12 +2555,32 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="parentalGateModal" role="dialog" aria-modal="true" aria-labelledby="parentalGateTitle" hidden>
+    <div class="modal">
+      <div class="modal-ellie" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+      </div>
+      <h2 id="parentalGateTitle">Ask a grown-up</h2>
+      <p id="parentalGateKidMsg">Ellie says Settings is for parents only.</p>
+      <p id="parentalGateHint"><strong>Grown-ups:</strong> tap the word <strong id="parentalGateCodeWord">elephant</strong>.</p>
+      <div class="parental-gate-words" id="parentalGateWords" role="group" aria-label="Choose the code word"></div>
+      <p class="parental-gate-feedback" id="parentalGateFeedback" role="status" aria-live="polite"></p>
+      <div class="modal-actions">
+        <button type="button" class="secondary btn-with-icon" id="closeParentalGate" aria-label="Cancel" data-speak="Cancel">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close"/></svg>
+          <span>Cancel</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
     <div class="modal">
       <div style="width:56px;height:56px;margin:0 auto 10px;color:var(--accent-dark);" aria-hidden="true">
-        <svg viewBox="0 0 24 24" style="width:100%;height:100%;display:block;"><use href="#icon-voice"/></svg>
+        <svg viewBox="0 0 24 24" style="width:100%;height:100%;display:block;"><use href="#icon-settings"/></svg>
       </div>
-      <h2 id="settingsTitle">Voice settings</h2>
+      <h2 id="settingsTitle">Settings</h2>
+      <p class="settings-section-label">Voice</p>
       <p>Pick a friendly voice for Ellie to use when saying whole words.</p>
       <div class="settings-grid">
         <div class="settings-row">
@@ -2603,6 +2621,18 @@
         <div class="field">
           <label for="settingsPreviewText">Preview text</label>
           <input type="text" id="settingsPreviewText" maxlength="500" autocomplete="off" spellcheck="true" />
+        </div>
+        <p class="settings-section-label">Progress backup</p>
+        <p class="range-hint" style="margin:0 0 4px;">Save or load a JSON backup on this device.</p>
+        <div class="settings-backup-row">
+          <button type="button" class="icon-btn" id="exportBtn" title="Download progress as a JSON file" aria-label="Save progress JSON" data-speak="Save">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-save"/></svg>
+            <span class="btn-caption">Save JSON</span>
+          </button>
+          <button type="button" class="icon-btn" id="importBtn" title="Choose a progress JSON file from your device" aria-label="Load progress JSON" data-speak="Load">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-load"/></svg>
+            <span class="btn-caption">Load JSON</span>
+          </button>
         </div>
       </div>
       <div class="modal-actions">

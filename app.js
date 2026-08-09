@@ -7,6 +7,9 @@
   const DEFAULT_PREVIEW_TEXT = "Hello! I will help you read.";
   /** Debounce window for uploading progress to Firestore after local changes. */
   const CLOUD_UPLOAD_DEBOUNCE_MS = 1500;
+  /** Parental gate: adult must tap this word among decoys. */
+  const PARENTAL_GATE_CODE_WORD = "elephant";
+  const PARENTAL_GATE_DECOYS = ["banana", "rainbow", "cookie", "pencil"];
 
   const DEFAULT_WORDS = [
     { word: "hat", letters: ["H", "A", "T"], phonemes: ["hh", "ae", "t"] },
@@ -241,12 +244,11 @@
 
   const els = {};
 
-  /** @type {import("firebase/auth").User | null} */
+  /** @type {object | null} Firebase Auth user when signed in. */
   let cloudUser = null;
   let cloudUploadTimer = null;
   let cloudSyncPaused = false;
   let cloudAuthSpeakPending = false;
-  let cloudAuthReady = false;
 
   function $(id) {
     return document.getElementById(id);
@@ -764,10 +766,7 @@
   function bindCloudAuth() {
     const cloud = getEllieCloud();
     updateCloudAuthUI();
-    if (!cloud || !cloud.isConfigured()) {
-      cloudAuthReady = true;
-      return;
-    }
+    if (!cloud || !cloud.isConfigured()) return;
     cloud.ensureInit();
     cloud.onAuthChange(async (user) => {
       cloudUser = user || null;
@@ -777,7 +776,6 @@
       } else {
         cloudAuthSpeakPending = false;
       }
-      cloudAuthReady = true;
     });
 
     if (els.cloudAuthBtn) {
@@ -1355,6 +1353,8 @@
         return "What is your name? Type it, then tap Let's read.";
       case "phonicsQuiz":
         return "Listen. Which letter makes this sound?";
+      case "parentalGate":
+        return `Ask a grown-up to open settings. Grown-ups, tap the word ${PARENTAL_GATE_CODE_WORD}.`;
       default:
         return "";
     }
@@ -2614,6 +2614,82 @@
     }
   }
 
+  function shuffleArray(items) {
+    const arr = items.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function closeParentalGate() {
+    if (!els.parentalGateModal) return;
+    els.parentalGateModal.hidden = true;
+    if (els.parentalGateFeedback) els.parentalGateFeedback.textContent = "";
+    if (els.parentalGateWords) els.parentalGateWords.innerHTML = "";
+  }
+
+  function openSettingsPanel() {
+    syncControlsFromState();
+    applyVoiceFilters();
+    els.settingsModal.hidden = false;
+  }
+
+  function renderParentalGateWords() {
+    if (!els.parentalGateWords) return;
+    if (els.parentalGateCodeWord) {
+      els.parentalGateCodeWord.textContent = PARENTAL_GATE_CODE_WORD;
+    }
+    const words = shuffleArray([
+      PARENTAL_GATE_CODE_WORD,
+      ...PARENTAL_GATE_DECOYS,
+    ]);
+    els.parentalGateWords.innerHTML = "";
+    for (const word of words) {
+      const label = word.charAt(0).toUpperCase() + word.slice(1);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = label;
+      btn.dataset.gateWord = word;
+      btn.setAttribute("aria-label", `Tap ${label}`);
+      btn.addEventListener("click", () => handleParentalGateChoice(word, btn));
+      els.parentalGateWords.appendChild(btn);
+    }
+  }
+
+  function handleParentalGateChoice(word, btn) {
+    if (word === PARENTAL_GATE_CODE_WORD) {
+      if (els.parentalGateFeedback) els.parentalGateFeedback.textContent = "";
+      closeParentalGate();
+      openSettingsPanel();
+      return;
+    }
+    playFeedbackSfx("miss");
+    if (els.parentalGateFeedback) {
+      els.parentalGateFeedback.textContent = "Try again!";
+    }
+    if (btn) {
+      btn.classList.remove("is-wrong");
+      // Retrigger tilt animation on repeated wrong taps.
+      void btn.offsetWidth;
+      btn.classList.add("is-wrong");
+    }
+  }
+
+  function openParentalGate() {
+    if (!els.parentalGateModal) {
+      openSettingsPanel();
+      return;
+    }
+    if (els.parentalGateFeedback) els.parentalGateFeedback.textContent = "";
+    renderParentalGateWords();
+    els.parentalGateModal.hidden = false;
+    speakInstruction("parentalGate", { force: true });
+  }
+
   function bindEvents() {
     els.welcomeOpenFile.addEventListener("click", () => {
       speakCue("Open file");
@@ -2666,11 +2742,21 @@
     });
 
     els.openSettings.addEventListener("click", () => {
-      speakCue("Voice");
-      syncControlsFromState();
-      applyVoiceFilters();
-      els.settingsModal.hidden = false;
+      openParentalGate();
     });
+
+    if (els.closeParentalGate) {
+      els.closeParentalGate.addEventListener("click", () => {
+        speakCue("Cancel");
+        closeParentalGate();
+      });
+    }
+
+    if (els.parentalGateModal) {
+      els.parentalGateModal.addEventListener("click", (e) => {
+        if (e.target === els.parentalGateModal) closeParentalGate();
+      });
+    }
 
     els.closeSettings.addEventListener("click", () => {
       els.settingsModal.hidden = true;
@@ -2895,6 +2981,11 @@
     els.nameForm = $("nameForm");
     els.nameInput = $("nameInput");
     els.homeGreeting = $("homeGreeting");
+    els.parentalGateModal = $("parentalGateModal");
+    els.parentalGateWords = $("parentalGateWords");
+    els.parentalGateFeedback = $("parentalGateFeedback");
+    els.parentalGateCodeWord = $("parentalGateCodeWord");
+    els.closeParentalGate = $("closeParentalGate");
     els.settingsModal = $("settingsModal");
     els.openSettings = $("openSettings");
     els.closeSettings = $("closeSettings");
