@@ -294,7 +294,7 @@
     voiceName: "",
     rate: 0.95,
     pitch: 1.05,
-    scrubIndex: 0,
+    scrubIndex: -1,
   };
 
   /** Multi-profile store keyed by profile id. */
@@ -515,7 +515,7 @@
         ? { ...p.storiesProgress }
         : {};
     state.storyReadingLevel = normalizeStoryLevel(p.storyReadingLevel);
-    state.scrubIndex = 0;
+    state.scrubIndex = -1;
     persistUserName(state.userName);
     applyEllieTheme(state.ellieColor);
     if (sightWords.length) {
@@ -548,7 +548,7 @@
     state.sightPracticeCounts = {};
     state.storiesProgress = {};
     state.storyReadingLevel = "beginner";
-    state.scrubIndex = 0;
+    state.scrubIndex = -1;
   }
 
   function resetDeviceVoiceSettings() {
@@ -1812,7 +1812,7 @@
       case "phonics":
         return "Phonics. Tap a letter. Hear it, practice it, then take a quiz.";
       case "sight":
-        return "Sight words. Tap a letter for one sound. Slide to blend. Then say the word.";
+        return "Sight words. Tap a letter for one sound. Start the slider on the left, then slide to blend. Then say the word.";
       case "stories":
         return "Stories. Pick Easy or Longer, then pick a short tale. Look at the picture, or tap Read aloud.";
       case "story": {
@@ -3366,10 +3366,16 @@
       els.letterRow.appendChild(btn);
     });
 
-    const max = Math.max(0, letters.length - 1);
-    els.scrubSlider.max = String(max);
-    state.scrubIndex = Math.min(state.scrubIndex, max);
-    els.scrubSlider.value = String(state.scrubIndex);
+    const letterCount = letters.length;
+    // Slider: 0 = start (before first sound), 1..n = letters so the first letter
+    // always gets an "enter" event when the thumb slides onto it.
+    els.scrubSlider.min = "0";
+    els.scrubSlider.max = String(letterCount);
+    if (!Number.isFinite(state.scrubIndex) || state.scrubIndex < -1) {
+      state.scrubIndex = -1;
+    } else if (state.scrubIndex >= letterCount) {
+      state.scrubIndex = Math.max(-1, letterCount - 1);
+    }
     setActiveLetter(state.scrubIndex);
 
     stopSayWordListening();
@@ -3390,13 +3396,29 @@
     }
   }
 
+  /** Slider value 0 = before sounds; 1..n map to letter indices 0..n-1. */
+  function letterIndexFromScrubValue(scrubVal) {
+    const v = parseInt(scrubVal, 10);
+    if (!Number.isFinite(v) || v <= 0) return -1;
+    return v - 1;
+  }
+
+  function scrubValueFromLetterIndex(letterIndex) {
+    const idx = letterIndex | 0;
+    return idx < 0 ? 0 : idx + 1;
+  }
+
   function setActiveLetter(index) {
+    const letterIndex = Number.isFinite(index) ? index | 0 : -1;
     const tiles = els.letterRow.querySelectorAll(".letter-tile");
     tiles.forEach((t, i) => {
-      t.classList.toggle("letter-tile--active", i === index);
+      t.classList.toggle(
+        "letter-tile--active",
+        letterIndex >= 0 && i === letterIndex
+      );
     });
-    state.scrubIndex = index;
-    els.scrubSlider.value = String(index);
+    state.scrubIndex = letterIndex;
+    els.scrubSlider.value = String(scrubValueFromLetterIndex(letterIndex));
   }
 
   async function handleProgressFile(file) {
@@ -3775,7 +3797,7 @@
     els.prevWord.addEventListener("click", () => {
       if (state.sightWordIndex <= 0) return;
       state.sightWordIndex--;
-      state.scrubIndex = 0;
+      state.scrubIndex = -1;
       persistProgress();
       updateSightWordUI();
     });
@@ -3783,7 +3805,7 @@
     els.nextWord.addEventListener("click", () => {
       if (state.sightWordIndex >= sightWords.length - 1) return;
       state.sightWordIndex++;
-      state.scrubIndex = 0;
+      state.scrubIndex = -1;
       persistProgress();
       updateSightWordUI();
     });
@@ -3833,16 +3855,20 @@
       });
     }
 
-    /** Last scrub index that played a phoneme (Lotty-style: one sound per letter). */
+    /** Last letter index that played a phoneme (Lotty-style: one sound per letter). */
     let lastScrubPhonemeIndex = -1;
     els.scrubSlider.addEventListener("input", () => {
-      const i = parseInt(els.scrubSlider.value, 10) || 0;
-      setActiveLetter(i);
-      if (i === lastScrubPhonemeIndex) return;
-      lastScrubPhonemeIndex = i;
+      const letterIdx = letterIndexFromScrubValue(els.scrubSlider.value);
+      setActiveLetter(letterIdx);
+      if (letterIdx < 0) {
+        lastScrubPhonemeIndex = -1;
+        return;
+      }
+      if (letterIdx === lastScrubPhonemeIndex) return;
+      lastScrubPhonemeIndex = letterIdx;
       const entry = getWordEntry(state.sightWordIndex);
       const letters = lettersForEntry(entry);
-      if (letters[i]) speakGraphemeSound(entry, i);
+      if (letters[letterIdx]) speakGraphemeSound(entry, letterIdx);
     });
     els.scrubSlider.addEventListener("change", () => {
       lastScrubPhonemeIndex = -1;
