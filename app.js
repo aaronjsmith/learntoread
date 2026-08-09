@@ -102,32 +102,32 @@
 
   /** A–Z letter-sound curriculum (primary phonics sounds). */
   const PHONICS_LETTERS = [
-    { id: "a", letter: "A", phoneme: "ae", example: "apple" },
-    { id: "b", letter: "B", phoneme: "b", example: "ball" },
-    { id: "c", letter: "C", phoneme: "k", example: "cat" },
-    { id: "d", letter: "D", phoneme: "d", example: "dog" },
-    { id: "e", letter: "E", phoneme: "eh", example: "egg" },
-    { id: "f", letter: "F", phoneme: "f", example: "fish" },
-    { id: "g", letter: "G", phoneme: "g", example: "goat" },
-    { id: "h", letter: "H", phoneme: "hh", example: "hat" },
-    { id: "i", letter: "I", phoneme: "ih", example: "igloo" },
-    { id: "j", letter: "J", phoneme: "jh", example: "jam" },
-    { id: "k", letter: "K", phoneme: "k", example: "kite" },
-    { id: "l", letter: "L", phoneme: "l", example: "leaf" },
-    { id: "m", letter: "M", phoneme: "m", example: "moon" },
-    { id: "n", letter: "N", phoneme: "n", example: "nest" },
-    { id: "o", letter: "O", phoneme: "aa", example: "octopus" },
-    { id: "p", letter: "P", phoneme: "p", example: "pig" },
-    { id: "q", letter: "Q", phoneme: "kw", example: "queen" },
-    { id: "r", letter: "R", phoneme: "r", example: "rain" },
-    { id: "s", letter: "S", phoneme: "s", example: "sun" },
-    { id: "t", letter: "T", phoneme: "t", example: "tiger" },
-    { id: "u", letter: "U", phoneme: "ah", example: "umbrella" },
-    { id: "v", letter: "V", phoneme: "v", example: "van" },
-    { id: "w", letter: "W", phoneme: "w", example: "web" },
-    { id: "x", letter: "X", phoneme: "ks", example: "fox" },
-    { id: "y", letter: "Y", phoneme: "y", example: "yo-yo" },
-    { id: "z", letter: "Z", phoneme: "z", example: "zebra" },
+    { id: "a", letter: "A", phoneme: "ae", example: "apple", emoji: "🍎" },
+    { id: "b", letter: "B", phoneme: "b", example: "ball", emoji: "🏀" },
+    { id: "c", letter: "C", phoneme: "k", example: "cat", emoji: "🐱" },
+    { id: "d", letter: "D", phoneme: "d", example: "dog", emoji: "🐶" },
+    { id: "e", letter: "E", phoneme: "eh", example: "egg", emoji: "🥚" },
+    { id: "f", letter: "F", phoneme: "f", example: "fish", emoji: "🐟" },
+    { id: "g", letter: "G", phoneme: "g", example: "goat", emoji: "🐐" },
+    { id: "h", letter: "H", phoneme: "hh", example: "hat", emoji: "🎩" },
+    { id: "i", letter: "I", phoneme: "ih", example: "igloo", emoji: "🧊" },
+    { id: "j", letter: "J", phoneme: "jh", example: "jam", emoji: "🫙" },
+    { id: "k", letter: "K", phoneme: "k", example: "kite", emoji: "🪁" },
+    { id: "l", letter: "L", phoneme: "l", example: "leaf", emoji: "🍃" },
+    { id: "m", letter: "M", phoneme: "m", example: "moon", emoji: "🌙" },
+    { id: "n", letter: "N", phoneme: "n", example: "nest", emoji: "🪺" },
+    { id: "o", letter: "O", phoneme: "aa", example: "octopus", emoji: "🐙" },
+    { id: "p", letter: "P", phoneme: "p", example: "pig", emoji: "🐷" },
+    { id: "q", letter: "Q", phoneme: "kw", example: "queen", emoji: "👑" },
+    { id: "r", letter: "R", phoneme: "r", example: "rain", emoji: "🌧️" },
+    { id: "s", letter: "S", phoneme: "s", example: "sun", emoji: "☀️" },
+    { id: "t", letter: "T", phoneme: "t", example: "tiger", emoji: "🐯" },
+    { id: "u", letter: "U", phoneme: "ah", example: "umbrella", emoji: "☂️" },
+    { id: "v", letter: "V", phoneme: "v", example: "van", emoji: "🚐" },
+    { id: "w", letter: "W", phoneme: "w", example: "web", emoji: "🕸️" },
+    { id: "x", letter: "X", phoneme: "ks", example: "fox", emoji: "🦊" },
+    { id: "y", letter: "Y", phoneme: "y", example: "yo-yo", emoji: "🪀" },
+    { id: "z", letter: "Z", phoneme: "z", example: "zebra", emoji: "🦓" },
   ];
 
   const PHONEME_AUDIO_BASE = "sounds/phonemes/";
@@ -1701,6 +1701,10 @@
     }
 
     if (els.phonicsLetterBig) els.phonicsLetterBig.textContent = entry.letter;
+    if (els.phonicsEmoji) {
+      els.phonicsEmoji.textContent = entry.emoji || "";
+      els.phonicsEmoji.hidden = !entry.emoji;
+    }
     if (els.phonicsExample) {
       els.phonicsExample.textContent = `as in ${entry.example}`;
     }
@@ -2201,6 +2205,7 @@
     els.sightProgressFill = $("sightProgressFill");
     els.phonicsGrid = $("phonicsGrid");
     els.phonicsLetterBig = $("phonicsLetterBig");
+    els.phonicsEmoji = $("phonicsEmoji");
     els.phonicsExample = $("phonicsExample");
     els.phonicsPlaySound = $("phonicsPlaySound");
     els.phonicsISaidIt = $("phonicsISaidIt");

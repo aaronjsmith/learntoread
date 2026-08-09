@@ -1274,6 +1274,29 @@
       min-height: 1.05em;
     }
 
+    .phonics-cue {
+      display: grid;
+      gap: 4px;
+      justify-items: center;
+      margin: 10px 0 16px;
+      padding: 12px 14px 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, var(--sun-soft) 0%, #fff8e8 100%);
+      border: 2px solid rgba(255, 201, 74, 0.55);
+      box-shadow: 0 4px 0 rgba(255, 201, 74, 0.18);
+    }
+
+    .phonics-emoji {
+      margin: 0;
+      font-size: clamp(3.4rem, 16vw, 5rem);
+      line-height: 1;
+      filter: drop-shadow(0 3px 0 rgba(42, 53, 80, 0.08));
+    }
+
+    .phonics-emoji[hidden] {
+      display: none !important;
+    }
+
     .field input[type="text"],
     .field select,
     .settings-row select {
@@ -1281,7 +1304,7 @@
     }
 
     .phonics-example {
-      margin: 6px 0 14px;
+      margin: 0;
       font-weight: 800;
       color: var(--muted);
       font-size: 1.05rem;
@@ -1949,7 +1972,10 @@
             <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
           </div>
           <p class="phonics-letter-big" id="phonicsLetterBig">A</p>
-          <p class="phonics-example" id="phonicsExample">as in apple</p>
+          <div class="phonics-cue">
+            <p class="phonics-emoji" id="phonicsEmoji" aria-hidden="true">🍎</p>
+            <p class="phonics-example" id="phonicsExample">as in apple</p>
+          </div>
           <div class="phonics-actions">
             <button type="button" class="btn-with-icon" id="phonicsPlaySound" aria-label="Hear the sound" data-speak="Hear">
               <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
