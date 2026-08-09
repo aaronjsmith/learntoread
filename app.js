@@ -3685,22 +3685,44 @@
       els.pitchValue.textContent = els.pitchRange.value;
     });
 
-    els.activitySightWords.addEventListener("click", () => {
+    function openPhonicsActivity() {
+      showScreen("phonics");
+      updatePhonicsUI();
+    }
+
+    function openSightActivity() {
       showScreen("sight");
       updateSightWordUI();
+    }
+
+    function openStoriesActivity() {
+      showScreen("stories");
+      updateStoryLevelPickersUI();
+      updateStoriesListUI();
+    }
+
+    els.activitySightWords.addEventListener("click", () => {
+      openSightActivity();
     });
 
     els.activityPhonics.addEventListener("click", () => {
-      showScreen("phonics");
-      updatePhonicsUI();
+      openPhonicsActivity();
     });
 
     if (els.activityStories) {
       els.activityStories.addEventListener("click", () => {
-        showScreen("stories");
-        updateStoryLevelPickersUI();
-        updateStoriesListUI();
+        openStoriesActivity();
       });
+    }
+
+    if (els.homeOpenPhonics) {
+      els.homeOpenPhonics.addEventListener("click", () => openPhonicsActivity());
+    }
+    if (els.homeOpenSight) {
+      els.homeOpenSight.addEventListener("click", () => openSightActivity());
+    }
+    if (els.homeOpenStories) {
+      els.homeOpenStories.addEventListener("click", () => openStoriesActivity());
     }
 
     document.querySelectorAll(".story-level-picker").forEach((picker) => {
@@ -3936,6 +3958,9 @@
     els.activitySightWords = $("activitySightWords");
     els.activityPhonics = $("activityPhonics");
     els.activityStories = $("activityStories");
+    els.homeOpenPhonics = $("homeOpenPhonics");
+    els.homeOpenSight = $("homeOpenSight");
+    els.homeOpenStories = $("homeOpenStories");
     els.activityReportCard = $("activityReportCard");
     els.storiesReportText = $("storiesReportText");
     els.storiesProgressBar = $("storiesProgressBar");
