@@ -543,6 +543,21 @@
       min-width: 72px;
     }
 
+    .sight-toolbar--story {
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .sight-toolbar--story .story-page-nav {
+      margin: 0;
+      gap: 4px;
+    }
+
+    .sight-toolbar--story .story-actions {
+      margin: 0 0 0 auto;
+      gap: 4px;
+    }
+
     .word-stage {
       background: var(--surface);
       border-radius: calc(var(--radius) + 6px);
@@ -2417,40 +2432,38 @@
       font-weight: 800;
     }
 
-    .story-blend {
-      margin: 8px 0 10px;
-      padding: 10px 10px 12px;
-      border-radius: 16px;
-      background: linear-gradient(180deg, #fff 0%, #f3fffc 100%);
-      border: 3px solid var(--mint-soft);
-      box-shadow: 0 5px 0 rgba(62, 207, 190, 0.16);
-      flex-shrink: 0;
+    .modal--blend {
+      width: min(100%, 420px);
+      text-align: center;
     }
 
-    .story-blend[hidden] {
-      display: none !important;
+    .modal--blend .story-blend-word {
+      display: block;
+      width: 100%;
+      margin: 0 0 12px;
     }
 
-    .story-blend-head {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 8px;
+    .modal--blend .letter-row--story {
+      margin-bottom: 12px;
+    }
+
+    .modal--blend .scrub-wrap--story {
+      margin: 0 0 8px;
+      text-align: left;
     }
 
     .story-blend-word {
       font-family: var(--display);
-      font-size: clamp(1.4rem, 5vw, 1.9rem);
+      font-size: clamp(1.5rem, 5.5vw, 2rem);
       font-weight: 700;
       letter-spacing: 0.04em;
       margin: 0;
-      padding: 4px 10px;
-      min-height: 44px;
-      background: none;
-      border: none;
-      border-radius: 12px;
-      box-shadow: none;
+      padding: 6px 12px;
+      min-height: 48px;
+      background: linear-gradient(180deg, #fff 0%, #f3fffc 100%);
+      border: 3px solid var(--mint-soft);
+      border-radius: 14px;
+      box-shadow: 0 4px 0 rgba(62, 207, 190, 0.16);
       color: var(--ink);
       cursor: pointer;
     }
@@ -2463,6 +2476,7 @@
     .letter-row--story {
       margin-bottom: 10px;
       gap: 8px;
+      justify-content: center;
     }
 
     .scrub-wrap--story {
@@ -2487,6 +2501,8 @@
       -webkit-box-decoration-break: clone;
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
       transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
     }
 
@@ -2551,8 +2567,7 @@
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-top: 8px;
+      gap: 6px;
       flex-shrink: 0;
     }
 
@@ -2560,12 +2575,28 @@
       display: none !important;
     }
 
+    .icon-btn--story-nav {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 4px 8px;
+      gap: 1px;
+    }
+
+    .icon-btn--story-nav .btn-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .icon-btn--story-nav .btn-caption {
+      font-size: 0.62rem;
+    }
+
     .story-page-label {
       margin: 0;
-      min-width: 7.5rem;
+      min-width: 6.5rem;
       text-align: center;
       font-family: var(--display);
-      font-size: 1.05rem;
+      font-size: 0.9rem;
       font-weight: 700;
       color: var(--ink);
     }
@@ -2573,10 +2604,32 @@
     .story-actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       justify-content: center;
-      margin-top: 8px;
       flex-shrink: 0;
+    }
+
+    .story-action-btn {
+      min-height: 36px;
+      padding: 6px 12px;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      border-width: 2px;
+      box-shadow: 0 3px 0 rgba(240, 69, 106, 0.28);
+    }
+
+    .story-action-btn.secondary {
+      box-shadow: 0 3px 0 rgba(255, 107, 138, 0.16);
+    }
+
+    .story-action-btn .btn-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .story-action-btn[hidden],
+    button.story-action-btn[hidden] {
+      display: none !important;
     }
 
     .story-credit {
@@ -3212,7 +3265,7 @@
     </section>
 
     <section class="screen" data-screen="story" id="storyScreen" hidden>
-      <div class="sight-toolbar">
+      <div class="sight-toolbar sight-toolbar--story">
         <button type="button" class="secondary icon-btn icon-btn--wide" id="storyBackToList" aria-label="Back to stories" data-speak="Stories">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-prev"/></svg>
           <span class="btn-caption">Stories</span>
@@ -3221,6 +3274,31 @@
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-home"/></svg>
           <span class="btn-caption">Home</span>
         </button>
+        <div class="story-page-nav" id="storyPageNav" hidden>
+          <button type="button" class="secondary icon-btn icon-btn--story-nav" id="storyPrevPage" aria-label="Previous page" data-speak="Previous">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-prev"/></svg>
+            <span class="btn-caption">Prev</span>
+          </button>
+          <p class="story-page-label" id="storyPageLabel" aria-live="polite">Page 1 of 1</p>
+          <button type="button" class="icon-btn icon-btn--story-nav" id="storyNextPage" aria-label="Next page" data-speak="Next">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-next"/></svg>
+            <span class="btn-caption">Next</span>
+          </button>
+        </div>
+        <div class="story-actions">
+          <button type="button" class="btn-with-icon story-action-btn" id="storyReadAloud" aria-label="Read aloud" data-speak="Read aloud">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+            <span>Read aloud</span>
+          </button>
+          <button type="button" class="secondary btn-with-icon story-action-btn" id="storyStopRead" aria-label="Stop reading" data-speak="Stop" hidden>
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close"/></svg>
+            <span>Stop</span>
+          </button>
+          <button type="button" class="btn-with-icon story-action-btn" id="storyFinished" aria-label="I finished this story" data-speak="I finished">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>
+            <span>I finished!</span>
+          </button>
+        </div>
       </div>
       <article class="story-reader" id="storyReader">
         <div class="story-illustration-wrap">
@@ -3246,48 +3324,7 @@
           </button>
         </div>
         <div class="story-body" id="storyBody"></div>
-        <div class="story-blend" id="storyBlend" hidden>
-          <div class="story-blend-head">
-            <button type="button" class="story-blend-word" id="storyBlendWord" aria-label="Hear whole word">—</button>
-            <button type="button" class="speak-help-btn" id="storyBlendClose" title="Close" aria-label="Close letter sounds">
-              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close"/></svg>
-            </button>
-          </div>
-          <div class="letter-row letter-row--story" id="storyBlendLetters" role="group" aria-label="Letter sounds in the word"></div>
-          <div class="scrub-wrap scrub-wrap--story">
-            <div class="scrub-label-row">
-              <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-blend"/></svg>
-              <label for="storyBlendSlider">Blend the sounds (start left, then slide across each letter)</label>
-            </div>
-            <input type="range" id="storyBlendSlider" min="0" max="0" value="0" aria-label="Blend letter sounds — start before the first letter" />
-          </div>
-        </div>
         <p class="story-moral" id="storyMoral" hidden></p>
-        <div class="story-page-nav" id="storyPageNav" hidden>
-          <button type="button" class="secondary icon-btn icon-btn--wide" id="storyPrevPage" aria-label="Previous page" data-speak="Previous">
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-prev"/></svg>
-            <span class="btn-caption">Prev</span>
-          </button>
-          <p class="story-page-label" id="storyPageLabel" aria-live="polite">Page 1 of 1</p>
-          <button type="button" class="icon-btn icon-btn--wide" id="storyNextPage" aria-label="Next page" data-speak="Next">
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-next"/></svg>
-            <span class="btn-caption">Next</span>
-          </button>
-        </div>
-        <div class="story-actions">
-          <button type="button" class="btn-with-icon" id="storyReadAloud" aria-label="Read aloud" data-speak="Read aloud">
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
-            <span>Read aloud</span>
-          </button>
-          <button type="button" class="secondary btn-with-icon" id="storyStopRead" aria-label="Stop reading" data-speak="Stop" hidden>
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close"/></svg>
-            <span>Stop</span>
-          </button>
-          <button type="button" class="btn-with-icon" id="storyFinished" aria-label="I finished this story" data-speak="I finished">
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>
-            <span>I finished!</span>
-          </button>
-        </div>
         <p class="story-credit" id="storyCredit"></p>
       </article>
     </section>
@@ -3362,6 +3399,35 @@
         </button>
       </div>
       <input type="file" id="welcomeImportInput" class="sr-only" accept="application/json,.json" aria-hidden="true" tabindex="-1" />
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="storyBlendModal" role="dialog" aria-modal="true" aria-labelledby="storyBlendTitle" hidden>
+    <div class="modal modal--blend">
+      <div class="modal-ellie" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+      </div>
+      <div class="lead-row" style="align-items:center;margin-bottom:8px;">
+        <h2 id="storyBlendTitle" style="margin:0;flex:1;">Sound it out</h2>
+        <button type="button" class="speak-help-btn" id="storyBlendClose" title="Close" aria-label="Close letter sounds">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-close"/></svg>
+        </button>
+      </div>
+      <button type="button" class="story-blend-word" id="storyBlendWord" aria-label="Hear whole word">—</button>
+      <div class="letter-row letter-row--story" id="storyBlendLetters" role="group" aria-label="Letter sounds in the word"></div>
+      <div class="scrub-wrap scrub-wrap--story">
+        <div class="scrub-label-row">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-blend"/></svg>
+          <label for="storyBlendSlider">Blend the sounds (start left, then slide across each letter)</label>
+        </div>
+        <input type="range" id="storyBlendSlider" min="0" max="0" value="0" aria-label="Blend letter sounds — start before the first letter" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-with-icon" id="storyBlendDone" aria-label="Done" data-speak="Done">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>
+          <span>Done</span>
+        </button>
+      </div>
     </div>
   </div>
 

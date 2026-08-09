@@ -2077,8 +2077,35 @@
     speakText(String(entry.example).toLowerCase());
   }
 
+  const STORY_WORD_DOUBLE_MS = 320;
+  const STORY_WORD_LONG_MS = 480;
+  let storyWordClickTimer = null;
+  let storyWordLongTimer = null;
+  let storyWordIgnoreClick = false;
+
+  function speakStoryWordOnly(wordEl) {
+    const toSpeak = wordForSpeech(wordEl && wordEl.textContent);
+    if (!toSpeak) return;
+    if (storyReading) stopStoryReading({ skipRestore: true });
+    speakText(toSpeak);
+  }
+
+  function clearStoryWordLongPress() {
+    if (storyWordLongTimer) {
+      clearTimeout(storyWordLongTimer);
+      storyWordLongTimer = null;
+    }
+  }
+
+  function clearStoryWordClickDelay() {
+    if (storyWordClickTimer) {
+      clearTimeout(storyWordClickTimer);
+      storyWordClickTimer = null;
+    }
+  }
+
   function speakTappedStoryWord(wordEl) {
-    openStoryWordBlend(wordEl);
+    speakStoryWordOnly(wordEl);
   }
 
   function entryForStoryWord(rawWord) {
@@ -2089,21 +2116,11 @@
     return { word: key };
   }
 
-  function parkStoryBlendPanel() {
-    if (!els.storyBlend) return;
-    const host =
-      els.storyReader ||
-      (els.storyBody && els.storyBody.parentElement) ||
-      null;
-    if (host) host.appendChild(els.storyBlend);
-  }
-
   function hideStoryWordBlend() {
     storyBlendEntry = null;
     storyBlendScrubIndex = -1;
     storyBlendLastPhonemeIndex = -1;
-    if (els.storyBlend) els.storyBlend.hidden = true;
-    parkStoryBlendPanel();
+    if (els.storyBlendModal) els.storyBlendModal.hidden = true;
     document.querySelectorAll(".story-word.is-blend-target").forEach((el) => {
       el.classList.remove("is-blend-target");
     });
@@ -2128,7 +2145,13 @@
   }
 
   function renderStoryBlendUI(entry) {
-    if (!els.storyBlend || !els.storyBlendLetters || !els.storyBlendSlider) return;
+    if (
+      !els.storyBlendModal ||
+      !els.storyBlendLetters ||
+      !els.storyBlendSlider
+    ) {
+      return;
+    }
     const letters = lettersForEntry(entry);
     const wordDisplay = sightWordKey(entry.word) || "—";
     if (els.storyBlendWord) {
@@ -2165,12 +2188,12 @@
     storyBlendScrubIndex = -1;
     storyBlendLastPhonemeIndex = -1;
     setStoryBlendActiveLetter(-1);
-    els.storyBlend.hidden = false;
+    els.storyBlendModal.hidden = false;
   }
 
   function openStoryWordBlend(wordEl) {
     const toSpeak = wordForSpeech(wordEl && wordEl.textContent);
-    if (!toSpeak || !els.storyBlend) return;
+    if (!toSpeak || !els.storyBlendModal) return;
     if (storyReading) stopStoryReading({ skipRestore: true });
 
     document.querySelectorAll(".story-word.is-blend-target").forEach((el) => {
@@ -2180,11 +2203,6 @@
 
     const entry = entryForStoryWord(toSpeak);
     storyBlendEntry = entry;
-
-    const host = wordEl.closest("p") || wordEl.parentElement;
-    if (host && host.parentNode) {
-      host.after(els.storyBlend);
-    }
     renderStoryBlendUI(entry);
     speakText(toSpeak);
   }
@@ -4096,16 +4114,62 @@
       Boolean
     );
     storyWordRoots.forEach((root) => {
+      root.addEventListener("pointerdown", (e) => {
+        const wordEl = e.target.closest(".story-word");
+        if (!wordEl || !root.contains(wordEl)) return;
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        storyWordIgnoreClick = false;
+        clearStoryWordLongPress();
+        storyWordLongTimer = setTimeout(() => {
+          storyWordLongTimer = null;
+          storyWordIgnoreClick = true;
+          clearStoryWordClickDelay();
+          openStoryWordBlend(wordEl);
+        }, STORY_WORD_LONG_MS);
+      });
+      root.addEventListener("pointerup", clearStoryWordLongPress);
+      root.addEventListener("pointercancel", clearStoryWordLongPress);
       root.addEventListener("click", (e) => {
         const wordEl = e.target.closest(".story-word");
         if (!wordEl || !root.contains(wordEl)) return;
-        speakTappedStoryWord(wordEl);
+        if (storyWordIgnoreClick) {
+          storyWordIgnoreClick = false;
+          return;
+        }
+        clearStoryWordClickDelay();
+        storyWordClickTimer = setTimeout(() => {
+          storyWordClickTimer = null;
+          speakTappedStoryWord(wordEl);
+        }, STORY_WORD_DOUBLE_MS);
+      });
+      root.addEventListener("dblclick", (e) => {
+        const wordEl = e.target.closest(".story-word");
+        if (!wordEl || !root.contains(wordEl)) return;
+        clearStoryWordLongPress();
+        clearStoryWordClickDelay();
+        storyWordIgnoreClick = true;
+        openStoryWordBlend(wordEl);
+      });
+      root.addEventListener("contextmenu", (e) => {
+        const wordEl = e.target.closest(".story-word");
+        if (!wordEl || !root.contains(wordEl)) return;
+        e.preventDefault();
       });
     });
 
     if (els.storyBlendClose) {
       els.storyBlendClose.addEventListener("click", () => {
         hideStoryWordBlend();
+      });
+    }
+    if (els.storyBlendDone) {
+      els.storyBlendDone.addEventListener("click", () => {
+        hideStoryWordBlend();
+      });
+    }
+    if (els.storyBlendModal) {
+      els.storyBlendModal.addEventListener("click", (e) => {
+        if (e.target === els.storyBlendModal) hideStoryWordBlend();
       });
     }
     if (els.storyBlendWord) {
@@ -4339,9 +4403,10 @@
     els.storyTitle = $("storyTitle");
     els.storyMeta = $("storyMeta");
     els.storyBody = $("storyBody");
-    els.storyBlend = $("storyBlend");
+    els.storyBlendModal = $("storyBlendModal");
     els.storyBlendWord = $("storyBlendWord");
     els.storyBlendClose = $("storyBlendClose");
+    els.storyBlendDone = $("storyBlendDone");
     els.storyBlendLetters = $("storyBlendLetters");
     els.storyBlendSlider = $("storyBlendSlider");
     els.storyMoral = $("storyMoral");
