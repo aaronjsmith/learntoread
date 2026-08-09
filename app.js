@@ -264,6 +264,7 @@
   let sightWords = [];
   let stories = [];
   let activeStoryId = "";
+  let storyPageIndex = 0;
   let storyReading = false;
   let storyReadGen = 0;
   let storyKaraokeActiveEl = null;
@@ -273,6 +274,11 @@
   const STORY_LEVEL_SPEAK = {
     beginner: "Easy",
     advanced: "Longer",
+  };
+  /** Paragraphs per story page (Easy packs short lines; Longer packs denser ones). */
+  const STORY_PAGE_SIZE = {
+    beginner: 2,
+    advanced: 1,
   };
 
   const state = {
@@ -712,6 +718,7 @@
     updateStoryLevelPickersUI();
     if (changed && activeStoryId) {
       stopStoryReading();
+      storyPageIndex = 0;
       updateStoryReaderUI();
     }
     return next;
@@ -779,6 +786,86 @@
       paragraphs: paragraphs.map((p) => String(p || "").trim()).filter(Boolean),
       moral: String((pack && pack.moral) || story.moral || "").trim(),
     };
+  }
+
+  function storyPageSizeForLevel(level) {
+    const key = normalizeStoryLevel(level);
+    return Math.max(1, STORY_PAGE_SIZE[key] | 0);
+  }
+
+  function chunkStoryParagraphs(paragraphs, pageSize) {
+    const list = Array.isArray(paragraphs) ? paragraphs : [];
+    const size = Math.max(1, pageSize | 0);
+    const pages = [];
+    for (let i = 0; i < list.length; i += size) {
+      pages.push(list.slice(i, i + size));
+    }
+    if (!pages.length) pages.push([]);
+    return pages;
+  }
+
+  function getStoryPages(content) {
+    return chunkStoryParagraphs(
+      content && content.paragraphs,
+      storyPageSizeForLevel(content && content.level)
+    );
+  }
+
+  function clampStoryPageIndex(pageCount) {
+    const max = Math.max(0, (pageCount | 0) - 1);
+    if (!Number.isFinite(storyPageIndex) || storyPageIndex < 0) {
+      storyPageIndex = 0;
+    }
+    if (storyPageIndex > max) storyPageIndex = max;
+    return storyPageIndex;
+  }
+
+  /** Current page slice of a story level (moral only on the last page). */
+  function getStoryPageContent(content) {
+    const pages = getStoryPages(content);
+    clampStoryPageIndex(pages.length);
+    const isLast = storyPageIndex >= pages.length - 1;
+    return {
+      level: content.level,
+      title: content.title,
+      paragraphs: pages[storyPageIndex] || [],
+      moral: isLast ? content.moral : "",
+      pageIndex: storyPageIndex,
+      pageCount: pages.length,
+      isFirst: storyPageIndex <= 0,
+      isLast,
+    };
+  }
+
+  function updateStoryPageNavUI(page) {
+    if (!els.storyPageNav) return;
+    const count = (page && page.pageCount) | 0;
+    const show = count > 1;
+    els.storyPageNav.hidden = !show;
+    if (!show) return;
+    const idx = ((page && page.pageIndex) | 0) + 1;
+    if (els.storyPageLabel) {
+      els.storyPageLabel.textContent = `Page ${idx} of ${count}`;
+    }
+    if (els.storyPrevPage) {
+      els.storyPrevPage.disabled = !!(page && page.isFirst);
+    }
+    if (els.storyNextPage) {
+      els.storyNextPage.disabled = !!(page && page.isLast);
+    }
+  }
+
+  function goStoryPage(delta) {
+    const story = getStoryById(activeStoryId);
+    if (!story) return;
+    const content = getStoryLevelContent(story);
+    const pages = getStoryPages(content);
+    const next = (storyPageIndex | 0) + (delta | 0);
+    if (next < 0 || next >= pages.length) return;
+    stopStoryReading({ skipRestore: true });
+    storyPageIndex = next;
+    updateStoryReaderUI();
+    speakCue(delta < 0 ? "Previous" : "Next");
   }
 
   function countStoriesFinished() {
@@ -1821,7 +1908,7 @@
         const title = content.title || (story && story.title) || "This story";
         const levelName =
           STORY_LEVEL_SPEAK[content.level] || STORY_LEVEL_SPEAK.beginner;
-        return `${title}. ${levelName} level. Look at the picture. Tap Read aloud to listen. Tap I finished when you're done.`;
+        return `${title}. ${levelName} level. Turn the pages as you read. Look at the picture. Tap Read aloud to listen to this page. Tap I finished when you're done.`;
       }
       case "report":
         return "Report card. Here are your stars for letters, words, and stories.";
@@ -2129,7 +2216,9 @@
   function speakStoryAloud(story) {
     if (!story) return;
     const content = getStoryLevelContent(story);
-    const tracks = prepareStoryKaraoke(content);
+    const page = getStoryPageContent(content);
+    const tracks = prepareStoryKaraoke(page);
+    updateStoryPageNavUI(page);
     if (!tracks.length) return;
 
     storyReadGen += 1;
@@ -2313,6 +2402,7 @@
     const story = getStoryById(activeStoryId);
     if (!story) return;
     const content = getStoryLevelContent(story);
+    const page = getStoryPageContent(content);
     updateStoryLevelPickersUI();
 
     if (els.storyImage) {
@@ -2322,12 +2412,17 @@
     if (els.storyMeta) {
       const levelHint =
         content.level === "beginner" ? "Easy words" : "Longer story";
+      const pageHint =
+        page.pageCount > 1
+          ? ` · Page ${page.pageIndex + 1} of ${page.pageCount}`
+          : "";
       els.storyMeta.textContent = story.author
-        ? `A fable by ${story.author} · ${levelHint}`
-        : `A classic fable · ${levelHint}`;
+        ? `A fable by ${story.author} · ${levelHint}${pageHint}`
+        : `A classic fable · ${levelHint}${pageHint}`;
     }
     // Keep karaoke-ready word spans so tap-to-speak works in Easy + Longer.
-    prepareStoryKaraoke(content);
+    prepareStoryKaraoke(page);
+    updateStoryPageNavUI(page);
     if (els.storyCredit) {
       els.storyCredit.textContent =
         content.level === "beginner"
@@ -2347,6 +2442,7 @@
     const story = getStoryById(id);
     if (!story) return;
     activeStoryId = story.id;
+    storyPageIndex = 0;
     markStoryOpened(story.id);
     stopStoryReading();
     updateStoryReaderUI();
@@ -3701,13 +3797,17 @@
       updateStoriesListUI();
     }
 
-    els.activitySightWords.addEventListener("click", () => {
-      openSightActivity();
-    });
+    if (els.activitySightWords) {
+      els.activitySightWords.addEventListener("click", () => {
+        openSightActivity();
+      });
+    }
 
-    els.activityPhonics.addEventListener("click", () => {
-      openPhonicsActivity();
-    });
+    if (els.activityPhonics) {
+      els.activityPhonics.addEventListener("click", () => {
+        openPhonicsActivity();
+      });
+    }
 
     if (els.activityStories) {
       els.activityStories.addEventListener("click", () => {
@@ -3736,10 +3836,12 @@
       });
     });
 
-    els.activityReportCard.addEventListener("click", () => {
-      showScreen("report");
-      updateReportCardUI();
-    });
+    if (els.activityReportCard) {
+      els.activityReportCard.addEventListener("click", () => {
+        showScreen("report");
+        updateReportCardUI();
+      });
+    }
 
     if (els.storyBackToList) {
       els.storyBackToList.addEventListener("click", () => {
@@ -3755,6 +3857,13 @@
         const story = getStoryById(activeStoryId);
         if (story) speakStoryAloud(story);
       });
+    }
+
+    if (els.storyPrevPage) {
+      els.storyPrevPage.addEventListener("click", () => goStoryPage(-1));
+    }
+    if (els.storyNextPage) {
+      els.storyNextPage.addEventListener("click", () => goStoryPage(1));
     }
 
     const storyWordRoots = [els.storyTitle, els.storyBody, els.storyMoral].filter(
@@ -3974,6 +4083,10 @@
     els.storyMeta = $("storyMeta");
     els.storyBody = $("storyBody");
     els.storyMoral = $("storyMoral");
+    els.storyPageNav = $("storyPageNav");
+    els.storyPageLabel = $("storyPageLabel");
+    els.storyPrevPage = $("storyPrevPage");
+    els.storyNextPage = $("storyNextPage");
     els.storyReadAloud = $("storyReadAloud");
     els.storyStopRead = $("storyStopRead");
     els.storyFinished = $("storyFinished");
