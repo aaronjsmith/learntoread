@@ -200,6 +200,10 @@
   let voices = [];
   let filteredVoices = [];
   let sightWords = [];
+  let stories = [];
+  let activeStoryId = "";
+  let storyReading = false;
+  let storyReadGen = 0;
 
   const state = {
     userName: "",
@@ -208,6 +212,7 @@
     phonicsIndex: 0,
     phonicsMastery: {},
     sightMastery: {},
+    storiesProgress: {},
     region: "",
     onlineOnly: true,
     gender: "both",
@@ -288,23 +293,36 @@
 
   function countSightMastered() {
     if (!sightWords.length) return 0;
-    return sightWords.filter((w) => {
-      const key = String(w.word || "")
-        .trim()
-        .toLowerCase();
-      return key && state.sightMastery[key];
-    }).length;
+    return sightWords.filter((w) => isSightWordMastered(w.word)).length;
+  }
+
+  function getStoryProgress(id) {
+    const key = String(id || "").trim();
+    if (!key) return { opened: false, finished: false };
+    if (!state.storiesProgress[key] || typeof state.storiesProgress[key] !== "object") {
+      state.storiesProgress[key] = { opened: false, finished: false };
+    }
+    return state.storiesProgress[key];
+  }
+
+  function countStoriesFinished() {
+    if (!stories.length) return 0;
+    return stories.filter((s) => getStoryProgress(s.id).finished).length;
   }
 
   function sectionPercents() {
     const phonicsTotal = PHONICS_LETTERS.length || 1;
     const sightTotal = Math.max(1, sightWords.length);
+    const storiesTotal = Math.max(1, stories.length);
     const phonicsPct = Math.round(
       (countPhonicsMastered() / phonicsTotal) * 100
     );
     const sightPct = Math.round((countSightMastered() / sightTotal) * 100);
-    const overallPct = Math.round((phonicsPct + sightPct) / 2);
-    return { phonicsPct, sightPct, overallPct };
+    const storiesPct = Math.round(
+      (countStoriesFinished() / storiesTotal) * 100
+    );
+    const overallPct = Math.round((phonicsPct + sightPct + storiesPct) / 3);
+    return { phonicsPct, sightPct, storiesPct, overallPct };
   }
 
   function setProgressBar(barEl, fillEl, pct) {
@@ -314,9 +332,10 @@
   }
 
   function updateProgressUI() {
-    const { phonicsPct, sightPct, overallPct } = sectionPercents();
+    const { phonicsPct, sightPct, storiesPct, overallPct } = sectionPercents();
     const phonicsDone = countPhonicsMastered();
     const sightDone = countSightMastered();
+    const storiesDone = countStoriesFinished();
 
     if (els.overallProgressLabel) {
       els.overallProgressLabel.textContent = `${overallPct}%`;
@@ -328,6 +347,11 @@
     );
     setProgressBar(els.phonicsProgressBar, els.phonicsProgressFill, phonicsPct);
     setProgressBar(els.sightProgressBar, els.sightProgressFill, sightPct);
+    setProgressBar(
+      els.storiesProgressBar,
+      els.storiesProgressFill,
+      storiesPct
+    );
 
     if (els.phonicsReportText) {
       els.phonicsReportText.textContent = `${phonicsDone} of ${PHONICS_LETTERS.length} letter sounds mastered`;
@@ -335,18 +359,60 @@
     if (els.sightReportText) {
       els.sightReportText.textContent = `${sightDone} of ${sightWords.length} words mastered`;
     }
+    if (els.storiesReportText) {
+      els.storiesReportText.textContent = `${storiesDone} of ${stories.length} stories finished`;
+    }
   }
 
-  function markSightWordMastered(word) {
-    const key = String(word || "")
+  function sightWordKey(word) {
+    return String(word || "")
       .trim()
       .toLowerCase();
+  }
+
+  function isSightWordMastered(word) {
+    const key = sightWordKey(word);
+    return !!(key && state.sightMastery[key]);
+  }
+
+  /** Update word-stage mastery chrome without clearing mic heard text / status. */
+  function refreshSightWordMasteryUi() {
+    const entry = getWordEntry(state.sightWordIndex);
+    const key = sightWordKey(entry.word);
+    const mastered = isSightWordMastered(key);
+
+    if (els.sightWordTitle) {
+      els.sightWordTitle.classList.toggle("is-mastered", mastered);
+      if (key) {
+        els.sightWordTitle.setAttribute(
+          "aria-label",
+          mastered ? "Hear whole word (mastered)" : "Hear whole word"
+        );
+      }
+    }
+    if (!els.sightWordProgress) return;
+    if (!sightWords.length) {
+      els.sightWordProgress.textContent = "No words loaded";
+      return;
+    }
+    els.sightWordProgress.textContent = mastered
+      ? `Word ${state.sightWordIndex + 1} of ${sightWords.length} · Mastered!`
+      : `Word ${state.sightWordIndex + 1} of ${sightWords.length}`;
+  }
+
+  /**
+   * Sight-word mastery is mic-only: call only after a successful spoken match.
+   * Hearing the word, tapping letters, or phonics “I can say it!” must never grant this.
+   */
+  function markSightWordMastered(word) {
+    const key = sightWordKey(word);
     if (!key) return;
     if (!state.sightMastery[key]) {
       state.sightMastery[key] = true;
       persistProgress();
       updateProgressUI();
     }
+    refreshSightWordMasteryUi();
   }
 
   function bumpPhonics(id, field) {
@@ -359,13 +425,14 @@
 
   function buildProgressPayload() {
     return {
-      version: 2,
+      version: 3,
       savedAt: new Date().toISOString(),
       userName: state.userName,
       sightWordIndex: state.sightWordIndex,
       phonicsIndex: state.phonicsIndex,
       phonicsMastery: state.phonicsMastery,
       sightMastery: state.sightMastery,
+      storiesProgress: state.storiesProgress,
       voiceName: state.voiceName,
       region: state.region,
       onlineOnly: state.onlineOnly,
@@ -399,6 +466,7 @@
     state.phonicsIndex = 0;
     state.phonicsMastery = {};
     state.sightMastery = {};
+    state.storiesProgress = {};
     state.scrubIndex = 0;
     state.region = "";
     state.onlineOnly = true;
@@ -431,6 +499,9 @@
     }
     if (data.sightMastery && typeof data.sightMastery === "object") {
       state.sightMastery = { ...data.sightMastery };
+    }
+    if (data.storiesProgress && typeof data.storiesProgress === "object") {
+      state.storiesProgress = { ...data.storiesProgress };
     }
     if (data.voiceName != null) state.voiceName = String(data.voiceName);
     if (data.region != null) state.region = String(data.region);
@@ -849,17 +920,20 @@
 
   function speakText(text, opts) {
     const voice = getSelectedVoice();
-    if (!voice || !text) return;
+    if (!voice || !text) return null;
 
     stopPhonemeAudio();
-    speechSynthesis.cancel();
+    if (!(opts && opts.append)) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.voice = voice;
     u.rate = state.rate;
     u.pitch = state.pitch;
     if (opts && typeof opts.rate === "number") u.rate = opts.rate;
     if (opts && typeof opts.pitch === "number") u.pitch = opts.pitch;
+    if (opts && typeof opts.onend === "function") u.onend = opts.onend;
+    if (opts && typeof opts.onerror === "function") u.onerror = opts.onerror;
     speechSynthesis.speak(u);
+    return u;
   }
 
   /** Short spoken cue for icon-first controls (non-readers). */
@@ -896,6 +970,213 @@
     sightWords = DEFAULT_WORDS.slice();
   }
 
+  async function loadStoriesFromJson() {
+    try {
+      const res = await fetch("data/stories.json", { cache: "no-store" });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      const list = data.stories;
+      if (Array.isArray(list) && list.length) {
+        stories = list.filter((s) => s && s.id && s.title);
+        return;
+      }
+    } catch (_) {
+      /* offline / missing */
+    }
+    stories = [];
+  }
+
+  function getStoryById(id) {
+    const key = String(id || "").trim();
+    return stories.find((s) => s.id === key) || null;
+  }
+
+  function setStoryReadingUi(reading) {
+    storyReading = !!reading;
+    if (els.storyStopRead) els.storyStopRead.hidden = !storyReading;
+    if (els.storyReadAloud) {
+      els.storyReadAloud.disabled = storyReading;
+    }
+  }
+
+  function stopStoryReading() {
+    storyReadGen += 1;
+    storyReading = false;
+    try {
+      speechSynthesis.cancel();
+    } catch (_) {}
+    setStoryReadingUi(false);
+  }
+
+  function markStoryOpened(id) {
+    const rec = getStoryProgress(id);
+    if (!rec.opened) {
+      rec.opened = true;
+      persistProgress();
+      updateProgressUI();
+    }
+  }
+
+  function markStoryFinished(id) {
+    const rec = getStoryProgress(id);
+    const wasFinished = !!rec.finished;
+    rec.opened = true;
+    rec.finished = true;
+    if (!wasFinished) {
+      persistProgress();
+      updateProgressUI();
+      playFeedbackSfx("success");
+    }
+    updateStoriesListUI();
+    updateStoryReaderUI();
+  }
+
+  function speakStoryAloud(story) {
+    if (!story) return;
+    const chunks = [];
+    if (story.title) chunks.push(String(story.title));
+    const paras = Array.isArray(story.paragraphs) ? story.paragraphs : [];
+    for (const p of paras) {
+      const line = String(p || "").trim();
+      if (line) chunks.push(line);
+    }
+    if (story.moral) chunks.push(`The lesson: ${String(story.moral)}`);
+    if (!chunks.length) return;
+
+    storyReadGen += 1;
+    const token = storyReadGen;
+    try {
+      speechSynthesis.cancel();
+    } catch (_) {}
+    setStoryReadingUi(true);
+    let i = 0;
+    const speakNext = () => {
+      if (token !== storyReadGen) return;
+      if (i >= chunks.length) {
+        setStoryReadingUi(false);
+        return;
+      }
+      const text = chunks[i++];
+      const utterance = speakText(text, {
+        append: i > 1,
+        onend: () => {
+          if (token !== storyReadGen) return;
+          speakNext();
+        },
+        onerror: (ev) => {
+          if (token !== storyReadGen) return;
+          if (ev && ev.error === "interrupted") return;
+          setStoryReadingUi(false);
+        },
+      });
+      if (!utterance) setStoryReadingUi(false);
+    };
+    speakNext();
+  }
+
+  function updateStoriesListUI() {
+    if (!els.storiesList) return;
+    els.storiesList.innerHTML = "";
+    if (!stories.length) {
+      const empty = document.createElement("p");
+      empty.className = "lead";
+      empty.textContent = "Stories could not be loaded.";
+      els.storiesList.appendChild(empty);
+      return;
+    }
+    stories.forEach((story) => {
+      const prog = getStoryProgress(story.id);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "story-card" + (prog.finished ? " is-finished" : "");
+      btn.setAttribute("role", "listitem");
+      btn.setAttribute("aria-label", story.title);
+      btn.dataset.speak = story.title;
+
+      const img = document.createElement("img");
+      img.className = "story-card-thumb";
+      img.src = story.image || "";
+      img.alt = story.imageAlt || story.title;
+      img.loading = "lazy";
+
+      const text = document.createElement("div");
+      const h3 = document.createElement("h3");
+      h3.textContent = story.title;
+      const p = document.createElement("p");
+      p.textContent = story.blurb || "A short tale to read with Ellie.";
+      text.appendChild(h3);
+      text.appendChild(p);
+      if (prog.finished) {
+        const badge = document.createElement("span");
+        badge.className = "story-card-badge";
+        badge.textContent = "Finished!";
+        text.appendChild(badge);
+      }
+
+      btn.appendChild(img);
+      btn.appendChild(text);
+      btn.addEventListener("click", () => {
+        speakCue(story.title);
+        openStory(story.id);
+      });
+      els.storiesList.appendChild(btn);
+    });
+  }
+
+  function updateStoryReaderUI() {
+    const story = getStoryById(activeStoryId);
+    if (!story) return;
+
+    if (els.storyImage) {
+      els.storyImage.src = story.image || "";
+      els.storyImage.alt = story.imageAlt || story.title;
+    }
+    if (els.storyTitle) els.storyTitle.textContent = story.title;
+    if (els.storyMeta) {
+      els.storyMeta.textContent = story.author
+        ? `A fable by ${story.author}`
+        : "A classic fable";
+    }
+    if (els.storyBody) {
+      els.storyBody.innerHTML = "";
+      const paras = Array.isArray(story.paragraphs) ? story.paragraphs : [];
+      paras.forEach((line) => {
+        const p = document.createElement("p");
+        p.textContent = line;
+        els.storyBody.appendChild(p);
+      });
+    }
+    if (els.storyMoral) {
+      if (story.moral) {
+        els.storyMoral.hidden = false;
+        els.storyMoral.textContent = `Lesson: ${story.moral}`;
+      } else {
+        els.storyMoral.hidden = true;
+        els.storyMoral.textContent = "";
+      }
+    }
+    if (els.storyCredit) {
+      els.storyCredit.textContent =
+        "Public-domain text adapted from The Æsop for Children (1919). Illustration by Milo Winter via Project Gutenberg / Wikimedia Commons.";
+    }
+    if (els.storyFinished) {
+      const finished = getStoryProgress(story.id).finished;
+      els.storyFinished.disabled = finished;
+      const label = els.storyFinished.querySelector("span:last-child");
+      if (label) label.textContent = finished ? "Finished!" : "I finished!";
+    }
+  }
+
+  function openStory(id) {
+    const story = getStoryById(id);
+    if (!story) return;
+    activeStoryId = story.id;
+    markStoryOpened(story.id);
+    stopStoryReading();
+    updateStoryReaderUI();
+    showScreen("story");
+  }
+
   function clampWordIndex() {
     if (sightWords.length && state.sightWordIndex >= sightWords.length) {
       state.sightWordIndex = sightWords.length - 1;
@@ -908,6 +1189,7 @@
       phonicsQuizMode = false;
       phonicsListenMode = false;
     }
+    if (name !== "story") stopStoryReading();
     document.querySelectorAll("[data-screen]").forEach((el) => {
       el.hidden = el.getAttribute("data-screen") !== name;
     });
@@ -1144,7 +1426,10 @@
     setSayWordListeningUi(true);
     setSayWordStatus("Listening… say the word clearly.", "listening");
 
+    let matchSettled = false;
     recognition.onresult = (event) => {
+      if (matchSettled) return;
+
       const display = getRecognitionDisplayText(event);
       if (display) {
         setHeardText(els.sayWordHeard, display, { listening: true });
@@ -1160,8 +1445,12 @@
       }
 
       if (matched) {
+        matchSettled = true;
         setSayWordStatus("Yay! Ellie heard it — you got it!", "success");
         markSightWordMastered(target);
+        try {
+          recognition.stop();
+        } catch (_) {}
       } else if (best) {
         setSayWordStatus(`Ellie heard “${best}”. Try again!`, "miss");
       } else {
@@ -1460,12 +1749,12 @@
   }
 
   function updateReportCardUI() {
-    const { overallPct, phonicsPct, sightPct } = sectionPercents();
+    const { overallPct, phonicsPct, sightPct, storiesPct } = sectionPercents();
     const grade = gradeFromPercent(overallPct);
     if (els.reportGradeBadge) els.reportGradeBadge.textContent = grade.letter;
     if (els.reportGradeTitle) els.reportGradeTitle.textContent = grade.title;
     if (els.reportGradeSummary) {
-      els.reportGradeSummary.textContent = `Overall ${overallPct}% · Phonics ${phonicsPct}% · Sight words ${sightPct}%`;
+      els.reportGradeSummary.textContent = `Overall ${overallPct}% · Phonics ${phonicsPct}% · Sight words ${sightPct}% · Stories ${storiesPct}%`;
     }
 
     if (els.reportLetterGrid) {
@@ -1483,14 +1772,22 @@
     if (els.reportWordList) {
       els.reportWordList.innerHTML = "";
       sightWords.forEach((w) => {
-        const key = String(w.word || "")
-          .trim()
-          .toLowerCase();
+        const key = sightWordKey(w.word);
         if (!key) return;
         const li = document.createElement("li");
         li.textContent = key;
-        if (state.sightMastery[key]) li.classList.add("is-mastered");
+        if (isSightWordMastered(key)) li.classList.add("is-mastered");
         els.reportWordList.appendChild(li);
+      });
+    }
+
+    if (els.reportStoryList) {
+      els.reportStoryList.innerHTML = "";
+      stories.forEach((story) => {
+        const li = document.createElement("li");
+        li.textContent = story.title;
+        if (getStoryProgress(story.id).finished) li.classList.add("is-mastered");
+        els.reportStoryList.appendChild(li);
       });
     }
   }
@@ -1509,12 +1806,10 @@
   function updateSightWordUI() {
     const entry = getWordEntry(state.sightWordIndex);
     const letters = lettersForEntry(entry);
-    const wordDisplay = (entry.word || "").toLowerCase();
+    const wordDisplay = sightWordKey(entry.word);
 
     els.sightWordTitle.textContent = wordDisplay || "—";
-    els.sightWordProgress.textContent = sightWords.length
-      ? `Word ${state.sightWordIndex + 1} of ${sightWords.length}`
-      : "No words loaded";
+    refreshSightWordMasteryUi();
 
     els.letterRow.innerHTML = "";
     letters.forEach((ch, idx) => {
@@ -1707,16 +2002,56 @@
       updatePhonicsUI();
     });
 
+    if (els.activityStories) {
+      els.activityStories.addEventListener("click", () => {
+        speakCue("Stories");
+        showScreen("stories");
+        updateStoriesListUI();
+      });
+    }
+
     els.activityReportCard.addEventListener("click", () => {
       speakCue("Report card");
       showScreen("report");
       updateReportCardUI();
     });
 
+    if (els.storyBackToList) {
+      els.storyBackToList.addEventListener("click", () => {
+        speakCue("Stories");
+        stopStoryReading();
+        showScreen("stories");
+        updateStoriesListUI();
+      });
+    }
+
+    if (els.storyReadAloud) {
+      els.storyReadAloud.addEventListener("click", () => {
+        const story = getStoryById(activeStoryId);
+        if (story) speakStoryAloud(story);
+      });
+    }
+
+    if (els.storyStopRead) {
+      els.storyStopRead.addEventListener("click", () => {
+        stopStoryReading();
+        speakCue("Stop");
+      });
+    }
+
+    if (els.storyFinished) {
+      els.storyFinished.addEventListener("click", () => {
+        if (!activeStoryId) return;
+        speakCue("I finished");
+        markStoryFinished(activeStoryId);
+      });
+    }
+
     document.querySelectorAll(".js-back-home").forEach((btn) => {
       btn.addEventListener("click", () => {
         speakCue("Home");
         stopSayWordListening();
+        stopStoryReading();
         showScreen("home");
         updateProgressUI();
       });
@@ -1824,7 +2159,23 @@
     els.pitchValue = $("pitchValue");
     els.activitySightWords = $("activitySightWords");
     els.activityPhonics = $("activityPhonics");
+    els.activityStories = $("activityStories");
     els.activityReportCard = $("activityReportCard");
+    els.storiesReportText = $("storiesReportText");
+    els.storiesProgressBar = $("storiesProgressBar");
+    els.storiesProgressFill = $("storiesProgressFill");
+    els.storiesList = $("storiesList");
+    els.storyBackToList = $("storyBackToList");
+    els.storyImage = $("storyImage");
+    els.storyTitle = $("storyTitle");
+    els.storyMeta = $("storyMeta");
+    els.storyBody = $("storyBody");
+    els.storyMoral = $("storyMoral");
+    els.storyReadAloud = $("storyReadAloud");
+    els.storyStopRead = $("storyStopRead");
+    els.storyFinished = $("storyFinished");
+    els.storyCredit = $("storyCredit");
+    els.reportStoryList = $("reportStoryList");
     els.sightScreen = $("sightScreen");
     els.sightWordTitle = $("sightWordTitle");
     els.sightWordProgress = $("sightWordProgress");
@@ -1880,6 +2231,7 @@
     bindEvents();
 
     await loadWordsFromJson();
+    await loadStoriesFromJson();
     clampWordIndex();
     preloadPhonemeAudio();
 
