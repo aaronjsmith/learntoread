@@ -1,6 +1,6 @@
 # Stories — attribution
 
-All story texts and illustrations in this folder are from public-domain sources suitable for free reuse in the United States.
+Story texts and cover illustrations in this folder are from public-domain sources suitable for free reuse in the United States. Per-page scene pictures are original illustrations created for Ellie Reads.
 
 ## Texts
 
@@ -11,7 +11,7 @@ Short early-reader retellings of traditional Aesop fables, adapted for young chi
 
 Adaptations simplify wording for early readers while preserving the classic plots and morals. Project Gutenberg license notice (normative): this ebook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever; you may copy, give it away, or re-use it under the terms of the [Project Gutenberg License](https://www.gutenberg.org/license).
 
-## Illustrations
+## Cover illustrations (story list thumbs)
 
 Color illustrations by **Milo Winter** from *The Æsop for Children* (Rand McNally, 1919), via Project Gutenberg ebook #19994 and Wikimedia Commons (public domain in the United States; published before 1929).
 
@@ -24,3 +24,15 @@ Color illustrations by **Milo Winter** from *The Æsop for Children* (Rand McNal
 | `boy-wolf.jpg` | The Boy Who Cried Wolf | [File:The Boy Who Cried Wolf - Project Gutenberg etext 19994.jpg](https://commons.wikimedia.org/wiki/File:The_Boy_Who_Cried_Wolf_-_Project_Gutenberg_etext_19994.jpg) |
 
 Artist: Milo Winter (1886–1956). These images are public-domain scans of a 1919 U.S. publication.
+
+## Per-page scene pictures
+
+Original kid-friendly storybook illustrations for each story page live in:
+
+- `tortoise-hare/p01.jpg` … `p04.jpg`
+- `lion-mouse/p01.jpg` … `p04.jpg`
+- `fox-grapes/p01.jpg` … `p04.jpg`
+- `ant-grasshopper/p01.jpg` … `p04.jpg`
+- `boy-wolf/p01.jpg` … `p04.jpg`
+
+Created for Ellie Reads page-by-page reading (not from Milo Winter plates).

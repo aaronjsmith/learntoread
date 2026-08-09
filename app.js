@@ -743,7 +743,7 @@
 
   /**
    * Resolve display/read-aloud text for the active (or given) reading level.
-   * Supports leveled `levels` data and legacy flat `paragraphs`.
+   * Supports leveled `pages`, `levels` packs, and legacy flat `paragraphs`.
    */
   function getStoryLevelContent(story, level) {
     if (!story) {
@@ -752,10 +752,12 @@
         title: "",
         paragraphs: [],
         moral: "",
+        pages: [],
       };
     }
     const lvl = normalizeStoryLevel(level || getStoryReadingLevel());
-    const levels = story.levels && typeof story.levels === "object" ? story.levels : null;
+    const levels =
+      story.levels && typeof story.levels === "object" ? story.levels : null;
     const pack =
       (levels && levels[lvl] && typeof levels[lvl] === "object" && levels[lvl]) ||
       (levels &&
@@ -768,24 +770,88 @@
         levels.advanced) ||
       null;
 
-    const paragraphs = Array.isArray(pack && pack.paragraphs)
-      ? pack.paragraphs
-      : Array.isArray(story.paragraphs)
-        ? story.paragraphs
-        : [];
+    const resolvedLevel = pack
+      ? levels && levels[lvl]
+        ? lvl
+        : levels && levels.beginner
+          ? "beginner"
+          : "advanced"
+      : "advanced";
+
+    const title = String(
+      (pack && pack.title) || story.title || ""
+    ).trim();
+    const moral = String(
+      (pack && pack.moral) || story.moral || ""
+    ).trim();
+
+    const explicitPages = buildStoryPages(story, resolvedLevel);
+    const paragraphs = explicitPages.length
+      ? explicitPages.flatMap((p) => p.paragraphs)
+      : (Array.isArray(pack && pack.paragraphs)
+          ? pack.paragraphs
+          : Array.isArray(story.paragraphs)
+            ? story.paragraphs
+            : []
+        )
+          .map((p) => String(p || "").trim())
+          .filter(Boolean);
 
     return {
-      level: pack
-        ? levels && levels[lvl]
-          ? lvl
-          : levels && levels.beginner
-            ? "beginner"
-            : "advanced"
-        : "advanced",
-      title: String((pack && pack.title) || story.title || "").trim(),
-      paragraphs: paragraphs.map((p) => String(p || "").trim()).filter(Boolean),
-      moral: String((pack && pack.moral) || story.moral || "").trim(),
+      level: resolvedLevel,
+      title,
+      paragraphs,
+      moral,
+      pages: explicitPages,
+      coverImage: String(story.image || "").trim(),
+      coverImageAlt: String(story.imageAlt || "").trim(),
     };
+  }
+
+  function normalizePageParagraphs(raw) {
+    if (!Array.isArray(raw)) return [];
+    return raw.map((p) => String(p || "").trim()).filter(Boolean);
+  }
+
+  /** Prefer explicit story.pages; otherwise chunk legacy paragraphs. */
+  function buildStoryPages(story, level) {
+    const lvl = normalizeStoryLevel(level);
+    const cover = String((story && story.image) || "").trim();
+    const coverAlt = String((story && story.imageAlt) || "").trim();
+
+    if (story && Array.isArray(story.pages) && story.pages.length) {
+      return story.pages.map((page) => {
+        const paras =
+          normalizePageParagraphs(page && page[lvl]).length
+            ? normalizePageParagraphs(page[lvl])
+            : normalizePageParagraphs(page && page.beginner);
+        return {
+          paragraphs: paras,
+          image: String((page && page.image) || cover).trim(),
+          imageAlt: String((page && page.imageAlt) || coverAlt).trim(),
+        };
+      });
+    }
+
+    const levels =
+      story && story.levels && typeof story.levels === "object"
+        ? story.levels
+        : null;
+    const pack =
+      (levels && levels[lvl]) ||
+      (levels && levels.beginner) ||
+      null;
+    const paragraphs = normalizePageParagraphs(
+      (pack && pack.paragraphs) || (story && story.paragraphs)
+    );
+    return chunkStoryParagraphs(
+      paragraphs,
+      storyPageSizeForLevel(lvl)
+    ).map((paras) => ({
+      paragraphs: paras,
+      image: cover,
+      imageAlt: coverAlt,
+    }));
   }
 
   function storyPageSizeForLevel(level) {
@@ -805,10 +871,17 @@
   }
 
   function getStoryPages(content) {
+    if (content && Array.isArray(content.pages) && content.pages.length) {
+      return content.pages;
+    }
     return chunkStoryParagraphs(
       content && content.paragraphs,
       storyPageSizeForLevel(content && content.level)
-    );
+    ).map((paras) => ({
+      paragraphs: paras,
+      image: String((content && content.coverImage) || "").trim(),
+      imageAlt: String((content && content.coverImageAlt) || "").trim(),
+    }));
   }
 
   function clampStoryPageIndex(pageCount) {
@@ -824,12 +897,26 @@
   function getStoryPageContent(content) {
     const pages = getStoryPages(content);
     clampStoryPageIndex(pages.length);
+    const current = pages[storyPageIndex] || {
+      paragraphs: [],
+      image: "",
+      imageAlt: "",
+    };
     const isLast = storyPageIndex >= pages.length - 1;
     return {
       level: content.level,
       title: content.title,
-      paragraphs: pages[storyPageIndex] || [],
+      paragraphs: current.paragraphs || [],
       moral: isLast ? content.moral : "",
+      image:
+        current.image ||
+        (content && content.coverImage) ||
+        "",
+      imageAlt:
+        current.imageAlt ||
+        (content && content.coverImageAlt) ||
+        content.title ||
+        "",
       pageIndex: storyPageIndex,
       pageCount: pages.length,
       isFirst: storyPageIndex <= 0,
@@ -2406,8 +2493,14 @@
     updateStoryLevelPickersUI();
 
     if (els.storyImage) {
-      els.storyImage.src = story.image || "";
-      els.storyImage.alt = story.imageAlt || content.title || story.title;
+      const src = page.image || story.image || "";
+      els.storyImage.src = src;
+      els.storyImage.alt =
+        page.imageAlt || story.imageAlt || content.title || story.title || "";
+      if (els.storyImage.closest) {
+        const wrap = els.storyImage.closest(".story-illustration-wrap");
+        if (wrap) wrap.hidden = !src;
+      }
     }
     if (els.storyMeta) {
       const levelHint =
