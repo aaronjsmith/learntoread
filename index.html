@@ -1074,6 +1074,236 @@
       color: var(--miss);
     }
 
+    .modal--wide {
+      width: min(100%, 540px);
+      max-height: min(92dvh, 720px);
+      overflow: auto;
+    }
+
+    .profile-picker-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin: 4px 0 14px;
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      min-height: 72px;
+      padding: 12px 16px;
+      border-radius: 20px;
+      background: #fffafb;
+      color: var(--ink);
+      border: 3px solid var(--accent-soft);
+      box-shadow: 0 4px 0 rgba(42, 53, 80, 0.08);
+      text-align: left;
+      font-weight: 800;
+    }
+
+    .profile-card:hover {
+      background: var(--accent-soft);
+    }
+
+    .profile-card.is-active {
+      border-color: var(--accent);
+      background: linear-gradient(180deg, #fff 0%, var(--accent-soft) 160%);
+      box-shadow: 0 4px 0 rgba(240, 69, 106, 0.28);
+    }
+
+    .profile-card-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-family: var(--display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+      box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    .profile-card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .profile-card-name {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      line-height: 1.2;
+    }
+
+    .profile-card-level {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .profile-card-delete {
+      flex-shrink: 0;
+      min-width: 48px;
+      min-height: 48px;
+      padding: 8px;
+      border-radius: 16px;
+      background: #ffe8dc;
+      color: var(--ink);
+      border: 3px solid #ffd0b8;
+      box-shadow: 0 3px 0 rgba(255, 138, 61, 0.35);
+    }
+
+    .profile-card-delete:hover {
+      background: #ffdcc8;
+    }
+
+    .profile-manage-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .profile-manage-actions button {
+      flex: 1 1 auto;
+    }
+
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 4px 0 16px;
+    }
+
+    .grade-grid button,
+    .age-band-row button,
+    .ellie-color-row button {
+      font-family: var(--display);
+      font-weight: 700;
+      min-height: 64px;
+      padding: 12px 8px;
+      border-radius: 18px;
+      background: var(--mint-soft);
+      color: var(--ink);
+      border: 3px solid #b8ebe3;
+      box-shadow: 0 4px 0 rgba(62, 207, 190, 0.35);
+    }
+
+    .grade-grid button:hover,
+    .age-band-row button:hover {
+      background: #c5f3ec;
+    }
+
+    .grade-grid button.is-selected,
+    .age-band-row button.is-selected,
+    .ellie-color-row button.is-selected {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent-dark);
+      box-shadow: 0 4px 0 rgba(240, 69, 106, 0.35);
+    }
+
+    .grade-grid .grade-label {
+      display: block;
+      font-size: 1.35rem;
+      line-height: 1.1;
+    }
+
+    .grade-grid .grade-sub {
+      display: block;
+      font-family: var(--font);
+      font-size: 0.72rem;
+      font-weight: 700;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .age-band-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 4px 0 16px;
+    }
+
+    .age-band-row button {
+      background: var(--sun-soft);
+      border-color: #ffe8c2;
+      box-shadow: 0 4px 0 rgba(255, 201, 74, 0.4);
+      font-size: 1.05rem;
+    }
+
+    .ellie-color-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin: 4px 0 8px;
+    }
+
+    .ellie-color-row button {
+      width: 56px;
+      height: 56px;
+      min-width: 56px;
+      min-height: 56px;
+      padding: 0;
+      border-radius: 50%;
+      border: 3px solid rgba(42, 53, 80, 0.12);
+      box-shadow: 0 4px 0 rgba(42, 53, 80, 0.12);
+      background: var(--swatch, var(--accent));
+    }
+
+    .ellie-color-row button.is-selected {
+      outline: 3px solid var(--ink);
+      outline-offset: 2px;
+      box-shadow: 0 4px 0 rgba(42, 53, 80, 0.2);
+    }
+
+    .onboarding-section-label {
+      margin: 10px 0 8px;
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent-dark);
+      text-align: center;
+    }
+
+    body.ellie-theme-mint {
+      --accent: #3ecfbe;
+      --accent-dark: #2ab3a3;
+      --accent-soft: #d5f7f2;
+    }
+
+    body.ellie-theme-sky {
+      --accent: #6bb7ff;
+      --accent-dark: #4a9aef;
+      --accent-soft: #d9ecff;
+    }
+
+    body.ellie-theme-sun {
+      --accent: #ffc94a;
+      --accent-dark: #e6a820;
+      --accent-soft: #fff0c2;
+    }
+
+    body.ellie-theme-grape {
+      --accent: #a78bfa;
+      --accent-dark: #7c5ce0;
+      --accent-soft: #ede9fe;
+    }
+
+    body.ellie-theme-coral {
+      --accent: #ff8a6a;
+      --accent-dark: #e86a48;
+      --accent-soft: #ffe4db;
+    }
+
     .settings-section-label {
       margin: 6px 0 0;
       font-family: var(--display);
@@ -1432,12 +1662,34 @@
       display: grid;
       gap: 4px;
       justify-items: center;
+      width: 100%;
       margin: 10px 0 16px;
-      padding: 12px 14px 14px;
+      padding: 14px 16px 16px;
+      min-height: calc(var(--touch-min) + 2.5rem);
       border-radius: 18px;
       background: linear-gradient(180deg, var(--sun-soft) 0%, #fff8e8 100%);
       border: 2px solid rgba(255, 201, 74, 0.55);
       box-shadow: 0 4px 0 rgba(255, 201, 74, 0.18);
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+    }
+
+    .phonics-cue:hover {
+      border-color: rgba(255, 201, 74, 0.9);
+      box-shadow: 0 5px 0 rgba(255, 201, 74, 0.28);
+    }
+
+    .phonics-cue:active {
+      transform: translateY(2px) scale(0.985);
+      box-shadow: 0 2px 0 rgba(255, 201, 74, 0.18);
+    }
+
+    .phonics-cue:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
     }
 
     .phonics-emoji {
@@ -1445,6 +1697,7 @@
       font-size: clamp(3.4rem, 16vw, 5rem);
       line-height: 1;
       filter: drop-shadow(0 3px 0 rgba(42, 53, 80, 0.08));
+      pointer-events: none;
     }
 
     .phonics-emoji[hidden] {
@@ -1462,6 +1715,7 @@
       font-weight: 800;
       color: var(--muted);
       font-size: 1.05rem;
+      pointer-events: none;
     }
 
     .phonics-actions {
@@ -1728,12 +1982,29 @@
     }
 
     .story-word {
-      border-radius: 0.35em;
-      padding: 0.05em 0.12em;
-      margin: 0 -0.04em;
+      border-radius: 0.4em;
+      padding: 0.18em 0.22em;
+      margin: 0.06em 0.02em;
+      display: inline-block;
       box-decoration-break: clone;
       -webkit-box-decoration-break: clone;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
       transition: background-color 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .story-word:hover {
+      background: var(--sun-soft);
+    }
+
+    .story-word:active {
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+    }
+
+    .story-body.is-beginner .story-word {
+      padding: 0.22em 0.28em;
+      margin: 0.1em 0.04em;
     }
 
     .story-word.is-reading {
@@ -1757,6 +2028,10 @@
 
     @media (prefers-reduced-motion: reduce) {
       .story-word {
+        transition: none;
+      }
+
+      .phonics-cue {
         transition: none;
       }
     }
@@ -2115,6 +2390,19 @@
       <circle cx="12" cy="12" r="3"/>
       <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6z"/>
     </symbol>
+
+    <symbol id="icon-who" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="9" cy="9" r="3.2"/>
+      <circle cx="16.5" cy="10.5" r="2.6"/>
+      <path d="M3.5 19c.6-2.8 2.8-4.2 5.5-4.2S14 16.2 14.6 19"/>
+      <path d="M14.2 19c.35-1.7 1.6-2.7 3.3-2.7 1.5 0 2.7.9 3.1 2.4"/>
+    </symbol>
+
+    <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 7h14"/>
+      <path d="M9 7V5h6v2"/>
+      <path d="M8 7l1 12h6l1-12"/>
+    </symbol>
   </svg>
 
   <header class="app-header">
@@ -2126,6 +2414,10 @@
         <h1>Ellie Reads</h1>
       </div>
       <div class="header-actions">
+        <button type="button" class="icon-btn" id="openProfiles" title="Who’s reading?" aria-label="Who’s reading?" data-speak="Who’s reading">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-who"/></svg>
+          <span class="btn-caption" id="openProfilesCaption">Who?</span>
+        </button>
         <button type="button" class="icon-btn icon-btn--google" id="cloudAuthBtn" hidden title="Sign in with Google to sync progress" aria-label="Sign in with Google" data-speak="Google">
           <svg class="btn-icon btn-icon--google" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-google"/></svg>
           <span class="btn-caption" id="cloudAuthCaption">Google</span>
@@ -2261,10 +2553,10 @@
             <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
           </div>
           <p class="phonics-letter-big" id="phonicsLetterBig">A</p>
-          <div class="phonics-cue">
-            <p class="phonics-emoji" id="phonicsEmoji" aria-hidden="true">🍎</p>
-            <p class="phonics-example" id="phonicsExample">as in apple</p>
-          </div>
+          <button type="button" class="phonics-cue" id="phonicsCue" aria-label="Hear apple">
+            <span class="phonics-emoji" id="phonicsEmoji" aria-hidden="true">🍎</span>
+            <span class="phonics-example" id="phonicsExample">as in apple</span>
+          </button>
           <div class="phonics-actions">
             <button type="button" class="btn-with-icon" id="phonicsPlaySound" aria-label="Hear the sound" data-speak="Hear">
               <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
@@ -2539,19 +2831,74 @@
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
         </button>
       </div>
-      <p>Ellie loves saying hello! Your name stays on this device, and is used in the suggested filename if you export a JSON backup.</p>
+      <p>Ellie loves saying hello! Each reader on this device gets their own name and progress.</p>
       <form id="nameForm">
         <div class="field">
           <label for="nameInput">Your name</label>
           <input type="text" id="nameInput" name="name" autocomplete="given-name" maxlength="40" required />
         </div>
         <div class="modal-actions">
-          <button type="submit" class="btn-with-icon" aria-label="Let’s read" data-speak="Let’s read">
-            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-spark"/></svg>
-            <span>Let’s read!</span>
+          <button type="submit" class="btn-with-icon" aria-label="Next" data-speak="Next">
+            <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-next"/></svg>
+            <span>Next</span>
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="levelModal" role="dialog" aria-modal="true" aria-labelledby="levelTitle" hidden>
+    <div class="modal modal--wide">
+      <div class="modal-ellie" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+      </div>
+      <div class="lead-row" style="align-items:center;margin-bottom:10px;">
+        <h2 id="levelTitle" style="margin:0;flex:1;">Grade or age?</h2>
+        <button type="button" class="speak-help-btn" data-speak-help="level" title="Hear instructions" aria-label="Hear grade instructions">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+        </button>
+      </div>
+      <p id="levelLead">Grown-ups: tap a school grade (K–12) or an age band. Ellie will pick Easy or Longer stories to start.</p>
+      <p class="onboarding-section-label">School grade</p>
+      <div class="grade-grid" id="gradeGrid" role="group" aria-label="Choose grade K through 12"></div>
+      <p class="onboarding-section-label">Or age</p>
+      <div class="age-band-row" id="ageBandRow" role="group" aria-label="Choose an age band"></div>
+      <p class="onboarding-section-label">Ellie color (optional)</p>
+      <div class="ellie-color-row" id="ellieColorRow" role="group" aria-label="Choose Ellie color"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn-with-icon" id="levelContinue" aria-label="Let’s read" data-speak="Let’s read">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-spark"/></svg>
+          <span>Let’s read!</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="profilePickerModal" role="dialog" aria-modal="true" aria-labelledby="profilePickerTitle" hidden>
+    <div class="modal modal--wide">
+      <div class="modal-ellie" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+      </div>
+      <div class="lead-row" style="align-items:center;margin-bottom:10px;">
+        <h2 id="profilePickerTitle" style="margin:0;flex:1;">Who’s reading?</h2>
+        <button type="button" class="speak-help-btn" data-speak-help="profiles" title="Hear instructions" aria-label="Hear who’s reading instructions">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
+        </button>
+      </div>
+      <p id="profilePickerLead">Tap your name. Grown-ups can add or delete readers after a quick check.</p>
+      <div class="profile-picker-list" id="profilePickerList" role="list"></div>
+      <div class="profile-manage-actions">
+        <button type="button" class="secondary btn-with-icon" id="profileAddBtn" aria-label="Add reader" data-speak="Add reader">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-spark"/></svg>
+          <span>Add reader</span>
+        </button>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="secondary btn-with-icon" id="closeProfilePicker" aria-label="Done" data-speak="Done">
+          <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-check"/></svg>
+          <span>Done</span>
+        </button>
+      </div>
     </div>
   </div>
 

@@ -5,11 +5,36 @@
   const LS_PREVIEW_TEXT = "learntoread_previewText";
   const LS_PROGRESS = "learntoread_progress";
   const DEFAULT_PREVIEW_TEXT = "Hello! I will help you read.";
+  /** Current progress payload schema (multi-profile). */
+  const PROGRESS_VERSION = 4;
   /** Debounce window for uploading progress to Firestore after local changes. */
   const CLOUD_UPLOAD_DEBOUNCE_MS = 1500;
   /** Parental gate: adult must tap this word among decoys. */
   const PARENTAL_GATE_CODE_WORD = "elephant";
   const PARENTAL_GATE_DECOYS = ["banana", "rainbow", "cookie", "pencil"];
+
+  /** Optional Ellie accent themes (avatar color). */
+  const ELLIE_COLOR_KEYS = ["pink", "mint", "sky", "sun", "grape", "coral"];
+  const ELLIE_COLOR_SWATCH = {
+    pink: "#ff6b8a",
+    mint: "#3ecfbe",
+    sky: "#6bb7ff",
+    sun: "#ffc94a",
+    grape: "#a78bfa",
+    coral: "#ff8a6a",
+  };
+
+  /** K–12 grade keys shown in onboarding. */
+  const GRADE_KEYS = ["K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+
+  /** Touch-friendly age bands → representative age + approximate grade. */
+  const AGE_BANDS = [
+    { id: "4-5", label: "Ages 4–5", age: 5, grade: "K" },
+    { id: "6-7", label: "Ages 6–7", age: 6, grade: "1" },
+    { id: "8-9", label: "Ages 8–9", age: 8, grade: "3" },
+    { id: "10-12", label: "Ages 10–12", age: 11, grade: "5" },
+    { id: "13+", label: "Ages 13+", age: 13, grade: "8" },
+  ];
 
   const DEFAULT_WORDS = [
     { word: "hat", letters: ["H", "A", "T"], phonemes: ["hh", "ae", "t"] },
@@ -233,6 +258,9 @@
     sightMastery: {},
     storiesProgress: {},
     storyReadingLevel: "beginner",
+    profileAge: null,
+    profileGrade: "",
+    ellieColor: "pink",
     region: "",
     onlineOnly: true,
     gender: "both",
@@ -242,6 +270,13 @@
     scrubIndex: 0,
   };
 
+  /** Multi-profile store keyed by profile id. */
+  const profilesStore = {
+    activeProfileId: "",
+    /** @type {Record<string, object>} */
+    profiles: {},
+  };
+
   const els = {};
 
   /** @type {object | null} Firebase Auth user when signed in. */
@@ -249,6 +284,10 @@
   let cloudUploadTimer = null;
   let cloudSyncPaused = false;
   let cloudAuthSpeakPending = false;
+  /** @type {null | (() => void)} Called after successful parental gate. */
+  let parentalGateOnSuccess = null;
+  /** Pending grade/age choice while onboarding (before Continue). */
+  let pendingLevelChoice = { grade: "", age: null, ageBandId: "" };
 
   function $(id) {
     return document.getElementById(id);
@@ -274,19 +313,303 @@
     } catch (_) {}
   }
 
-  function loadPersistedProfile() {
-    try {
-      const u = localStorage.getItem(LS_USER_NAME);
-      if (u != null) {
-        const t = String(u).trim();
-        if (t) state.userName = t;
-      }
-    } catch (_) {}
+  function loadPersistedPreviewText() {
     try {
       const p = localStorage.getItem(LS_PREVIEW_TEXT);
       if (p != null && String(p).trim()) state.previewText = String(p).trim();
     } catch (_) {}
     if (!state.previewText) state.previewText = DEFAULT_PREVIEW_TEXT;
+  }
+
+  function newProfileId() {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    return `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  function normalizeGrade(grade) {
+    const g = String(grade || "").trim().toUpperCase();
+    if (g === "K" || g === "KINDERGARTEN") return "K";
+    if (GRADE_KEYS.includes(g)) return g;
+    const n = parseInt(g, 10);
+    if (Number.isFinite(n) && n >= 1 && n <= 12) return String(n);
+    return "";
+  }
+
+  function normalizeEllieColor(color) {
+    const key = String(color || "").trim().toLowerCase();
+    return ELLIE_COLOR_KEYS.includes(key) ? key : "pink";
+  }
+
+  function normalizeAge(age) {
+    const n = typeof age === "number" ? age : parseInt(age, 10);
+    if (!Number.isFinite(n) || n < 3 || n > 19) return null;
+    return n | 0;
+  }
+
+  /** Map K–12 (or age) to default story reading level. */
+  function storyLevelForGradeOrAge(grade, age) {
+    const g = normalizeGrade(grade);
+    if (g === "K" || g === "1") return "beginner";
+    if (g) return "advanced";
+    const a = normalizeAge(age);
+    if (a != null) return a <= 6 ? "beginner" : "advanced";
+    return "beginner";
+  }
+
+  function profileHasLevel(profile) {
+    if (!profile) return false;
+    return !!(normalizeGrade(profile.grade) || normalizeAge(profile.age) != null);
+  }
+
+  function emptyLearningFields() {
+    return {
+      sightWordIndex: 0,
+      phonicsIndex: 0,
+      phonicsMastery: {},
+      sightMastery: {},
+      storiesProgress: {},
+      storyReadingLevel: "beginner",
+    };
+  }
+
+  function createEmptyProfile(opts) {
+    const o = opts || {};
+    const now = new Date().toISOString();
+    return {
+      id: o.id || newProfileId(),
+      name: String(o.name || "").trim(),
+      age: normalizeAge(o.age),
+      grade: normalizeGrade(o.grade),
+      ellieColor: normalizeEllieColor(o.ellieColor),
+      createdAt: o.createdAt || now,
+      updatedAt: o.updatedAt || now,
+      ...emptyLearningFields(),
+      storyReadingLevel:
+        o.storyReadingLevel != null
+          ? normalizeStoryLevel(o.storyReadingLevel)
+          : storyLevelForGradeOrAge(o.grade, o.age),
+    };
+  }
+
+  function listProfilesSorted() {
+    return Object.values(profilesStore.profiles).sort((a, b) => {
+      const ta = Date.parse(a.createdAt) || 0;
+      const tb = Date.parse(b.createdAt) || 0;
+      if (ta !== tb) return ta - tb;
+      return String(a.name || "").localeCompare(String(b.name || ""));
+    });
+  }
+
+  function getActiveProfile() {
+    return profilesStore.profiles[profilesStore.activeProfileId] || null;
+  }
+
+  function ensureActiveProfile() {
+    if (getActiveProfile()) return getActiveProfile();
+    const list = listProfilesSorted();
+    if (list.length) {
+      profilesStore.activeProfileId = list[0].id;
+      return list[0];
+    }
+    const p = createEmptyProfile({ name: "" });
+    profilesStore.profiles[p.id] = p;
+    profilesStore.activeProfileId = p.id;
+    return p;
+  }
+
+  function applyEllieTheme(color) {
+    const key = normalizeEllieColor(color);
+    state.ellieColor = key;
+    const body = document.body;
+    if (!body) return;
+    ELLIE_COLOR_KEYS.forEach((c) => {
+      body.classList.remove(`ellie-theme-${c}`);
+    });
+    if (key !== "pink") body.classList.add(`ellie-theme-${key}`);
+  }
+
+  function gradeLabel(grade) {
+    const g = normalizeGrade(grade);
+    if (!g) return "";
+    return g === "K" ? "Grade K" : `Grade ${g}`;
+  }
+
+  function profileLevelLabel(profile) {
+    if (!profile) return "";
+    const g = gradeLabel(profile.grade);
+    if (g) return g;
+    const age = normalizeAge(profile.age);
+    if (age != null) return `Age ${age}`;
+    return "";
+  }
+
+  function syncActiveProfileFromState() {
+    const p = getActiveProfile();
+    if (!p) return;
+    p.name = String(state.userName || "").trim();
+    p.age = normalizeAge(state.profileAge);
+    p.grade = normalizeGrade(state.profileGrade);
+    p.ellieColor = normalizeEllieColor(state.ellieColor);
+    p.sightWordIndex = state.sightWordIndex | 0;
+    p.phonicsIndex = state.phonicsIndex | 0;
+    p.phonicsMastery = state.phonicsMastery || {};
+    p.sightMastery = state.sightMastery || {};
+    p.storiesProgress = state.storiesProgress || {};
+    p.storyReadingLevel = getStoryReadingLevel();
+    p.updatedAt = new Date().toISOString();
+  }
+
+  function loadProfileIntoState(profile) {
+    const p = profile || ensureActiveProfile();
+    state.userName = String(p.name || "").trim();
+    state.profileAge = normalizeAge(p.age);
+    state.profileGrade = normalizeGrade(p.grade);
+    state.ellieColor = normalizeEllieColor(p.ellieColor);
+    state.sightWordIndex = Math.max(0, p.sightWordIndex | 0);
+    state.phonicsIndex = Math.max(0, p.phonicsIndex | 0);
+    state.phonicsMastery =
+      p.phonicsMastery && typeof p.phonicsMastery === "object"
+        ? { ...p.phonicsMastery }
+        : {};
+    state.sightMastery =
+      p.sightMastery && typeof p.sightMastery === "object"
+        ? { ...p.sightMastery }
+        : {};
+    state.storiesProgress =
+      p.storiesProgress && typeof p.storiesProgress === "object"
+        ? { ...p.storiesProgress }
+        : {};
+    state.storyReadingLevel = normalizeStoryLevel(p.storyReadingLevel);
+    state.scrubIndex = 0;
+    persistUserName(state.userName);
+    applyEllieTheme(state.ellieColor);
+    if (sightWords.length) {
+      state.sightWordIndex = Math.min(
+        state.sightWordIndex,
+        Math.max(0, sightWords.length - 1)
+      );
+    }
+    state.phonicsIndex = Math.min(
+      state.phonicsIndex,
+      Math.max(0, PHONICS_LETTERS.length - 1)
+    );
+  }
+
+  function applyDeviceSettingsFromPayload(data) {
+    if (!data || typeof data !== "object") return;
+    if (data.voiceName != null) state.voiceName = String(data.voiceName);
+    if (data.region != null) state.region = String(data.region);
+    if (typeof data.onlineOnly === "boolean") state.onlineOnly = data.onlineOnly;
+    if (data.gender != null) state.gender = String(data.gender);
+    if (typeof data.rate === "number") state.rate = data.rate;
+    if (typeof data.pitch === "number") state.pitch = data.pitch;
+  }
+
+  function resetLearningStateOnly() {
+    state.sightWordIndex = 0;
+    state.phonicsIndex = 0;
+    state.phonicsMastery = {};
+    state.sightMastery = {};
+    state.storiesProgress = {};
+    state.storyReadingLevel = "beginner";
+    state.scrubIndex = 0;
+  }
+
+  function resetDeviceVoiceSettings() {
+    state.region = "";
+    state.onlineOnly = true;
+    state.gender = "both";
+    state.voiceName = "";
+    state.rate = 0.95;
+    state.pitch = 1.05;
+  }
+
+  /**
+   * Migrate legacy v3 (or flatter) single-user progress into a profiles map.
+   * @returns {{ activeProfileId: string, profiles: Record<string, object> }}
+   */
+  function migrateLegacyProgressToProfiles(data) {
+    let legacyName = "";
+    try {
+      const u = localStorage.getItem(LS_USER_NAME);
+      if (u != null) legacyName = String(u).trim();
+    } catch (_) {}
+    const name =
+      (data && data.userName != null && String(data.userName).trim()) ||
+      legacyName ||
+      "Reader";
+    const profile = createEmptyProfile({
+      name,
+      age: data && data.profileAge != null ? data.profileAge : null,
+      grade: data && data.profileGrade != null ? data.profileGrade : "",
+      ellieColor: data && data.ellieColor != null ? data.ellieColor : "pink",
+      storyReadingLevel:
+        data && data.storyReadingLevel != null
+          ? data.storyReadingLevel
+          : "beginner",
+    });
+    if (data && typeof data === "object") {
+      if (Number.isFinite(data.sightWordIndex))
+        profile.sightWordIndex = Math.max(0, data.sightWordIndex | 0);
+      if (Number.isFinite(data.phonicsIndex))
+        profile.phonicsIndex = Math.max(0, data.phonicsIndex | 0);
+      if (data.phonicsMastery && typeof data.phonicsMastery === "object") {
+        profile.phonicsMastery = { ...data.phonicsMastery };
+      }
+      if (data.sightMastery && typeof data.sightMastery === "object") {
+        profile.sightMastery = { ...data.sightMastery };
+      }
+      if (data.storiesProgress && typeof data.storiesProgress === "object") {
+        profile.storiesProgress = { ...data.storiesProgress };
+      }
+    }
+    return { activeProfileId: profile.id, profiles: { [profile.id]: profile } };
+  }
+
+  function normalizeProfilesMap(rawProfiles) {
+    const out = {};
+    if (!rawProfiles || typeof rawProfiles !== "object") return out;
+    const entries = Array.isArray(rawProfiles)
+      ? rawProfiles.map((p) => [p && p.id, p])
+      : Object.entries(rawProfiles);
+    entries.forEach(([key, raw]) => {
+      if (!raw || typeof raw !== "object") return;
+      const id = String(raw.id || key || "").trim() || newProfileId();
+      const p = createEmptyProfile({
+        id,
+        name: raw.name,
+        age: raw.age,
+        grade: raw.grade,
+        ellieColor: raw.ellieColor,
+        createdAt: raw.createdAt,
+        updatedAt: raw.updatedAt,
+        storyReadingLevel: raw.storyReadingLevel,
+      });
+      if (Number.isFinite(raw.sightWordIndex))
+        p.sightWordIndex = Math.max(0, raw.sightWordIndex | 0);
+      if (Number.isFinite(raw.phonicsIndex))
+        p.phonicsIndex = Math.max(0, raw.phonicsIndex | 0);
+      if (raw.phonicsMastery && typeof raw.phonicsMastery === "object") {
+        p.phonicsMastery = { ...raw.phonicsMastery };
+      }
+      if (raw.sightMastery && typeof raw.sightMastery === "object") {
+        p.sightMastery = { ...raw.sightMastery };
+      }
+      if (raw.storiesProgress && typeof raw.storiesProgress === "object") {
+        p.storiesProgress = { ...raw.storiesProgress };
+      }
+      out[id] = p;
+    });
+    return out;
+  }
+
+  function adoptProfilesStore(activeProfileId, profiles) {
+    profilesStore.profiles = profiles && typeof profiles === "object" ? profiles : {};
+    profilesStore.activeProfileId = String(activeProfileId || "");
+    ensureActiveProfile();
+    loadProfileIntoState(getActiveProfile());
   }
 
   function emptyPhonicsRecord() {
@@ -531,10 +854,19 @@
   }
 
   function buildProgressPayload() {
+    ensureActiveProfile();
+    syncActiveProfileFromState();
+    const active = getActiveProfile();
     return {
-      version: 3,
+      version: PROGRESS_VERSION,
       savedAt: new Date().toISOString(),
+      activeProfileId: profilesStore.activeProfileId,
+      profiles: profilesStore.profiles,
+      // Convenience mirrors for active profile (export / older tools).
       userName: state.userName,
+      profileAge: state.profileAge,
+      profileGrade: state.profileGrade,
+      ellieColor: state.ellieColor,
       sightWordIndex: state.sightWordIndex,
       phonicsIndex: state.phonicsIndex,
       phonicsMastery: state.phonicsMastery,
@@ -547,6 +879,8 @@
       gender: state.gender,
       rate: state.rate,
       pitch: state.pitch,
+      // Keep a pointer for readers that only inspect top-level name.
+      activeProfileName: active ? active.name : state.userName,
     };
   }
 
@@ -833,60 +1167,36 @@
   }
 
   function resetStateForFreshStart() {
-    state.sightWordIndex = 0;
-    state.phonicsIndex = 0;
-    state.phonicsMastery = {};
-    state.sightMastery = {};
-    state.storiesProgress = {};
-    state.storyReadingLevel = "beginner";
-    state.scrubIndex = 0;
-    state.region = "";
-    state.onlineOnly = true;
-    state.gender = "both";
-    state.voiceName = "";
-    state.rate = 0.95;
-    state.pitch = 1.05;
+    resetDeviceVoiceSettings();
+    const p = createEmptyProfile({ name: state.userName || "" });
+    profilesStore.profiles = { [p.id]: p };
+    profilesStore.activeProfileId = p.id;
+    loadProfileIntoState(p);
   }
 
   function applyProgressData(data, opts) {
     const shouldPersist = !opts || opts.persist !== false;
-    if (data.userName != null) {
-      state.userName = String(data.userName).trim();
-      persistUserName(state.userName);
-    }
-    if (Number.isFinite(data.sightWordIndex))
-      state.sightWordIndex = Math.max(0, data.sightWordIndex | 0);
-    if (sightWords.length)
-      state.sightWordIndex = Math.min(
-        state.sightWordIndex,
-        sightWords.length - 1
-      );
-    if (Number.isFinite(data.phonicsIndex))
-      state.phonicsIndex = Math.max(
-        0,
-        Math.min(PHONICS_LETTERS.length - 1, data.phonicsIndex | 0)
-      );
-    if (data.phonicsMastery && typeof data.phonicsMastery === "object") {
-      state.phonicsMastery = { ...data.phonicsMastery };
-    }
-    if (data.sightMastery && typeof data.sightMastery === "object") {
-      state.sightMastery = { ...data.sightMastery };
-    }
-    if (data.storiesProgress && typeof data.storiesProgress === "object") {
-      state.storiesProgress = { ...data.storiesProgress };
-    }
-    if (data.storyReadingLevel != null) {
-      state.storyReadingLevel = normalizeStoryLevel(data.storyReadingLevel);
+    if (!data || typeof data !== "object") return;
+
+    applyDeviceSettingsFromPayload(data);
+
+    if (data.profiles && typeof data.profiles === "object") {
+      const profiles = normalizeProfilesMap(data.profiles);
+      let activeId = String(data.activeProfileId || "").trim();
+      if (!profiles[activeId]) {
+        activeId = Object.keys(profiles)[0] || "";
+      }
+      if (!activeId) {
+        const migrated = migrateLegacyProgressToProfiles(data);
+        adoptProfilesStore(migrated.activeProfileId, migrated.profiles);
+      } else {
+        adoptProfilesStore(activeId, profiles);
+      }
     } else {
-      state.storyReadingLevel = "beginner";
+      const migrated = migrateLegacyProgressToProfiles(data);
+      adoptProfilesStore(migrated.activeProfileId, migrated.profiles);
     }
-    if (data.voiceName != null) state.voiceName = String(data.voiceName);
-    if (data.region != null) state.region = String(data.region);
-    if (typeof data.onlineOnly === "boolean")
-      state.onlineOnly = data.onlineOnly;
-    if (data.gender != null) state.gender = String(data.gender);
-    if (typeof data.rate === "number") state.rate = data.rate;
-    if (typeof data.pitch === "number") state.pitch = data.pitch;
+
     if (shouldPersist) persistProgress();
   }
 
@@ -1350,11 +1660,15 @@
       case "welcome":
         return "Welcome! Progress saves on this device. Tap Start, Open file for a backup, or Sign in with Google to sync.";
       case "name":
-        return "What is your name? Type it, then tap Let's read.";
+        return "What is your name? Type it, then tap Next.";
+      case "level":
+        return "Grown-ups: pick a school grade from K to 12, or an age band. Then tap Let's read.";
+      case "profiles":
+        return "Who's reading? Tap your name. Grown-ups can add or delete readers.";
       case "phonicsQuiz":
         return "Listen. Which letter makes this sound?";
       case "parentalGate":
-        return `Ask a grown-up to open settings. Grown-ups, tap the word ${PARENTAL_GATE_CODE_WORD}.`;
+        return `Ask a grown-up. Grown-ups, tap the word ${PARENTAL_GATE_CODE_WORD}.`;
       default:
         return "";
     }
@@ -1395,6 +1709,29 @@
 
   function speakWholeWord(word) {
     speakText(word.toLowerCase());
+  }
+
+  /** Strip edge punctuation so a tapped token like "fox." speaks as "fox". */
+  function wordForSpeech(token) {
+    return String(token || "")
+      .replace(/^[^A-Za-z0-9']+|[^A-Za-z0-9']+$/g, "")
+      .replace(/’/g, "'")
+      .trim()
+      .toLowerCase();
+  }
+
+  function speakPhonicsExample() {
+    const entry = getPhonicsEntry(state.phonicsIndex);
+    if (!entry || !entry.example) return;
+    stopSayWordListening();
+    speakText(String(entry.example).toLowerCase());
+  }
+
+  function speakTappedStoryWord(wordEl) {
+    const toSpeak = wordForSpeech(wordEl && wordEl.textContent);
+    if (!toSpeak) return;
+    if (storyReading) stopStoryReading();
+    speakText(toSpeak);
   }
 
   function loadVoices() {
@@ -1890,7 +2227,9 @@
     const silent = opts && opts.silent;
     const welcomeOpen = els.welcomeModal && !els.welcomeModal.hidden;
     const nameOpen = els.nameModal && !els.nameModal.hidden;
-    if (!silent && changed && !welcomeOpen && !nameOpen) {
+    const levelOpen = els.levelModal && !els.levelModal.hidden;
+    const profilesOpen = els.profilePickerModal && !els.profilePickerModal.hidden;
+    if (!silent && changed && !welcomeOpen && !nameOpen && !levelOpen && !profilesOpen) {
       speakInstruction(name);
     }
   }
@@ -2422,6 +2761,12 @@
     if (els.phonicsExample) {
       els.phonicsExample.textContent = `as in ${entry.example}`;
     }
+    if (els.phonicsCue) {
+      els.phonicsCue.setAttribute(
+        "aria-label",
+        entry.example ? `Hear ${entry.example}` : "Hear example word"
+      );
+    }
 
     if (els.phonicsGrid) {
       els.phonicsGrid.innerHTML = "";
@@ -2929,6 +3274,9 @@
     els.phonicsISaidIt.addEventListener("click", () => markPhonicsPracticed());
     els.phonicsSayBtn.addEventListener("click", () => startPhonicsSayListening());
     els.phonicsStartQuiz.addEventListener("click", () => startPhonicsQuiz());
+    if (els.phonicsCue) {
+      els.phonicsCue.addEventListener("click", () => speakPhonicsExample());
+    }
 
     els.sayWordBtn.addEventListener("click", () => {
       startSayWordListening();
