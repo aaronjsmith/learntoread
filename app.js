@@ -1243,6 +1243,9 @@
     const sightDone = countSightMastered();
     const flashDone = countFlashcardMastered();
     const storiesDone = countStoriesFinished();
+    const vowelDone = countVowelFamiliesPracticed();
+    const vowelTotal = Math.max(1, vowelFamilies.length);
+    const vowelPct = Math.round((vowelDone / vowelTotal) * 100);
 
     if (els.overallProgressLabel) {
       els.overallProgressLabel.textContent = `${overallPct}%`;
@@ -1254,6 +1257,7 @@
     );
     setProgressBar(els.phonicsProgressBar, els.phonicsProgressFill, phonicsPct);
     setProgressBar(els.sightProgressBar, els.sightProgressFill, sightPct);
+    setProgressBar(els.vowelProgressBar, els.vowelProgressFill, vowelPct);
     setProgressBar(
       els.storiesProgressBar,
       els.storiesProgressFill,
@@ -1270,6 +1274,9 @@
     }
     if (els.sightReportText) {
       els.sightReportText.textContent = `${sightDone} of ${sightWords.length} words mastered`;
+    }
+    if (els.vowelReportText) {
+      els.vowelReportText.textContent = `${vowelDone} of ${vowelFamilies.length} families practiced`;
     }
     if (els.flashcardsReportText) {
       els.flashcardsReportText.textContent = `${flashDone} of ${flashcardWords.length} words mastered`;
@@ -2520,6 +2527,8 @@
         return "Phonics. Tap a letter. Hear it, practice it, then take a quiz.";
       case "sight":
         return "Sight words. Tap a letter for one sound. Start the slider on the left, then slide to blend. Then say the word.";
+      case "vowels":
+        return "Vowel words. Same letters, new vowel. Tap a, e, i, o, or u to change the middle letter. Tap the word to hear it. Then say it.";
       case "flashcards":
         return "Story words. Tap the big word to hear it. Tap I know it when you can read it. Use Next for another word.";
       case "stories":
@@ -2760,6 +2769,31 @@
       /* offline / missing */
     }
     sightWords = DEFAULT_WORDS.slice();
+  }
+
+  async function loadVowelWordsFromJson() {
+    try {
+      const res = await fetch("data/vowel-words.json", { cache: "no-store" });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      const list = data.families;
+      if (Array.isArray(list) && list.length) {
+        const normalized = list
+          .map((item) => normalizeVowelFamily(item))
+          .filter(Boolean);
+        if (normalized.length) {
+          vowelFamilies = normalized;
+          clampVowelFamilyIndex();
+          return;
+        }
+      }
+    } catch (_) {
+      /* offline / missing */
+    }
+    vowelFamilies = DEFAULT_VOWEL_FAMILIES.map((item) =>
+      normalizeVowelFamily(item)
+    ).filter(Boolean);
+    clampVowelFamilyIndex();
   }
 
   async function loadStoriesFromJson() {
@@ -3410,6 +3444,7 @@
       els.homeEllie,
       els.phonicsEllie,
       els.flashcardEllie,
+      els.vowelEllie,
     ].filter(Boolean);
     for (const node of nodes) {
       node.classList.remove("is-listen", "is-cheer", "is-think");
