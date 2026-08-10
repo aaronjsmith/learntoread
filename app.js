@@ -13,7 +13,7 @@
   const PARENTAL_GATE_CODE_WORD = "elephant";
   const PARENTAL_GATE_DECOYS = ["banana", "rainbow", "cookie", "pencil"];
 
-  /** Optional Ellie accent themes (avatar color). */
+  /** Optional accent themes (avatar / UI color). */
   const ELLIE_COLOR_KEYS = ["pink", "mint", "sky", "sun", "grape", "coral"];
   const ELLIE_COLOR_SWATCH = {
     pink: "#ff6b8a",
@@ -640,15 +640,16 @@
     return p;
   }
 
-  function applyEllieTheme(color) {
+  function applyAccentTheme(color) {
     const key = normalizeEllieColor(color);
     state.ellieColor = key;
     const body = document.body;
     if (!body) return;
     ELLIE_COLOR_KEYS.forEach((c) => {
+      body.classList.remove(`theme-${c}`);
       body.classList.remove(`ellie-theme-${c}`);
     });
-    if (key !== "pink") body.classList.add(`ellie-theme-${key}`);
+    if (key !== "pink") body.classList.add(`theme-${key}`);
   }
 
   function gradeLabel(grade) {
@@ -730,7 +731,7 @@
     state.storyReadingLevel = normalizeStoryLevel(p.storyReadingLevel);
     state.scrubIndex = -1;
     persistUserName(state.userName);
-    applyEllieTheme(state.ellieColor);
+    applyAccentTheme(state.ellieColor);
     if (sightWords.length) {
       state.sightWordIndex = Math.min(
         state.sightWordIndex,
@@ -1739,7 +1740,7 @@
     clearTimeout(cloudUploadTimer);
     cloudUploadTimer = setTimeout(() => {
       uploadProgressToCloud().catch((err) => {
-        console.warn("Ellie cloud sync: upload failed", err);
+        console.warn("Cloud sync: upload failed", err);
         setCloudSyncing(false);
       });
     }, CLOUD_UPLOAD_DEBOUNCE_MS);
@@ -1823,7 +1824,7 @@
           }
         });
       } catch (err) {
-        console.warn("Ellie cloud sync: auth bind failed", err);
+        console.warn("Cloud sync: auth bind failed", err);
       }
     }
 
@@ -1841,7 +1842,7 @@
         try {
           await live.signOutUser();
         } catch (err) {
-          console.warn("Ellie cloud sync: sign-out failed", err);
+          console.warn("Cloud sync: sign-out failed", err);
         }
         return;
       }
@@ -1858,7 +1859,7 @@
         ) {
           return;
         }
-        console.warn("Ellie cloud sync: sign-in failed", err);
+        console.warn("Cloud sync: sign-in failed", err);
         const msg =
           code === "auth/unauthorized-domain"
             ? "This website domain isn’t allowed in Firebase yet. Add read.ensign.quest under Authentication → Settings → Authorized domains."
@@ -1888,7 +1889,7 @@
 
   function refreshUiAfterProgressApply() {
     syncControlsFromState();
-    applyEllieTheme(state.ellieColor);
+    applyAccentTheme(state.ellieColor);
     updateHomeGreeting();
     updateProgressUI();
     updateStoryLevelPickersUI();
@@ -1915,7 +1916,7 @@
         speakCue("Signed in");
       }
     } catch (err) {
-      console.warn("Ellie cloud sync: merge failed", err);
+      console.warn("Cloud sync: merge failed", err);
       cloudAuthSpeakPending = false;
     } finally {
       setCloudSyncing(false);
@@ -2523,8 +2524,8 @@
     switch (key) {
       case "home":
         return state.userName
-          ? `Hi, ${state.userName}! Pick an activity with Ellie.`
-          : "Hi! I'm Ellie. Pick an activity.";
+          ? `Hi, ${state.userName}! Pick an activity.`
+          : "Hi! Let’s read together. Pick an activity.";
       case "phonics":
         return "Phonics. Tap a letter. Hear it, practice it, then take a quiz.";
       case "sight":
@@ -3200,7 +3201,7 @@
       const p = document.createElement("p");
       p.textContent = prog.finished
         ? "Finished!"
-        : story.blurb || "A short tale to read with Ellie.";
+        : story.blurb || "A short tale to read together.";
 
       const bar = document.createElement("div");
       bar.className = "progress-bar progress-bar--thin";
@@ -3442,20 +3443,6 @@
     return tokens.some((tok) => accept.includes(tok));
   }
 
-  function setEllieMood(mood) {
-    const nodes = [
-      els.sightEllie,
-      els.homeEllie,
-      els.phonicsEllie,
-      els.flashcardEllie,
-      els.vowelEllie,
-    ].filter(Boolean);
-    for (const node of nodes) {
-      node.classList.remove("is-listen", "is-cheer", "is-think");
-      if (mood) node.classList.add(`is-${mood}`);
-    }
-  }
-
   function stopSfxAudio() {
     if (!activeSfxAudio) return;
     try {
@@ -3489,14 +3476,8 @@
     if (!els.sayWordStatus) return;
     els.sayWordStatus.textContent = message || "";
     els.sayWordStatus.className = "say-word-status" + (kind ? ` is-${kind}` : "");
-    if (kind === "listening") setEllieMood("listen");
-    else if (kind === "success") {
-      setEllieMood("cheer");
-      playFeedbackSfx("success");
-    } else if (kind === "miss") {
-      setEllieMood("think");
-      playFeedbackSfx("miss");
-    } else if (!kind) setEllieMood("");
+    if (kind === "success") playFeedbackSfx("success");
+    else if (kind === "miss") playFeedbackSfx("miss");
   }
 
   function setVowelSayStatus(message, kind) {
@@ -3504,14 +3485,8 @@
     els.vowelSayStatus.textContent = message || "";
     els.vowelSayStatus.className =
       "say-word-status" + (kind ? ` is-${kind}` : "");
-    if (kind === "listening") setEllieMood("listen");
-    else if (kind === "success") {
-      setEllieMood("cheer");
-      playFeedbackSfx("success");
-    } else if (kind === "miss") {
-      setEllieMood("think");
-      playFeedbackSfx("miss");
-    } else if (!kind) setEllieMood("");
+    if (kind === "success") playFeedbackSfx("success");
+    else if (kind === "miss") playFeedbackSfx("miss");
   }
 
   function setVowelSayListeningUi(listening) {
@@ -3708,16 +3683,16 @@
 
       if (matched) {
         matchSettled = true;
-        setSayWordStatus("Yay! Ellie heard it — you got it!", "success");
+        setSayWordStatus("Yay! We heard it — you got it!", "success");
         bumpSightPractice(target);
         markSightWordMastered(target);
         try {
           recognition.stop();
         } catch (_) {}
       } else if (best) {
-        setSayWordStatus(`Ellie heard “${best}”. Try again!`, "miss");
+        setSayWordStatus(`We heard “${best}”. Try again!`, "miss");
       } else {
-        setSayWordStatus("Ellie didn’t catch that. Try again!", "miss");
+        setSayWordStatus("We didn’t catch that. Try again!", "miss");
       }
     };
 
@@ -3828,15 +3803,15 @@
 
       if (matched) {
         matchSettled = true;
-        setVowelSayStatus("Yay! Ellie heard it — you got it!", "success");
+        setVowelSayStatus("Yay! We heard it — you got it!", "success");
         markVowelWordMastered(target);
         try {
           recognition.stop();
         } catch (_) {}
       } else if (best) {
-        setVowelSayStatus(`Ellie heard “${best}”. Try again!`, "miss");
+        setVowelSayStatus(`We heard “${best}”. Try again!`, "miss");
       } else {
-        setVowelSayStatus("Ellie didn’t catch that. Try again!", "miss");
+        setVowelSayStatus("We didn’t catch that. Try again!", "miss");
       }
     };
 
@@ -3889,14 +3864,8 @@
     els.phonicsStatus.textContent = message || "";
     els.phonicsStatus.className =
       "phonics-status" + (kind ? ` is-${kind}` : "");
-    if (kind === "listening") setEllieMood("listen");
-    else if (kind === "success") {
-      setEllieMood("cheer");
-      playFeedbackSfx("success");
-    } else if (kind === "miss") {
-      setEllieMood("think");
-      playFeedbackSfx("miss");
-    }
+    if (kind === "success") playFeedbackSfx("success");
+    else if (kind === "miss") playFeedbackSfx("miss");
   }
 
   function playPhonicsSound() {
@@ -3913,7 +3882,6 @@
     if (!entry) return;
     bumpPhonics(entry.id, "practiced");
     setPhonicsStatus(`Great practice on ${entry.letter}!`, "success");
-    setEllieMood("cheer");
   }
 
   function shuffle(arr) {
@@ -4055,7 +4023,7 @@
       if (matched) {
         bumpPhonics(entry.id, "practiced");
         setPhonicsStatus(
-          `Ellie heard the ${entry.letter} sound — great!`,
+          `We heard the ${entry.letter} sound — great!`,
           "success"
         );
       } else {
@@ -4222,13 +4190,8 @@
 
   function updateHomeGreeting() {
     els.homeGreeting.textContent = state.userName
-      ? `Hi, ${state.userName}! Pick an activity with Ellie.`
-      : "Pick an activity with Ellie.";
-    if (els.ellieBubble) {
-      els.ellieBubble.textContent = state.userName
-        ? `Hi, ${state.userName}! I’m Ellie — let’s read together!`
-        : "Hi! I’m Ellie — let’s read together!";
-    }
+      ? `Hi, ${state.userName}! Let’s read together.`
+      : "Let’s read together. Pick an activity.";
     if (els.openProfilesCaption) {
       const short = state.userName ? String(state.userName).slice(0, 8) : "Who?";
       els.openProfilesCaption.textContent = short;
@@ -4318,9 +4281,9 @@
     });
   }
 
-  function renderEllieColorRow() {
-    if (!els.ellieColorRow) return;
-    els.ellieColorRow.innerHTML = "";
+  function renderThemeColorRow() {
+    if (!els.themeColorRow) return;
+    els.themeColorRow.innerHTML = "";
     const selected = normalizeEllieColor(
       pendingLevelChoice.ellieColor || state.ellieColor
     );
@@ -4329,15 +4292,15 @@
       btn.type = "button";
       btn.dataset.ellieColor = key;
       btn.style.setProperty("--swatch", ELLIE_COLOR_SWATCH[key] || ELLIE_COLOR_SWATCH.pink);
-      btn.setAttribute("aria-label", `${key} Ellie`);
+      btn.setAttribute("aria-label", `${key} theme`);
       btn.classList.toggle("is-selected", selected === key);
       btn.addEventListener("click", () => {
         pendingLevelChoice.ellieColor = key;
-        applyEllieTheme(key);
-        renderEllieColorRow();
+        applyAccentTheme(key);
+        renderThemeColorRow();
         speakCue(key);
       });
-      els.ellieColorRow.appendChild(btn);
+      els.themeColorRow.appendChild(btn);
     });
   }
 
@@ -4357,7 +4320,7 @@
     }
     renderGradeGrid();
     renderAgeBands();
-    renderEllieColorRow();
+    renderThemeColorRow();
     els.levelModal.hidden = false;
     if (opts && opts.forceSpeak) speakInstruction("level", { force: true });
   }
@@ -4374,7 +4337,7 @@
     state.ellieColor = normalizeEllieColor(
       pendingLevelChoice.ellieColor || state.ellieColor
     );
-    applyEllieTheme(state.ellieColor);
+    applyAccentTheme(state.ellieColor);
     const level = storyLevelForGradeOrAge(grade, age);
     state.storyReadingLevel = level;
     const p = ensureActiveProfile();
@@ -4500,7 +4463,7 @@
       del.addEventListener("click", (e) => {
         e.stopPropagation();
         openParentalGate({
-          kidMsg: "Ellie says deleting a reader is for grown-ups.",
+          kidMsg: "Deleting a reader is for grown-ups.",
           onSuccess: () => {
             const ok = window.confirm(
               `Delete ${profile.name || "this reader"} and their progress on this device?`
@@ -4587,7 +4550,6 @@
     setActiveLetter(state.scrubIndex);
 
     stopSayWordListening();
-    setEllieMood("");
     clearHeardText(
       els.sayWordHeard,
       "Tap the mic and say the word"
@@ -4736,7 +4698,7 @@
     if (els.parentalGateKidMsg) {
       els.parentalGateKidMsg.textContent =
         (opts && opts.kidMsg) ||
-        "Ellie says Settings is for parents only.";
+        "Settings is for grown-ups only.";
     }
     if (els.parentalGateFeedback) els.parentalGateFeedback.textContent = "";
     renderParentalGateWords();
@@ -4814,7 +4776,7 @@
     if (els.profileAddBtn) {
       els.profileAddBtn.addEventListener("click", () => {
         openParentalGate({
-          kidMsg: "Ellie says adding a reader is for grown-ups.",
+          kidMsg: "Adding a reader is for grown-ups.",
           onSuccess: () => beginAddProfileFlow(),
         });
       });
@@ -4833,7 +4795,7 @@
 
     els.openSettings.addEventListener("click", () => {
       openParentalGate({
-        kidMsg: "Ellie says Settings is for parents only.",
+        kidMsg: "Settings is for grown-ups only.",
         onSuccess: () => openSettingsPanel(),
       });
     });
@@ -4961,6 +4923,13 @@
 
     if (els.headerProgressBtn) {
       els.headerProgressBtn.addEventListener("click", () => {
+        showScreen("report");
+        updateReportCardUI();
+      });
+    }
+
+    if (els.activityReportCard) {
+      els.activityReportCard.addEventListener("click", () => {
         showScreen("report");
         updateReportCardUI();
       });
@@ -5114,20 +5083,6 @@
       });
     });
 
-    const hearHomeAgain = () => speakInstruction("home", { force: true });
-    if (els.ellieBubble) {
-      els.ellieBubble.addEventListener("click", hearHomeAgain);
-      els.ellieBubble.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          hearHomeAgain();
-        }
-      });
-    }
-    if (els.homeEllie) {
-      els.homeEllie.addEventListener("click", hearHomeAgain);
-    }
-
     els.prevWord.addEventListener("click", () => {
       if (state.sightWordIndex <= 0) return;
       state.sightWordIndex--;
@@ -5143,6 +5098,42 @@
       persistProgress();
       updateSightWordUI();
     });
+
+    if (els.prevVowelFamily) {
+      els.prevVowelFamily.addEventListener("click", () => {
+        if (!vowelFamilies.length || state.vowelFamilyIndex <= 0) return;
+        state.vowelFamilyIndex--;
+        state.vowelVowelIndex = 0;
+        persistProgress();
+        updateVowelWordsUI();
+      });
+    }
+    if (els.nextVowelFamily) {
+      els.nextVowelFamily.addEventListener("click", () => {
+        if (
+          !vowelFamilies.length ||
+          state.vowelFamilyIndex >= vowelFamilies.length - 1
+        ) {
+          return;
+        }
+        state.vowelFamilyIndex++;
+        state.vowelVowelIndex = 0;
+        persistProgress();
+        updateVowelWordsUI();
+      });
+    }
+    if (els.vowelWordTitle) {
+      els.vowelWordTitle.addEventListener("click", () => {
+        stopSayWordListening();
+        const word = getCurrentVowelWord();
+        if (word) speakWholeWord(word);
+      });
+    }
+    if (els.vowelSayWordBtn) {
+      els.vowelSayWordBtn.addEventListener("click", () => {
+        startVowelSayListening();
+      });
+    }
 
     if (els.prevFlashcard) {
       els.prevFlashcard.addEventListener("click", () => {
@@ -5175,7 +5166,6 @@
         const entry = getFlashcardEntry(state.flashcardWordIndex);
         if (!entry.word || isFlashcardMastered(entry.word)) return;
         markFlashcardMastered(entry.word);
-        setEllieMood("cheer");
         playFeedbackSfx("success");
         speakCue("I know it");
         if (state.flashcardWordIndex < flashcardWords.length - 1) {
@@ -5289,7 +5279,7 @@
     els.levelModal = $("levelModal");
     els.gradeGrid = $("gradeGrid");
     els.ageBandRow = $("ageBandRow");
-    els.ellieColorRow = $("ellieColorRow");
+    els.themeColorRow = $("themeColorRow");
     els.levelContinue = $("levelContinue");
     els.parentalGateModal = $("parentalGateModal");
     els.parentalGateWords = $("parentalGateWords");
@@ -5316,6 +5306,7 @@
     els.activityStories = $("activityStories");
     els.homeOpenPhonics = $("homeOpenPhonics");
     els.homeOpenSight = $("homeOpenSight");
+    els.homeOpenVowels = $("homeOpenVowels");
     els.homeOpenStories = $("homeOpenStories");
     els.homeOpenFlashcards = $("homeOpenFlashcards");
     els.headerProgressBtn = $("headerProgressBtn");
@@ -5323,6 +5314,9 @@
     els.storiesReportText = $("storiesReportText");
     els.storiesProgressBar = $("storiesProgressBar");
     els.storiesProgressFill = $("storiesProgressFill");
+    els.vowelReportText = $("vowelReportText");
+    els.vowelProgressBar = $("vowelProgressBar");
+    els.vowelProgressFill = $("vowelProgressFill");
     els.flashcardsReportText = $("flashcardsReportText");
     els.flashcardsProgressBar = $("flashcardsProgressBar");
     els.flashcardsProgressFill = $("flashcardsProgressFill");
@@ -5331,7 +5325,6 @@
     els.flashcardWordProgress = $("flashcardWordProgress");
     els.flashcardHearBtn = $("flashcardHearBtn");
     els.flashcardKnowBtn = $("flashcardKnowBtn");
-    els.flashcardEllie = $("flashcardEllie");
     els.prevFlashcard = $("prevFlashcard");
     els.nextFlashcard = $("nextFlashcard");
     els.storiesList = $("storiesList");
@@ -5374,9 +5367,17 @@
     els.sayWordStatus = $("sayWordStatus");
     els.sayWordHeard = $("sayWordHeard");
     els.sayWordListenHint = $("sayWordListenHint");
-    els.sightEllie = $("sightEllie");
-    els.homeEllie = $("homeEllie");
-    els.ellieBubble = $("ellieBubble");
+    els.vowelsScreen = $("vowelsScreen");
+    els.vowelWordTitle = $("vowelWordTitle");
+    els.vowelWordProgress = $("vowelWordProgress");
+    els.vowelFrameLabel = $("vowelFrameLabel");
+    els.vowelTileRow = $("vowelTileRow");
+    els.prevVowelFamily = $("prevVowelFamily");
+    els.nextVowelFamily = $("nextVowelFamily");
+    els.vowelSayWordBtn = $("vowelSayWordBtn");
+    els.vowelSayStatus = $("vowelSayStatus");
+    els.vowelSayHeard = $("vowelSayHeard");
+    els.vowelSayListenHint = $("vowelSayListenHint");
     els.overallProgressLabel = $("overallProgressLabel");
     els.overallProgressBar = $("overallProgressBar");
     els.overallProgressFill = $("overallProgressFill");
@@ -5400,7 +5401,6 @@
     els.phonicsQuiz = $("phonicsQuiz");
     els.phonicsQuizChoices = $("phonicsQuizChoices");
     els.phonicsStartQuiz = $("phonicsStartQuiz");
-    els.phonicsEllie = $("phonicsEllie");
     els.prevPhonicsLetter = $("prevPhonicsLetter");
     els.nextPhonicsLetter = $("nextPhonicsLetter");
     els.reportGradeBadge = $("reportGradeBadge");
@@ -5428,8 +5428,10 @@
     whenCloudReady(() => bindCloudAuth());
 
     await loadWordsFromJson();
+    await loadVowelWordsFromJson();
     await loadStoriesFromJson();
     clampWordIndex();
+    clampVowelFamilyIndex();
     clampFlashcardIndex();
     preloadPhonemeAudio();
 
@@ -5437,7 +5439,7 @@
     loadVoices();
 
     syncControlsFromState();
-    applyEllieTheme(state.ellieColor);
+    applyAccentTheme(state.ellieColor);
     updateHomeGreeting();
     updateProgressUI();
     updateStoryLevelPickersUI();
