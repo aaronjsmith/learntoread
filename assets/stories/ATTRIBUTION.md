@@ -1,8 +1,34 @@
 # Stories — attribution
 
-Story texts and cover illustrations in this folder include public-domain Aesop materials and original Ellie Reads primer stories. Per-page scene pictures are original illustrations created for Ellie Reads.
+Story texts and cover illustrations in this folder include public-domain Aesop materials, original Ellie Reads primer stories, and original children’s scripture retellings for Ellie Reads. Per-page scene pictures are original illustrations created for Ellie Reads.
+
+These scripture retellings are **not** official scripture text. They are original early-reader children’s adaptations written for Ellie Reads.
 
 ## Texts
+
+### Bible stories (original children’s retellings)
+
+Original simplified children’s retellings of traditional public-domain Bible narratives (not a copyrighted modern Bible translation). Written for early readers on Ellie Reads; wording is original.
+
+| Story id | Title |
+| --- | --- |
+| `bible-noah-ark` | Noah and the Ark |
+| `bible-david-brave` | David Is Brave |
+| `bible-daniel-lions` | Daniel and the Lions |
+| `bible-jesus-children` | Jesus Loves Children |
+| `bible-good-friend` | A Good Friend Helps |
+
+### Book of Mormon stories (original children’s retellings)
+
+Original simplified children’s retellings of well-known Book of Mormon events, written for early readers on Ellie Reads. These are **not** official scripture and do **not** copy copyrighted Book of Mormon wording.
+
+| Story id | Title |
+| --- | --- |
+| `bom-nephi-brave` | Nephi Is Brave |
+| `bom-lehi-tree` | Lehi Sees a Tree |
+| `bom-enos-prays` | Enos Prays |
+| `bom-jesus-visits` | Jesus Visits the Children |
+| `bom-brave-and-true` | Brave and True |
 
 ### Aesop retellings
 
