@@ -1,14 +1,14 @@
 # Stories — attribution
 
-Story texts and cover illustrations in this folder include public-domain Aesop materials, original Ellie Reads primer stories, and original children’s scripture retellings for Ellie Reads. Per-page scene pictures are original illustrations created for Ellie Reads.
+Story texts and cover illustrations in this folder include public-domain Aesop materials, original Learn to Read primer stories, and original children’s scripture retellings for Learn to Read. Per-page scene pictures are original illustrations created for Learn to Read.
 
-These scripture retellings are **not** official scripture text. They are original early-reader children’s adaptations written for Ellie Reads.
+These scripture retellings are **not** official scripture text. They are original early-reader children’s adaptations written for Learn to Read.
 
 ## Texts
 
 ### Bible stories (original children’s retellings)
 
-Original simplified children’s retellings of traditional public-domain Bible narratives (not a copyrighted modern Bible translation). Written for early readers on Ellie Reads; wording is original.
+Original simplified children’s retellings of traditional public-domain Bible narratives (not a copyrighted modern Bible translation). Written for early readers on Learn to Read; wording is original.
 
 | Story id | Title |
 | --- | --- |
@@ -20,7 +20,7 @@ Original simplified children’s retellings of traditional public-domain Bible n
 
 ### Book of Mormon stories (original children’s retellings)
 
-Original simplified children’s retellings of well-known Book of Mormon events, written for early readers on Ellie Reads. These are **not** official scripture and do **not** copy copyrighted Book of Mormon wording.
+Original simplified children’s retellings of well-known Book of Mormon events, written for early readers on Learn to Read. These are **not** official scripture and do **not** copy copyrighted Book of Mormon wording.
 
 | Story id | Title |
 | --- | --- |
@@ -41,7 +41,7 @@ Adaptations simplify wording for early readers while preserving the classic plot
 
 ### Primer stories (original) — First Words series
 
-Original early-reader texts written for Ellie Reads in a classic progressive primer style (short repetitive sentences, controlled vocabulary that grows book by book). Characters and wording are original—not copies of Bob Books, Dick and Jane, or other commercial primers.
+Original early-reader texts written for Learn to Read in a classic progressive primer style (short repetitive sentences, controlled vocabulary that grows book by book). Characters and wording are original—not copies of Bob Books, Dick and Jane, or other commercial primers.
 
 | Order | Story id | Title | Skill focus |
 | --- | --- | --- | --- |
@@ -93,7 +93,7 @@ Artist: Milo Winter (1886–1956). These images are public-domain scans of a 191
 | `primer-11-dot-is-lost.jpg` | Book 11 · Dot Is Lost |
 | `primer-12-a-day-of-fun.jpg` | Book 12 · A Day of Fun |
 
-Original kid-friendly watercolor-style covers created for Ellie Reads. Books 2, 4, and 5 reuse art adapted from the retired standalone primers.
+Original kid-friendly watercolor-style covers created for Learn to Read. Books 2, 4, and 5 reuse art adapted from the retired standalone primers.
 
 ## Per-page scene pictures
 
@@ -106,4 +106,4 @@ Original kid-friendly storybook illustrations for each story page live in:
 - `boy-wolf/p01.jpg` … `p04.jpg`
 - `primer-01-nan-can/` … `primer-12-a-day-of-fun/` each with `p01.jpg` … `p04.jpg`
 
-Created for Ellie Reads page-by-page reading (Aesop page art is not from Milo Winter plates; primer art is original for Ellie Reads).
+Created for Learn to Read page-by-page reading (Aesop page art is not from Milo Winter plates; primer art is original for Learn to Read).
