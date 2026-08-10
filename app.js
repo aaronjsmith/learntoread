@@ -949,6 +949,380 @@
     return sightWords.filter((w) => isSightWordMastered(w.word)).length;
   }
 
+  const ALL_VOWELS = ["a", "e", "i", "o", "u"];
+
+  /** Fallback CVC families when vowel-words.json is unavailable. */
+  const DEFAULT_VOWEL_FAMILIES = [
+    {
+      id: "c_t",
+      onset: "c",
+      coda: "t",
+      vowels: ["a", "o", "u"],
+      words: ["cat", "cot", "cut"],
+    },
+    {
+      id: "b_g",
+      onset: "b",
+      coda: "g",
+      vowels: ["a", "i", "o", "u"],
+      words: ["bag", "big", "bog", "bug"],
+    },
+    {
+      id: "h_t",
+      onset: "h",
+      coda: "t",
+      vowels: ["a", "i", "o", "u"],
+      words: ["hat", "hit", "hot", "hut"],
+    },
+    {
+      id: "p_n",
+      onset: "p",
+      coda: "n",
+      vowels: ["a", "e", "i", "u"],
+      words: ["pan", "pen", "pin", "pun"],
+    },
+    {
+      id: "m_p",
+      onset: "m",
+      coda: "p",
+      vowels: ["a", "o"],
+      words: ["map", "mop"],
+    },
+    {
+      id: "b_t",
+      onset: "b",
+      coda: "t",
+      vowels: ["a", "e", "i", "u"],
+      words: ["bat", "bet", "bit", "but"],
+    },
+    {
+      id: "d_g",
+      onset: "d",
+      coda: "g",
+      vowels: ["i", "o", "u"],
+      words: ["dig", "dog", "dug"],
+    },
+    {
+      id: "c_p",
+      onset: "c",
+      coda: "p",
+      vowels: ["a", "o", "u"],
+      words: ["cap", "cop", "cup"],
+    },
+    {
+      id: "b_d",
+      onset: "b",
+      coda: "d",
+      vowels: ["a", "e", "i", "u"],
+      words: ["bad", "bed", "bid", "bud"],
+    },
+    {
+      id: "n_t",
+      onset: "n",
+      coda: "t",
+      vowels: ["e", "i", "o", "u"],
+      words: ["net", "nit", "not", "nut"],
+    },
+    {
+      id: "l_p",
+      onset: "l",
+      coda: "p",
+      vowels: ["a", "i", "o"],
+      words: ["lap", "lip", "lop"],
+    },
+    {
+      id: "f_n",
+      onset: "f",
+      coda: "n",
+      vowels: ["a", "i", "u"],
+      words: ["fan", "fin", "fun"],
+    },
+    {
+      id: "s_t",
+      onset: "s",
+      coda: "t",
+      vowels: ["a", "e", "i"],
+      words: ["sat", "set", "sit"],
+    },
+    {
+      id: "t_p",
+      onset: "t",
+      coda: "p",
+      vowels: ["a", "i", "o"],
+      words: ["tap", "tip", "top"],
+    },
+  ];
+
+  function normalizeVowelFamily(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    const onset = String(raw.onset || "")
+      .trim()
+      .toLowerCase();
+    const coda = String(raw.coda || "")
+      .trim()
+      .toLowerCase();
+    if (!/^[a-z]$/.test(onset) || !/^[a-z]$/.test(coda)) return null;
+    const vowels = (Array.isArray(raw.vowels) ? raw.vowels : [])
+      .map((v) => String(v || "").trim().toLowerCase())
+      .filter((v) => ALL_VOWELS.includes(v));
+    const words = (Array.isArray(raw.words) ? raw.words : [])
+      .map((w) => String(w || "").trim().toLowerCase())
+      .filter(Boolean);
+    const vowelSet = new Set();
+    const wordList = [];
+    for (const v of vowels) {
+      const expected = `${onset}${v}${coda}`;
+      if (!words.includes(expected)) continue;
+      if (vowelSet.has(v)) continue;
+      vowelSet.add(v);
+      wordList.push(expected);
+    }
+    if (!wordList.length) return null;
+    const id = String(raw.id || "").trim() || `${onset}_${coda}`;
+    return {
+      id,
+      onset,
+      coda,
+      vowels: wordList.map((w) => w[1]),
+      words: wordList,
+    };
+  }
+
+  function getVowelFamily(i) {
+    if (!vowelFamilies.length) return null;
+    return vowelFamilies[
+      Math.min(Math.max(0, i), vowelFamilies.length - 1)
+    ];
+  }
+
+  function clampVowelFamilyIndex() {
+    if (!vowelFamilies.length) {
+      state.vowelFamilyIndex = 0;
+      state.vowelVowelIndex = 0;
+      return;
+    }
+    state.vowelFamilyIndex = Math.min(
+      Math.max(0, state.vowelFamilyIndex | 0),
+      vowelFamilies.length - 1
+    );
+    const family = getVowelFamily(state.vowelFamilyIndex);
+    const maxV = family && family.vowels.length ? family.vowels.length - 1 : 0;
+    state.vowelVowelIndex = Math.min(
+      Math.max(0, state.vowelVowelIndex | 0),
+      maxV
+    );
+  }
+
+  function getCurrentVowelWord() {
+    const family = getVowelFamily(state.vowelFamilyIndex);
+    if (!family) return "";
+    const idx = Math.min(
+      Math.max(0, state.vowelVowelIndex | 0),
+      family.words.length - 1
+    );
+    return family.words[idx] || "";
+  }
+
+  function getCurrentVowelLetter() {
+    const family = getVowelFamily(state.vowelFamilyIndex);
+    if (!family || !family.vowels.length) return "";
+    const idx = Math.min(
+      Math.max(0, state.vowelVowelIndex | 0),
+      family.vowels.length - 1
+    );
+    return family.vowels[idx] || "";
+  }
+
+  function isVowelFamilyPracticed(familyId) {
+    const key = String(familyId || "").trim();
+    return !!(key && state.vowelFamilyPracticed[key]);
+  }
+
+  function countVowelFamiliesPracticed() {
+    if (!vowelFamilies.length) return 0;
+    return vowelFamilies.filter((f) => isVowelFamilyPracticed(f.id)).length;
+  }
+
+  function markVowelFamilyPracticed(familyId) {
+    const key = String(familyId || "").trim();
+    if (!key) return;
+    if (
+      !state.vowelFamilyPracticed ||
+      typeof state.vowelFamilyPracticed !== "object"
+    ) {
+      state.vowelFamilyPracticed = {};
+    }
+    if (!state.vowelFamilyPracticed[key]) {
+      state.vowelFamilyPracticed[key] = true;
+      persistProgress();
+      updateProgressUI();
+    }
+  }
+
+  function isVowelWordMastered(word) {
+    const key = sightWordKey(word);
+    return !!(key && state.vowelWordMastery[key]);
+  }
+
+  function markVowelWordMastered(word) {
+    const key = sightWordKey(word);
+    if (!key) return;
+    if (
+      !state.vowelWordMastery ||
+      typeof state.vowelWordMastery !== "object"
+    ) {
+      state.vowelWordMastery = {};
+    }
+    if (!state.vowelWordMastery[key]) {
+      state.vowelWordMastery[key] = true;
+      persistProgress();
+      updateProgressUI();
+    }
+    const family = getVowelFamily(state.vowelFamilyIndex);
+    if (family) markVowelFamilyPracticed(family.id);
+    refreshVowelWordMasteryUi();
+  }
+
+  function setVowelVowelByLetter(letter, opts) {
+    const family = getVowelFamily(state.vowelFamilyIndex);
+    if (!family) return;
+    const v = String(letter || "")
+      .trim()
+      .toLowerCase();
+    const idx = family.vowels.indexOf(v);
+    if (idx < 0) return;
+    state.vowelVowelIndex = idx;
+    markVowelFamilyPracticed(family.id);
+    updateVowelWordsUI({ keepStatus: !!(opts && opts.keepStatus) });
+    if (!(opts && opts.silent)) {
+      const word = getCurrentVowelWord();
+      if (word) speakWholeWord(word);
+    }
+  }
+
+  function refreshVowelWordMasteryUi() {
+    const word = getCurrentVowelWord();
+    const mastered = isVowelWordMastered(word);
+    if (els.vowelWordTitle) {
+      els.vowelWordTitle.classList.toggle("is-mastered", mastered);
+      if (word) {
+        els.vowelWordTitle.setAttribute(
+          "aria-label",
+          mastered ? "Hear whole word (mastered)" : "Hear whole word"
+        );
+      }
+    }
+    if (!els.vowelWordProgress) return;
+    if (!vowelFamilies.length) {
+      els.vowelWordProgress.textContent = "No word families loaded";
+      return;
+    }
+    const family = getVowelFamily(state.vowelFamilyIndex);
+    const practiced = family && isVowelFamilyPracticed(family.id);
+    const base = `Family ${state.vowelFamilyIndex + 1} of ${vowelFamilies.length}`;
+    if (mastered) {
+      els.vowelWordProgress.textContent = `${base} · Mastered!`;
+    } else if (practiced) {
+      els.vowelWordProgress.textContent = `${base} · Practiced`;
+    } else {
+      els.vowelWordProgress.textContent = base;
+    }
+  }
+
+  function renderVowelWordTitle(word) {
+    if (!els.vowelWordTitle) return;
+    const w = String(word || "")
+      .trim()
+      .toLowerCase();
+    if (!w || w.length < 3) {
+      els.vowelWordTitle.textContent = w || "—";
+      return;
+    }
+    const onset = w[0];
+    const vowel = w[1];
+    const coda = w.slice(2);
+    els.vowelWordTitle.innerHTML = "";
+    const makeSpan = (ch, className) => {
+      const span = document.createElement("span");
+      span.className = className;
+      span.textContent = ch;
+      return span;
+    };
+    els.vowelWordTitle.appendChild(
+      makeSpan(onset, "vowel-word-letter vowel-word-letter--onset")
+    );
+    els.vowelWordTitle.appendChild(
+      makeSpan(vowel, "vowel-word-letter vowel-word-letter--vowel")
+    );
+    els.vowelWordTitle.appendChild(
+      makeSpan(coda, "vowel-word-letter vowel-word-letter--coda")
+    );
+  }
+
+  function updateVowelWordsUI(opts) {
+    clampVowelFamilyIndex();
+    const family = getVowelFamily(state.vowelFamilyIndex);
+    const word = getCurrentVowelWord();
+    const vowelLetter = getCurrentVowelLetter();
+    const keepStatus = !!(opts && opts.keepStatus);
+
+    if (els.vowelFrameLabel) {
+      if (family) {
+        els.vowelFrameLabel.textContent = `${family.onset} _ ${family.coda}`;
+        els.vowelFrameLabel.hidden = false;
+      } else {
+        els.vowelFrameLabel.textContent = "—";
+      }
+    }
+
+    renderVowelWordTitle(word);
+    refreshVowelWordMasteryUi();
+
+    if (els.vowelTileRow) {
+      els.vowelTileRow.innerHTML = "";
+      const available = new Set(family ? family.vowels : []);
+      ALL_VOWELS.forEach((v) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "vowel-tile";
+        btn.textContent = v;
+        btn.dataset.vowel = v;
+        const enabled = available.has(v);
+        btn.disabled = !enabled;
+        if (enabled && v === vowelLetter) btn.classList.add("is-active");
+        btn.setAttribute(
+          "aria-label",
+          enabled
+            ? `Make ${family.onset}${v}${family.coda}`
+            : `${v} does not make a word here`
+        );
+        btn.setAttribute("aria-pressed", v === vowelLetter ? "true" : "false");
+        if (enabled) {
+          btn.addEventListener("click", () => {
+            setVowelVowelByLetter(v);
+          });
+        }
+        els.vowelTileRow.appendChild(btn);
+      });
+    }
+
+    stopSayWordListening();
+    setEllieMood("");
+    if (!keepStatus) {
+      clearHeardText(els.vowelSayHeard, "Tap the mic and say the word");
+    }
+    if (!SpeechRecognitionAPI) {
+      if (els.vowelSayWordBtn) els.vowelSayWordBtn.disabled = true;
+      setVowelSayStatus(
+        "Speech recognition isn’t available in this browser.",
+        "error"
+      );
+    } else {
+      if (els.vowelSayWordBtn) els.vowelSayWordBtn.disabled = !word;
+      if (!keepStatus) setVowelSayStatus("", "");
+    }
+  }
+
   function normalizeStoryLevel(level) {
     const key = String(level || "").trim().toLowerCase();
     return STORY_LEVELS.includes(key) ? key : "beginner";
