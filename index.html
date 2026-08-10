@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ellie Reads — Learn to Read</title>
+  <title>Learn to Read</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet" />
@@ -385,16 +385,6 @@
     .speak-help-btn .btn-icon {
       width: 22px;
       height: 22px;
-    }
-
-    .home-hero {
-      display: grid;
-      gap: 4px;
-      justify-items: center;
-      text-align: center;
-      margin-bottom: 8px;
-      padding: 0;
-      flex-shrink: 0;
     }
 
     .activity-grid {
@@ -1628,9 +1618,7 @@
       50% { transform: translateY(-7px); }
     }
 
-    @keyframes floaty {
-      0%, 100% { transform: translateY(0) rotate(-4deg); }
-      50% { transform: translateY(-8px) rotate(4deg); }
+    50% { transform: translateY(-8px) rotate(4deg); }
     }
 
     @keyframes pop-in {
@@ -2380,7 +2368,7 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.15s ease, background 0.15s ease;
-      min-height: 0;
+      min-height: 168px;
       width: 100%;
       overflow: hidden;
     }
@@ -2473,21 +2461,13 @@
       flex-shrink: 0;
     }
 
-    .story-card-badge {
-      display: inline-block;
-      margin: 0 0 6px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: var(--mint-soft);
-      color: var(--mint-dark);
-      font-size: 0.72rem;
-      font-weight: 800;
-      width: fit-content;
-    }
-
     @media (max-width: 360px) {
       .stories-category-grid {
         grid-template-columns: 1fr;
+      }
+
+      .stories-category-grid > .story-card:last-child:nth-child(odd) {
+        grid-column: auto;
       }
     }
 
@@ -2926,18 +2906,10 @@
       .story-illustration {
         max-height: min(24dvh, 200px);
       }
-
-      .sight-buddy {
-        display: none;
-      }
-    }
+}
 
     @media (max-height: 640px) {
-      .home-hero {
-        display: none;
-      }
-
-      #homeScreen > h2 {
+#homeScreen > h2 {
         display: none;
       }
 
@@ -3103,62 +3075,8 @@
   </style>
 </head>
 <body>
-  <!-- Cute Sanrio-style elephant sprites (inline so they tint with theme). -->
   <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
-    <symbol id="ellie-full" viewBox="0 0 200 200">
-      <!-- ears -->
-      <ellipse cx="42" cy="96" rx="28" ry="34" fill="#9fd6ff"/>
-      <ellipse cx="42" cy="96" rx="16" ry="22" fill="#ffb6c8"/>
-      <ellipse cx="158" cy="96" rx="28" ry="34" fill="#9fd6ff"/>
-      <ellipse cx="158" cy="96" rx="16" ry="22" fill="#ffb6c8"/>
-      <!-- body -->
-      <ellipse cx="100" cy="148" rx="46" ry="34" fill="#b8e2ff"/>
-      <!-- head -->
-      <circle cx="100" cy="98" r="52" fill="#c9ebff"/>
-      <!-- trunk -->
-      <path d="M92 118c2 22 6 34 14 40 6 4 14 2 16-4 2-6-2-10-8-12-8-2-12-12-12-24z" fill="#9fd6ff"/>
-      <ellipse cx="108" cy="156" rx="8" ry="6" fill="#ffb6c8"/>
-      <!-- blush -->
-      <ellipse cx="72" cy="108" rx="10" ry="6" fill="#ffb6c8" opacity="0.85"/>
-      <ellipse cx="128" cy="108" rx="10" ry="6" fill="#ffb6c8" opacity="0.85"/>
-      <!-- eyes -->
-      <ellipse cx="82" cy="92" rx="5.5" ry="7" fill="#2a3550"/>
-      <ellipse cx="118" cy="92" rx="5.5" ry="7" fill="#2a3550"/>
-      <circle cx="84" cy="90" r="1.8" fill="#fff"/>
-      <circle cx="120" cy="90" r="1.8" fill="#fff"/>
-      <!-- tiny smile -->
-      <path d="M94 112c4 5 12 5 16 0" fill="none" stroke="#2a3550" stroke-width="2.5" stroke-linecap="round"/>
-      <!-- bow -->
-      <circle cx="100" cy="54" r="8" fill="#ff6b8a"/>
-      <ellipse cx="86" cy="54" rx="12" ry="8" fill="#ff6b8a"/>
-      <ellipse cx="114" cy="54" rx="12" ry="8" fill="#ff6b8a"/>
-      <circle cx="100" cy="54" r="4" fill="#ffc94a"/>
-      <!-- feet -->
-      <ellipse cx="78" cy="176" rx="14" ry="8" fill="#9fd6ff"/>
-      <ellipse cx="122" cy="176" rx="14" ry="8" fill="#9fd6ff"/>
-    </symbol>
-
-    <symbol id="ellie-mini" viewBox="0 0 120 120">
-      <ellipse cx="24" cy="62" rx="16" ry="20" fill="#9fd6ff"/>
-      <ellipse cx="24" cy="62" rx="9" ry="12" fill="#ffb6c8"/>
-      <ellipse cx="96" cy="62" rx="16" ry="20" fill="#9fd6ff"/>
-      <ellipse cx="96" cy="62" rx="9" ry="12" fill="#ffb6c8"/>
-      <circle cx="60" cy="64" r="34" fill="#c9ebff"/>
-      <path d="M54 78c1 14 4 22 10 26 4 3 10 1 11-3 1-4-2-7-6-8-5-1-8-8-8-15z" fill="#9fd6ff"/>
-      <ellipse cx="42" cy="70" rx="7" ry="4" fill="#ffb6c8" opacity="0.9"/>
-      <ellipse cx="78" cy="70" rx="7" ry="4" fill="#ffb6c8" opacity="0.9"/>
-      <ellipse cx="48" cy="60" rx="4" ry="5" fill="#2a3550"/>
-      <ellipse cx="72" cy="60" rx="4" ry="5" fill="#2a3550"/>
-      <circle cx="49.5" cy="58.5" r="1.2" fill="#fff"/>
-      <circle cx="73.5" cy="58.5" r="1.2" fill="#fff"/>
-      <path d="M55 74c3 3.5 9 3.5 12 0" fill="none" stroke="#2a3550" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="60" cy="34" r="5" fill="#ff6b8a"/>
-      <ellipse cx="51" cy="34" rx="8" ry="5" fill="#ff6b8a"/>
-      <ellipse cx="69" cy="34" rx="8" ry="5" fill="#ff6b8a"/>
-      <circle cx="60" cy="34" r="2.5" fill="#ffc94a"/>
-    </symbol>
-
-    <symbol id="friend-sun" viewBox="0 0 64 64">
+<symbol id="friend-sun" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="14" fill="#ffc94a"/>
       <g stroke="#ffc94a" stroke-width="4" stroke-linecap="round">
         <line x1="32" y1="6" x2="32" y2="14"/>
@@ -3355,9 +3273,9 @@
     <div class="header-row">
       <button type="button" class="brand js-back-home" id="brandHome" title="Home" aria-label="Home" data-speak="Home">
         <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
+          <svg viewBox="0 0 72 72"><use href="#icon-book"/></svg>
         </span>
-        <h1 class="brand-title">Ellie Reads</h1>
+        <h1 class="brand-title">Learn to Read</h1>
       </button>
       <div class="header-actions">
         <button type="button" class="header-progress" id="headerProgressBtn" title="Report card" aria-label="Report card — overall progress" data-speak="Report card">
@@ -3385,17 +3303,7 @@
 
   <main>
     <section class="screen" data-screen="home" id="homeScreen">
-      <div class="home-hero">
-        <div class="ellie-stage" id="homeEllie" aria-hidden="true">
-          <svg viewBox="0 0 200 200"><use href="#ellie-full"/></svg>
-        </div>
-        <p class="ellie-bubble" id="ellieBubble" role="button" tabindex="0" title="Tap to hear instructions" aria-label="Hear home instructions">Hi! I’m Ellie — let’s read together!</p>
-        <div class="home-friends" aria-hidden="true">
-          <svg class="friend friend--sun" viewBox="0 0 64 64"><use href="#friend-sun"/></svg>
-          <svg class="friend friend--bird" viewBox="0 0 64 64"><use href="#friend-bird"/></svg>
-        </div>
-      </div>
-      <h2>Activities</h2>
+<h2>Activities</h2>
       <div class="lead-row">
         <p class="lead" id="homeGreeting">Pick an activity.</p>
         <button type="button" class="speak-help-btn" data-speak-help="home" title="Hear instructions" aria-label="Hear home instructions">
@@ -3479,10 +3387,7 @@
           <div class="phonics-grid" id="phonicsGrid" role="list" aria-label="Alphabet letter sounds"></div>
         </div>
         <div class="phonics-stage">
-          <div class="sight-buddy" id="phonicsEllie" aria-hidden="true">
-            <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-          </div>
-          <button type="button" class="phonics-letter-big" id="phonicsLetterBig" aria-label="Hear letter sound">A</button>
+<button type="button" class="phonics-letter-big" id="phonicsLetterBig" aria-label="Hear letter sound">A</button>
           <button type="button" class="phonics-cue" id="phonicsCue" aria-label="Hear apple">
             <span class="phonics-emoji" id="phonicsEmoji" aria-hidden="true">🍎</span>
             <span class="phonics-example" id="phonicsExample">as in apple</span>
@@ -3511,7 +3416,7 @@
           <div class="phonics-say">
             <p class="say-listen-hint" id="phonicsListenHint" aria-hidden="true">Listening…</p>
             <div class="say-heard-panel">
-              <span class="say-heard-label" id="phonicsHeardLabel">What Ellie heard</span>
+              <span class="say-heard-label" id="phonicsHeardLabel">What we heard</span>
               <div class="say-heard-box is-empty" id="phonicsHeard" aria-live="polite" aria-labelledby="phonicsHeardLabel">Tap the mic and say it</div>
             </div>
             <p class="phonics-status" id="phonicsStatus" role="status" aria-live="polite"></p>
@@ -3546,10 +3451,7 @@
         </button>
       </div>
       <div class="word-stage">
-        <div class="sight-buddy" id="sightEllie" aria-hidden="true">
-          <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-        </div>
-        <button type="button" class="sight-word-emoji-btn" id="sightWordEmojiBtn" hidden aria-label="Picture hint">
+<button type="button" class="sight-word-emoji-btn" id="sightWordEmojiBtn" hidden aria-label="Picture hint">
           <span class="sight-word-emoji" id="sightWordEmoji" aria-hidden="true"></span>
         </button>
         <div class="word-hear-wrap">
@@ -3589,7 +3491,7 @@
           </button>
           <p class="say-listen-hint" id="sayWordListenHint" aria-hidden="true">Listening…</p>
           <div class="say-heard-panel">
-            <span class="say-heard-label" id="sayWordHeardLabel">What Ellie heard</span>
+            <span class="say-heard-label" id="sayWordHeardLabel">What we heard</span>
             <div class="say-heard-box is-empty" id="sayWordHeard" aria-live="polite" aria-labelledby="sayWordHeardLabel">Tap the mic and say the word</div>
           </div>
           <p class="say-word-status" id="sayWordStatus" role="status" aria-live="polite"></p>
@@ -3613,10 +3515,7 @@
         </button>
       </div>
       <div class="word-stage">
-        <div class="sight-buddy" id="vowelEllie" aria-hidden="true">
-          <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-        </div>
-        <p class="vowel-frame" id="vowelFrameLabel" aria-hidden="true">—</p>
+<p class="vowel-frame" id="vowelFrameLabel" aria-hidden="true">—</p>
         <div class="word-hear-wrap">
           <button type="button" class="word-big" id="vowelWordTitle" aria-label="Hear whole word" title="Tap to hear the whole word">—</button>
           <span class="word-hear-cue" aria-hidden="true" title="Tap the word to hear it">
@@ -3647,7 +3546,7 @@
           </button>
           <p class="say-listen-hint" id="vowelSayListenHint" aria-hidden="true">Listening…</p>
           <div class="say-heard-panel">
-            <span class="say-heard-label" id="vowelSayHeardLabel">What Ellie heard</span>
+            <span class="say-heard-label" id="vowelSayHeardLabel">What we heard</span>
             <div class="say-heard-box is-empty" id="vowelSayHeard" aria-live="polite" aria-labelledby="vowelSayHeardLabel">Tap the mic and say the word</div>
           </div>
           <p class="say-word-status" id="vowelSayStatus" role="status" aria-live="polite"></p>
@@ -3671,10 +3570,7 @@
         </button>
       </div>
       <div class="word-stage word-stage--flashcards">
-        <div class="sight-buddy" id="flashcardEllie" aria-hidden="true">
-          <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-        </div>
-        <div class="word-hear-wrap">
+<div class="word-hear-wrap">
           <button type="button" class="word-big" id="flashcardWordTitle" aria-label="Hear word" title="Tap to hear the word">—</button>
           <span class="word-hear-cue" aria-hidden="true" title="Tap the word to hear it">
             <svg viewBox="0 0 24 24"><use href="#icon-speaker"/></svg>
@@ -3818,7 +3714,7 @@
               <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
             </button>
           </div>
-          <p id="reportGradeSummary">Keep practicing with Ellie!</p>
+          <p id="reportGradeSummary">Keep practicing — you’re doing great!</p>
           <p class="lead" id="reportLead" style="margin:8px 0 0;font-size:0.98rem;">Your stars for letters, words, and stories.</p>
         </div>
         <div class="report-section">
@@ -3848,11 +3744,8 @@
 
   <div class="modal-overlay" id="welcomeModal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
     <div class="modal">
-      <div class="modal-ellie" aria-hidden="true">
-        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-      </div>
-      <div class="lead-row" style="align-items:center;margin-bottom:10px;">
-        <h2 id="welcomeTitle" style="margin:0;flex:1;">Welcome with Ellie!</h2>
+<div class="lead-row" style="align-items:center;margin-bottom:10px;">
+        <h2 id="welcomeTitle" style="margin:0;flex:1;">Welcome!</h2>
         <button type="button" class="speak-help-btn" data-speak-help="welcome" title="Hear instructions" aria-label="Hear welcome instructions">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
         </button>
@@ -3903,16 +3796,13 @@
 
   <div class="modal-overlay" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="nameTitle" hidden>
     <div class="modal">
-      <div class="modal-ellie" aria-hidden="true">
-        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-      </div>
-      <div class="lead-row" style="align-items:center;margin-bottom:10px;">
+<div class="lead-row" style="align-items:center;margin-bottom:10px;">
         <h2 id="nameTitle" style="margin:0;flex:1;">What is your name?</h2>
         <button type="button" class="speak-help-btn" data-speak-help="name" title="Hear instructions" aria-label="Hear name instructions">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
         </button>
       </div>
-      <p>Ellie loves saying hello! Each reader on this device gets their own name and progress.</p>
+      <p>Each reader on this device gets their own name and progress.</p>
       <form id="nameForm">
         <div class="field">
           <label for="nameInput">Your name</label>
@@ -3930,22 +3820,19 @@
 
   <div class="modal-overlay" id="levelModal" role="dialog" aria-modal="true" aria-labelledby="levelTitle" hidden>
     <div class="modal modal--wide">
-      <div class="modal-ellie" aria-hidden="true">
-        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-      </div>
-      <div class="lead-row" style="align-items:center;margin-bottom:10px;">
+<div class="lead-row" style="align-items:center;margin-bottom:10px;">
         <h2 id="levelTitle" style="margin:0;flex:1;">Grade or age?</h2>
         <button type="button" class="speak-help-btn" data-speak-help="level" title="Hear instructions" aria-label="Hear grade instructions">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
         </button>
       </div>
-      <p id="levelLead">Grown-ups: tap a school grade (K–12) or an age band. Ellie will pick Easy or Longer stories to start.</p>
+      <p id="levelLead">Grown-ups: tap a school grade (K–12) or an age band. We’ll pick Easy or Longer stories to start.</p>
       <p class="onboarding-section-label">School grade</p>
       <div class="grade-grid" id="gradeGrid" role="group" aria-label="Choose grade K through 12"></div>
       <p class="onboarding-section-label">Or age</p>
       <div class="age-band-row" id="ageBandRow" role="group" aria-label="Choose an age band"></div>
-      <p class="onboarding-section-label">Ellie color (optional)</p>
-      <div class="ellie-color-row" id="ellieColorRow" role="group" aria-label="Choose Ellie color"></div>
+      <p class="onboarding-section-label">Theme color (optional)</p>
+      <div class="theme-color-row" id="themeColorRow" role="group" aria-label="Choose theme color"></div>
       <div class="modal-actions">
         <button type="button" class="btn-with-icon" id="levelContinue" aria-label="Let’s read" data-speak="Let’s read">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-spark"/></svg>
@@ -3957,10 +3844,7 @@
 
   <div class="modal-overlay" id="profilePickerModal" role="dialog" aria-modal="true" aria-labelledby="profilePickerTitle" hidden>
     <div class="modal modal--wide">
-      <div class="modal-ellie" aria-hidden="true">
-        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-      </div>
-      <div class="lead-row" style="align-items:center;margin-bottom:10px;">
+<div class="lead-row" style="align-items:center;margin-bottom:10px;">
         <h2 id="profilePickerTitle" style="margin:0;flex:1;">Who’s reading?</h2>
         <button type="button" class="speak-help-btn" data-speak-help="profiles" title="Hear instructions" aria-label="Hear who’s reading instructions">
           <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-speaker"/></svg>
@@ -3985,11 +3869,8 @@
 
   <div class="modal-overlay" id="parentalGateModal" role="dialog" aria-modal="true" aria-labelledby="parentalGateTitle" hidden>
     <div class="modal">
-      <div class="modal-ellie" aria-hidden="true">
-        <svg viewBox="0 0 120 120"><use href="#ellie-mini"/></svg>
-      </div>
-      <h2 id="parentalGateTitle">Ask a grown-up</h2>
-      <p id="parentalGateKidMsg">Ellie says Settings is for parents only.</p>
+<h2 id="parentalGateTitle">Ask a grown-up</h2>
+      <p id="parentalGateKidMsg">Settings is for grown-ups only.</p>
       <p id="parentalGateHint"><strong>Grown-ups:</strong> tap the word <strong id="parentalGateCodeWord">elephant</strong>.</p>
       <div class="parental-gate-words" id="parentalGateWords" role="group" aria-label="Choose the code word"></div>
       <p class="parental-gate-feedback" id="parentalGateFeedback" role="status" aria-live="polite"></p>
@@ -4009,7 +3890,7 @@
       </div>
       <h2 id="settingsTitle">Settings</h2>
       <p class="settings-section-label" style="text-align:center;margin:0;">Voice</p>
-      <p class="settings-lead">Pick a friendly voice for Ellie to use when saying whole words.</p>
+      <p class="settings-lead">Pick a friendly voice for saying whole words.</p>
       <div class="settings-layout">
         <div class="settings-col settings-col--voice">
           <div class="settings-row">
