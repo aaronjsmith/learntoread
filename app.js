@@ -1892,6 +1892,7 @@
     updateProgressUI();
     updateStoryLevelPickersUI();
     if (els.sightScreen && !els.sightScreen.hidden) updateSightWordUI();
+    if (els.vowelsScreen && !els.vowelsScreen.hidden) updateVowelWordsUI();
     if (els.flashcardsScreen && !els.flashcardsScreen.hidden) updateFlashcardUI();
     applyVoiceFilters();
   }
@@ -3323,7 +3324,9 @@
   }
 
   function showScreen(name, opts) {
-    if (name !== "sight" && name !== "phonics") stopSayWordListening();
+    if (name !== "sight" && name !== "phonics" && name !== "vowels") {
+      stopSayWordListening();
+    }
     if (name !== "phonics") {
       phonicsQuizMode = false;
       phonicsListenMode = false;
