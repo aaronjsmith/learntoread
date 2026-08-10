@@ -349,6 +349,7 @@
 
   let activeRecognition = null;
   let sayWordListening = false;
+  let vowelSayListening = false;
   let lastPhonicsUiIndex = -1;
 
   /**
@@ -3498,6 +3499,35 @@
     } else if (!kind) setEllieMood("");
   }
 
+  function setVowelSayStatus(message, kind) {
+    if (!els.vowelSayStatus) return;
+    els.vowelSayStatus.textContent = message || "";
+    els.vowelSayStatus.className =
+      "say-word-status" + (kind ? ` is-${kind}` : "");
+    if (kind === "listening") setEllieMood("listen");
+    else if (kind === "success") {
+      setEllieMood("cheer");
+      playFeedbackSfx("success");
+    } else if (kind === "miss") {
+      setEllieMood("think");
+      playFeedbackSfx("miss");
+    } else if (!kind) setEllieMood("");
+  }
+
+  function setVowelSayListeningUi(listening) {
+    vowelSayListening = listening;
+    setMicButtonListening(
+      els.vowelSayWordBtn,
+      listening,
+      "Say the word",
+      "Listening…"
+    );
+    setListenHint(els.vowelSayListenHint, listening);
+    if (els.vowelSayHeard) {
+      els.vowelSayHeard.classList.toggle("is-listening", !!listening);
+    }
+  }
+
   function setHeardText(box, text, opts) {
     if (!box) return;
     const listening = !!(opts && opts.listening);
@@ -3558,6 +3588,7 @@
       activeRecognition = null;
     }
     if (sayWordListening) setSayWordListeningUi(false);
+    if (vowelSayListening) setVowelSayListeningUi(false);
     if (phonicsListenMode) {
       phonicsListenMode = false;
       setPhonicsListeningUi(false);
@@ -3723,6 +3754,125 @@
       activeRecognition = null;
       setSayWordListeningUi(false);
       setSayWordStatus("Couldn’t start the microphone. Try again.", "error");
+    }
+  }
+
+  function startVowelSayListening() {
+    const target = getCurrentVowelWord();
+    if (!target) return;
+
+    if (!SpeechRecognitionAPI) {
+      setVowelSayStatus(
+        "Speech recognition isn’t available in this browser. Try Chrome or Edge.",
+        "error"
+      );
+      return;
+    }
+
+    if (vowelSayListening) {
+      stopSayWordListening();
+      setVowelSayStatus("Canceled.", "");
+      return;
+    }
+
+    stopPhonemeAudio();
+    try {
+      speechSynthesis.cancel();
+    } catch (_) {}
+    stopSayWordListening();
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 5;
+    recognition.continuous = false;
+
+    if (SpeechGrammarListAPI) {
+      try {
+        const list = new SpeechGrammarListAPI();
+        const safe = normalizeHeardText(target).replace(/[^a-z0-9]/g, "");
+        if (safe) {
+          list.addFromString(
+            `#JSGF V1.0; grammar word; public <word> = ${safe} ;`,
+            1
+          );
+          recognition.grammars = list;
+        }
+      } catch (_) {
+        /* grammar optional */
+      }
+    }
+
+    activeRecognition = recognition;
+    clearHeardText(els.vowelSayHeard, "Listening… say the word");
+    setVowelSayListeningUi(true);
+    setVowelSayStatus("Listening… say the word clearly.", "listening");
+
+    let matchSettled = false;
+    recognition.onresult = (event) => {
+      if (matchSettled) return;
+
+      const display = getRecognitionDisplayText(event);
+      if (display) {
+        setHeardText(els.vowelSayHeard, display, { listening: true });
+      }
+
+      const hypotheses = collectRecognitionHypotheses(event);
+      if (!hypotheses.length) return;
+
+      const matched = hypotheses.some((h) => heardMatchesTarget(h, target));
+      const best = hypotheses[0] ? normalizeHeardText(hypotheses[0]) : "";
+      if (best) {
+        setHeardText(els.vowelSayHeard, best, { listening: false });
+      }
+
+      if (matched) {
+        matchSettled = true;
+        setVowelSayStatus("Yay! Ellie heard it — you got it!", "success");
+        markVowelWordMastered(target);
+        try {
+          recognition.stop();
+        } catch (_) {}
+      } else if (best) {
+        setVowelSayStatus(`Ellie heard “${best}”. Try again!`, "miss");
+      } else {
+        setVowelSayStatus("Ellie didn’t catch that. Try again!", "miss");
+      }
+    };
+
+    recognition.onerror = (event) => {
+      const err = (event && event.error) || "";
+      if (err === "aborted") return;
+      if (err === "not-allowed" || err === "service-not-allowed") {
+        setVowelSayStatus(
+          "Microphone permission is needed to check your reading.",
+          "error"
+        );
+      } else if (err === "no-speech") {
+        setVowelSayStatus("No speech heard. Tap and try again.", "miss");
+      } else if (err === "audio-capture") {
+        setVowelSayStatus("No microphone found.", "error");
+      } else if (err === "network") {
+        setVowelSayStatus(
+          "Speech check needs a network connection in this browser.",
+          "error"
+        );
+      } else {
+        setVowelSayStatus("Couldn’t listen right now. Try again.", "error");
+      }
+    };
+
+    recognition.onend = () => {
+      activeRecognition = null;
+      setVowelSayListeningUi(false);
+    };
+
+    try {
+      recognition.start();
+    } catch (_) {
+      activeRecognition = null;
+      setVowelSayListeningUi(false);
+      setVowelSayStatus("Couldn’t start the microphone. Try again.", "error");
     }
   }
 

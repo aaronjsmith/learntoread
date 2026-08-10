@@ -341,11 +341,11 @@
           "imageAlt": "Nan and Pip wave goodbye as the sun gets low",
           "beginner": [
             "The sun is set.",
-            "Get in! Fun end."
+            "Nan and Pip go in."
           ],
           "advanced": [
             "The sun is set low.",
-            "Nan and Pip get in. Fun ends."
+            "Nan and Pip go in. Fun ends."
           ]
         }
       ]
@@ -806,11 +806,11 @@
           "image": "assets/stories/primer-12-a-day-of-fun/p02.jpg",
           "imageAlt": "They run, hop, and dig in the yard",
           "beginner": [
-            "They ran and hop.",
+            "They run and hop.",
             "They dig and dig."
           ],
           "advanced": [
-            "They ran and hop in the yard.",
+            "They run and hop in the yard.",
             "They dig and find a big stick."
           ]
         },

@@ -11,19 +11,28 @@ Short early-reader retellings of traditional Aesop fables, adapted for young chi
 - **The Æsop for Children** (1919), Project Gutenberg ebook [#19994](https://www.gutenberg.org/ebooks/19994)
 - Original fables attributed to **Aesop** (ancient Greek tradition; public domain)
 
-Adaptations simplify wording for early readers while preserving the classic plots and morals. Project Gutenberg license notice (normative): this ebook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever; you may copy, give it away, or re-use it under the terms of the [Project Gutenberg License](https://www.gutenberg.org/license).
+Adaptations simplify wording for early readers while preserving the classic plots and morals. Project Gutenberg license notice (normative): this ebook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever; you may copy it, give it away, or re-use it under the terms of the [Project Gutenberg License](https://www.gutenberg.org/license).
 
-### Primer stories (original)
+### Primer stories (original) — First Words series
 
-Original early-reader texts written for Ellie Reads in a classic primer style (short repetitive sentences, controlled vocabulary). Characters and wording are original—not copies of Bob Books, Dick and Jane, or other commercial primers.
+Original early-reader texts written for Ellie Reads in a classic progressive primer style (short repetitive sentences, controlled vocabulary that grows book by book). Characters and wording are original—not copies of Bob Books, Dick and Jane, or other commercial primers.
 
-| Story id | Title |
-| --- | --- |
-| `nan-runs` | Nan Can Run |
-| `pip-and-dot` | Pip and Dot |
-| `see-the-sun` | See the Sun |
-| `dos-can-run` | Dos Can Run |
-| `primer-01-nan-can` … `primer-12-a-day-of-fun` | First Words Books 1–12 |
+| Order | Story id | Title | Skill focus |
+| --- | --- | --- | --- |
+| 1 | `primer-01-nan-can` | Book 1 · Nan Can | Short a CVC |
+| 2 | `primer-02-nan-ran` | Book 2 · Nan Ran | More short a; see / a / the |
+| 3 | `primer-03-pip-sits` | Book 3 · Pip Sits | Short i |
+| 4 | `primer-04-dot-hops` | Book 4 · Dot Hops | Short o |
+| 5 | `primer-05-fun-sun` | Book 5 · Fun in the Sun | Short u / e |
+| 6 | `primer-06-mix-it-up` | Book 6 · Mix It Up | Mixing short vowels |
+| 7 | `primer-07-see-the-map` | Book 7 · See the Map | Sight words + CVC |
+| 8 | `primer-08-we-can-help` | Book 8 · We Can Help | More sight + CVC |
+| 9 | `primer-09-fish-and-wish` | Book 9 · Fish and Wish | Light digraphs (sh, th) |
+| 10 | `primer-10-the-big-trip` | Book 10 · The Big Trip | Slightly longer controlled |
+| 11 | `primer-11-dot-is-lost` | Book 11 · Dot Is Lost | Slightly longer narrative |
+| 12 | `primer-12-a-day-of-fun` | Book 12 · A Day of Fun | All skills together |
+
+Earlier standalone primers (`nan-runs`, `pip-and-dot`, `see-the-sun`) were folded into this series (primarily Books 2, 4, and 5) and retired as separate story entries.
 
 ## Cover illustrations (story list thumbs)
 
@@ -45,12 +54,20 @@ Artist: Milo Winter (1886–1956). These images are public-domain scans of a 191
 
 | Local file | Story |
 | --- | --- |
-| `nan-runs.jpg` | Nan Can Run |
-| `pip-and-dot.jpg` | Pip and Dot |
-| `see-the-sun.jpg` | See the Sun |
-| `dos-can-run.jpg` | Dos Can Run |
+| `primer-01-nan-can.jpg` | Book 1 · Nan Can |
+| `primer-02-nan-ran.jpg` | Book 2 · Nan Ran |
+| `primer-03-pip-sits.jpg` | Book 3 · Pip Sits |
+| `primer-04-dot-hops.jpg` | Book 4 · Dot Hops |
+| `primer-05-fun-sun.jpg` | Book 5 · Fun in the Sun |
+| `primer-06-mix-it-up.jpg` | Book 6 · Mix It Up |
+| `primer-07-see-the-map.jpg` | Book 7 · See the Map |
+| `primer-08-we-can-help.jpg` | Book 8 · We Can Help |
+| `primer-09-fish-and-wish.jpg` | Book 9 · Fish and Wish |
+| `primer-10-the-big-trip.jpg` | Book 10 · The Big Trip |
+| `primer-11-dot-is-lost.jpg` | Book 11 · Dot Is Lost |
+| `primer-12-a-day-of-fun.jpg` | Book 12 · A Day of Fun |
 
-Original kid-friendly watercolor-style covers created for Ellie Reads.
+Original kid-friendly watercolor-style covers created for Ellie Reads. Books 2, 4, and 5 reuse art adapted from the retired standalone primers.
 
 ## Per-page scene pictures
 
@@ -61,9 +78,6 @@ Original kid-friendly storybook illustrations for each story page live in:
 - `fox-grapes/p01.jpg` … `p04.jpg`
 - `ant-grasshopper/p01.jpg` … `p04.jpg`
 - `boy-wolf/p01.jpg` … `p04.jpg`
-- `nan-runs/p01.jpg` … `p04.jpg`
-- `pip-and-dot/p01.jpg` … `p04.jpg`
-- `see-the-sun/p01.jpg` … `p04.jpg`
-- `dos-can-run/p01.jpg` … `p04.jpg`
+- `primer-01-nan-can/` … `primer-12-a-day-of-fun/` each with `p01.jpg` … `p04.jpg`
 
 Created for Ellie Reads page-by-page reading (Aesop page art is not from Milo Winter plates; primer art is original for Ellie Reads).
