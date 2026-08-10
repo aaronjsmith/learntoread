@@ -95,6 +95,23 @@ Artist: Milo Winter (1886–1956). These images are public-domain scans of a 191
 
 Original kid-friendly watercolor-style covers created for Learn to Read. Books 2, 4, and 5 reuse art adapted from the retired standalone primers.
 
+### Bible and Book of Mormon covers (original)
+
+| Local file | Story |
+| --- | --- |
+| `bible-noah-ark.jpg` | Noah and the Ark |
+| `bible-david-brave.jpg` | David Is Brave |
+| `bible-daniel-lions.jpg` | Daniel and the Lions |
+| `bible-jesus-children.jpg` | Jesus Loves Children |
+| `bible-good-friend.jpg` | A Good Friend Helps |
+| `bom-nephi-brave.jpg` | Nephi Is Brave |
+| `bom-lehi-tree.jpg` | Lehi Sees a Tree |
+| `bom-enos-prays.jpg` | Enos Prays |
+| `bom-jesus-visits.jpg` | Jesus Visits the Children |
+| `bom-brave-and-true.jpg` | Brave and True |
+
+Original soft watercolor kid storybook covers created for Learn to Read.
+
 ## Per-page scene pictures
 
 Original kid-friendly storybook illustrations for each story page live in:
@@ -105,5 +122,7 @@ Original kid-friendly storybook illustrations for each story page live in:
 - `ant-grasshopper/p01.jpg` … `p04.jpg`
 - `boy-wolf/p01.jpg` … `p04.jpg`
 - `primer-01-nan-can/` … `primer-12-a-day-of-fun/` each with `p01.jpg` … `p04.jpg`
+- `bible-noah-ark/` … `bible-good-friend/` each with `p01.jpg` … `p04.jpg`
+- `bom-nephi-brave/` … `bom-brave-and-true/` each with `p01.jpg` … `p04.jpg`
 
-Created for Learn to Read page-by-page reading (Aesop page art is not from Milo Winter plates; primer art is original for Learn to Read).
+Created for Learn to Read page-by-page reading (Aesop page art is not from Milo Winter plates; primer and scripture art is original for Learn to Read).

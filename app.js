@@ -5239,6 +5239,11 @@
       updateSightWordUI();
     }
 
+    function openVowelsActivity() {
+      showScreen("vowels");
+      updateVowelWordsUI();
+    }
+
     function openStoriesActivity() {
       showScreen("stories");
       updateStoryLevelPickersUI();
@@ -5274,6 +5279,9 @@
     }
     if (els.homeOpenSight) {
       els.homeOpenSight.addEventListener("click", () => openSightActivity());
+    }
+    if (els.homeOpenVowels) {
+      els.homeOpenVowels.addEventListener("click", () => openVowelsActivity());
     }
     if (els.homeOpenStories) {
       els.homeOpenStories.addEventListener("click", () => openStoriesActivity());
