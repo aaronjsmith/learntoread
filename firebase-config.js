@@ -1,5 +1,5 @@
 /**
- * Ellie Reads — Firebase client config (public).
+ * Learn to Read — Firebase client config (public).
  *
  * Fill in values from Firebase Console → Project settings → Your apps.
  * Client config is safe to expose in the browser; never put service-account

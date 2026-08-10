@@ -1,5 +1,5 @@
 /**
- * Google sign-in + Firestore progress sync for Ellie Reads.
+ * Google sign-in + Firestore progress sync for Learn to Read.
  * Uses the Firebase modular SDK from CDN (no bundler).
  *
  * Document path: progress/{uid} — one JSON progress payload per Google account.
@@ -53,7 +53,7 @@ function ensureInit() {
     db = getFirestore(app);
     return true;
   } catch (err) {
-    console.warn("Ellie cloud sync: Firebase init failed", err);
+    console.warn("Cloud sync: Firebase init failed", err);
     app = null;
     auth = null;
     db = null;
