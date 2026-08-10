@@ -2906,7 +2906,7 @@
       case "vowels":
         return "Vowel words. Same letters, new vowel. Tap a, e, i, o, or u to change the middle letter. Tap the word to hear it. Then say it.";
       case "flashcards":
-        return "Story words. Tap the big word to hear it. Tap I know it when you can read it. Use Next for another word.";
+        return "Story words. Tap the big word to hear it. Double-tap or tap Sound it out to blend the letters. Tap I know it when you can read it.";
       case "stories":
         return "Stories. Pick Easy or Longer, then pick a First Words or Fables tale. Look at the picture, or tap Read aloud.";
       case "story": {
@@ -3107,20 +3107,35 @@
     els.storyBlendModal.hidden = false;
   }
 
-  function openStoryWordBlend(wordEl) {
-    const toSpeak = wordForSpeech(wordEl && wordEl.textContent);
+  function openWordBlend(rawWord, opts) {
+    const toSpeak = wordForSpeech(rawWord);
     if (!toSpeak || !els.storyBlendModal) return;
     if (storyReading) stopStoryReading({ skipRestore: true });
 
     document.querySelectorAll(".story-word.is-blend-target").forEach((el) => {
       el.classList.remove("is-blend-target");
     });
-    wordEl.classList.add("is-blend-target");
+    const targetEl = opts && opts.targetEl;
+    if (targetEl && targetEl.classList) {
+      targetEl.classList.add("is-blend-target");
+    }
 
     const entry = entryForStoryWord(toSpeak);
     storyBlendEntry = entry;
     renderStoryBlendUI(entry);
-    speakText(toSpeak);
+    if (!(opts && opts.silent)) speakText(toSpeak);
+  }
+
+  function openStoryWordBlend(wordEl) {
+    if (!wordEl) return;
+    openWordBlend(wordEl.textContent, { targetEl: wordEl });
+  }
+
+  function openFlashcardWordBlend() {
+    const entry = getFlashcardEntry(state.flashcardWordIndex);
+    const word = entry && (entry.word || entry.display);
+    if (!word) return;
+    openWordBlend(word, { targetEl: els.flashcardWordTitle || null });
   }
 
   function loadVoices() {
@@ -5533,13 +5548,51 @@
       });
     }
     if (els.flashcardWordTitle) {
+      let flashcardLongTimer = null;
+      let flashcardIgnoreClick = false;
+      const clearFlashcardLong = () => {
+        if (flashcardLongTimer) {
+          clearTimeout(flashcardLongTimer);
+          flashcardLongTimer = null;
+        }
+      };
+      els.flashcardWordTitle.addEventListener("pointerdown", (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        flashcardIgnoreClick = false;
+        clearFlashcardLong();
+        flashcardLongTimer = setTimeout(() => {
+          flashcardLongTimer = null;
+          flashcardIgnoreClick = true;
+          openFlashcardWordBlend();
+        }, 480);
+      });
+      els.flashcardWordTitle.addEventListener("pointerup", clearFlashcardLong);
+      els.flashcardWordTitle.addEventListener("pointercancel", clearFlashcardLong);
       els.flashcardWordTitle.addEventListener("click", () => {
+        if (flashcardIgnoreClick) {
+          flashcardIgnoreClick = false;
+          return;
+        }
         hearCurrentFlashcard();
+      });
+      els.flashcardWordTitle.addEventListener("dblclick", (e) => {
+        e.preventDefault();
+        clearFlashcardLong();
+        flashcardIgnoreClick = true;
+        openFlashcardWordBlend();
+      });
+      els.flashcardWordTitle.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
       });
     }
     if (els.flashcardHearBtn) {
       els.flashcardHearBtn.addEventListener("click", () => {
         hearCurrentFlashcard();
+      });
+    }
+    if (els.flashcardBlendBtn) {
+      els.flashcardBlendBtn.addEventListener("click", () => {
+        openFlashcardWordBlend();
       });
     }
     if (els.flashcardKnowBtn) {
@@ -5705,6 +5758,7 @@
     els.flashcardWordTitle = $("flashcardWordTitle");
     els.flashcardWordProgress = $("flashcardWordProgress");
     els.flashcardHearBtn = $("flashcardHearBtn");
+    els.flashcardBlendBtn = $("flashcardBlendBtn");
     els.flashcardKnowBtn = $("flashcardKnowBtn");
     els.prevFlashcard = $("prevFlashcard");
     els.nextFlashcard = $("nextFlashcard");
