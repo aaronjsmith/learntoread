@@ -69,11 +69,12 @@
       gap: 0;
       flex-shrink: 0;
       padding: 8px 14px 10px;
-      background: rgba(255, 255, 255, 0.82);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(10px);
       border-bottom: 3px solid rgba(255, 107, 138, 0.18);
       position: relative;
-      z-index: 10;
+      z-index: 40;
+      isolation: isolate;
     }
 
     .brand {
@@ -1911,6 +1912,30 @@
 
     .section-report--flashcards h3 {
       color: #3a86c8;
+    }
+
+
+    .section-report--report {
+      border-color: #ffe0e8;
+      box-shadow: 0 5px 0 rgba(255, 107, 138, 0.14);
+    }
+
+    button.section-report--report:hover,
+    button.section-report--report:active {
+      background: #fff8fa;
+    }
+
+    button.section-report--report:hover {
+      border-color: var(--accent);
+      box-shadow: 0 7px 0 rgba(255, 107, 138, 0.18);
+    }
+
+    button.section-report--report:active {
+      box-shadow: 0 3px 0 rgba(255, 107, 138, 0.14);
+    }
+
+    .section-report--report h3 {
+      color: var(--accent-dark);
     }
 
     .section-report--vowels {
