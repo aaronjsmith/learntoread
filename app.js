@@ -1307,7 +1307,6 @@
     }
 
     stopSayWordListening();
-    setEllieMood("");
     if (!keepStatus) {
       clearHeardText(els.vowelSayHeard, "Tap the mic and say the word");
     }
